@@ -2,10 +2,14 @@
 
 This is the **frontend repo** for the QR Feedback System. It is its own git repository, separate from the backend repo (`../backend`). See `../CLAUDE.md` (root) for the full business context, requirements, and day-by-day project plan.
 
+**Tech stack locked 2026-07-23.**
+
 ## Tech Stack
 - **Framework:** Next.js + TypeScript + Tailwind CSS
 - **Auth:** Supabase Auth (session handling, protected routes)
-- **API:** Calls the FastAPI backend (`NEXT_PUBLIC_API_BASE_URL`)
+- **API:** Calls the NestJS backend (`NEXT_PUBLIC_API_BASE_URL`)
+- **Media:** Cloudinary (upload widget or signed upload, per Open Decision #6 in root doc)
+- **Deployment:** Vercel
 
 ## Two Distinct Surfaces in This Repo
 1. **Admin Portal** (`/admin` or similar) — internal dashboard for the client's team (including a non-technical VA). Login required. Client/site CRUD, CSV bulk upload UI, QR preview/download, deactivate/delete flows.
