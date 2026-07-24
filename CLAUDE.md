@@ -1,6 +1,6 @@
 # Frontend — QR Feedback System (Next.js Admin Portal + Public Form)
 
-This is the **frontend repo** for the QR Feedback System. It is its own git repository, separate from the backend repo (`../backend`). See `../CLAUDE.md` (root) for the full business context, requirements, and day-by-day project plan.
+This is the **frontend repo** for the QR Feedback System. It is its own git repository, separate from the backend repo (`../QRcode-system-backend`). See `../../CLAUDE.md` (root) for the full business context, requirements, and day-by-day project plan.
 
 **Tech stack locked 2026-07-23.**
 
