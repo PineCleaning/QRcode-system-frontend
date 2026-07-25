@@ -12,12 +12,11 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* This admin UI is explicitly light-themed throughout (bg-white,
+   text-gray-900, etc.) - it doesn't adapt to OS dark mode. An earlier
+   prefers-color-scheme override here flipped body text to near-white,
+   which made form inputs (no explicit text color of their own)
+   invisible against their white background. */
 
 body {
   background: var(--background);
