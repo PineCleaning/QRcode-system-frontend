@@ -1,7 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PUBLIC_PATHS = ['/login'];
+// Everything under these prefixes requires an admin session. Everything
+// else - "/", "/login", and any "/{slug}" (the public feedback form) -
+// is public by design, not "public because we forgot to protect it".
+const PROTECTED_PREFIXES = ['/clients'];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -24,9 +27,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isPublicPath = PUBLIC_PATHS.some((path) => request.nextUrl.pathname.startsWith(path));
+  const isProtectedPath = PROTECTED_PREFIXES.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 
-  if (!user && !isPublicPath) {
+  if (!user && isProtectedPath) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/login';
     return NextResponse.redirect(loginUrl);
