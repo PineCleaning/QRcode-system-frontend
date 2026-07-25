@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { uploadToCloudinary } from '@/lib/api/cloudinary-upload';
 import type { FeedbackMediaInput, SignedUploadParams } from '@/lib/api/public-types';
+import { BrandHeader } from './BrandHeader';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const MAX_FILES = 5;
@@ -21,6 +22,7 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(e.target.files ?? []);
@@ -89,31 +91,34 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
     }
   }
 
+  const isBusy = status === 'uploading' || status === 'submitting';
+
   if (status === 'success') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8">
-        <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
-          <h1 className="text-lg font-semibold text-gray-900">Thank you!</h1>
-          <p className="mt-2 text-sm text-gray-500">Your feedback has been received.</p>
+      <div className="min-h-screen bg-gray-100 px-4 pb-12">
+        <BrandHeader />
+        <div className="mx-auto w-full max-w-lg rounded-md border border-gray-300 bg-white p-6 text-center shadow-sm">
+          <h1 className="text-xl font-bold text-slate-800">Thank you!</h1>
+          <p className="mt-2 text-sm text-gray-600">Your feedback has been received.</p>
         </div>
       </div>
     );
   }
 
-  const isBusy = status === 'uploading' || status === 'submitting';
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8">
-      <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="mb-6 text-center">
-          <h1 className="text-lg font-semibold text-gray-900">{clientName}</h1>
+    <div className="min-h-screen bg-gray-100 px-4 pb-12">
+      <BrandHeader />
+
+      <div className="mx-auto w-full max-w-lg rounded-md border border-gray-300 bg-white p-6 shadow-sm sm:p-8">
+        <div className="mb-6">
+          <p className="text-lg font-bold text-slate-800">{clientName}</p>
           <p className="text-sm text-gray-500">{siteName}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="feedback" className="mb-1 block text-sm font-medium text-gray-700">
-              Your feedback
+            <label htmlFor="feedback" className="mb-2 block text-base font-bold text-slate-800">
+              Feedback: <span className="text-red-600">*</span>
             </label>
             <textarea
               id="feedback"
@@ -121,48 +126,82 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
               onChange={(e) => setFeedback(e.target.value)}
               required
               maxLength={5000}
-              rows={5}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-base focus:border-gray-500 focus:outline-none"
+              rows={6}
+              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-blue-600 focus:outline-none"
             />
           </div>
 
           <div>
-            <label htmlFor="mobileNumber" className="mb-1 block text-sm font-medium text-gray-700">
-              Mobile number <span className="text-gray-400">(optional)</span>
+            <label htmlFor="mobileNumber" className="mb-2 block text-base font-bold text-slate-800">
+              Mobile Number <span className="font-normal text-gray-500">(optional)</span>
             </label>
             <input
               id="mobileNumber"
               type="tel"
               value={mobileNumber}
               onChange={(e) => setMobileNumber(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-base focus:border-gray-500 focus:outline-none"
+              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-blue-600 focus:outline-none"
             />
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-800">
+              This lets us send you a text update
+            </p>
           </div>
 
           <div>
-            <label htmlFor="media" className="mb-1 block text-sm font-medium text-gray-700">
-              Photo/video <span className="text-gray-400">(optional, up to {MAX_FILES})</span>
+            <label className="mb-2 block text-base font-bold text-slate-800">
+              Upload File / Image <span className="font-normal text-gray-500">(optional, up to {MAX_FILES})</span>
             </label>
             <input
-              id="media"
+              ref={fileInputRef}
               type="file"
               accept="image/*,video/*"
               multiple
               onChange={handleFilesSelected}
-              className="w-full text-sm"
+              className="hidden"
             />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex w-full flex-col items-center justify-center rounded border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center hover:border-blue-500 hover:bg-blue-50"
+            >
+              <svg
+                className="mb-2 h-8 w-8 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
+                />
+              </svg>
+              <span className="text-base font-bold text-slate-800">Browse Files</span>
+              <span className="mt-1 text-sm text-gray-500">
+                {files.length > 0 ? `${files.length} file${files.length > 1 ? 's' : ''} chosen` : 'Choose a file'}
+              </span>
+            </button>
+
             {files.map((file) => (
               <div key={file.name} className="mt-2">
                 <div className="flex justify-between text-xs text-gray-500">
                   <span className="truncate">{file.name}</span>
-                  <span>{progress[file.name] ?? 0}%</span>
+                  {/* Only show a percentage once the upload has actually
+                      started (status 'uploading') - otherwise a freshly
+                      selected file always reads "0%", which looks stuck
+                      even though nothing has happened yet (upload only
+                      begins on Submit). */}
+                  {status === 'uploading' && <span>{progress[file.name] ?? 0}%</span>}
                 </div>
-                <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                  <div
-                    className="h-full bg-gray-900 transition-all"
-                    style={{ width: `${progress[file.name] ?? 0}%` }}
-                  />
-                </div>
+                {status === 'uploading' && (
+                  <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                    <div
+                      className="h-full bg-blue-700 transition-all"
+                      style={{ width: `${progress[file.name] ?? 0}%` }}
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -172,9 +211,9 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
           <button
             type="submit"
             disabled={isBusy}
-            className="w-full rounded-md bg-gray-900 px-3 py-3 text-base font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+            className="w-full rounded-md bg-blue-700 px-3 py-3 text-base font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
           >
-            {status === 'uploading' ? 'Uploading…' : status === 'submitting' ? 'Submitting…' : 'Submit feedback'}
+            {status === 'uploading' ? 'Uploading…' : status === 'submitting' ? 'Submitting…' : 'Submit'}
           </button>
         </form>
       </div>
