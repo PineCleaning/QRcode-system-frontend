@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api/server-fetch';
-import type { FeedbackSubmission, Site } from '@/lib/api/types';
+import type { Client, FeedbackSubmission, Site } from '@/lib/api/types';
 
 const STATUS_STYLES: Record<string, string> = {
   DELIVERED: 'bg-green-100 text-green-700',
@@ -26,19 +26,33 @@ export default async function SiteFeedbackPage({
   params: Promise<{ id: string; siteId: string }>;
 }) {
   const { id, siteId } = await params;
-  const [site, feedback] = await Promise.all([
+  const [client, site, feedback] = await Promise.all([
+    apiFetch<Client>(`/clients/${id}`),
     apiFetch<Site>(`/sites/${siteId}`),
     apiFetch<FeedbackSubmission[]>(`/sites/${siteId}/feedback`),
   ]);
 
   return (
     <div>
-      <div className="mb-6">
-        <Link prefetch={false} href={`/clients/${id}`} className="text-sm text-gray-500 hover:underline">
-          ← {site.siteName}
-        </Link>
-        <h1 className="mt-1 text-xl font-semibold text-gray-900">Feedback — {site.siteName}</h1>
-        <p className="text-sm text-gray-500">{site.slug}</p>
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 sm:px-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-xl font-bold text-gray-900">Feedback</h1>
+          <span className="rounded-full bg-gray-900 px-2.5 py-0.5 text-xs font-semibold text-white">
+            {feedback.length}
+          </span>
+        </div>
+        <nav className="mt-1 flex flex-wrap items-center gap-1 text-sm text-gray-500">
+          <Link prefetch={false} href="/clients" className="hover:underline">
+            Clients
+          </Link>
+          <span>/</span>
+          <Link prefetch={false} href={`/clients/${id}`} className="hover:underline">
+            {client.name}
+          </Link>
+          <span>/</span>
+          <span className="text-gray-700">{site.siteName}</span>
+        </nav>
+        <p className="mt-1 text-xs text-gray-400">{site.slug}</p>
       </div>
 
       {feedback.length === 0 ? (
@@ -64,42 +78,61 @@ export default async function SiteFeedbackPage({
                   <td className="max-w-md px-4 py-3 text-gray-900">
                     <p className="whitespace-pre-wrap">{item.feedback}</p>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-gray-500">{item.mobileNumber ?? '—'}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-gray-500">
+                    {item.mobileNumber ?? <span className="text-xs italic text-gray-400">Not provided</span>}
+                  </td>
                   <td className="px-4 py-3">
                     {item.media.length === 0 ? (
-                      <span className="text-gray-400">—</span>
+                      <span className="text-xs italic text-gray-400">No attachments</span>
                     ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {item.media.map((mediaItem) =>
-                          mediaItem.url ? (
+                      <div className="flex flex-col gap-1">
+                        {item.media.map((mediaItem) => {
+                          const label =
+                            mediaItem.originalFilename || (mediaItem.resourceType === 'IMAGE' ? 'Photo' : 'Video');
+                          const icon =
                             mediaItem.resourceType === 'IMAGE' ? (
-                              <a key={mediaItem.id} href={mediaItem.url} target="_blank" rel="noreferrer">
-                                <img
-                                  src={mediaItem.url}
-                                  alt={mediaItem.originalFilename ?? 'Feedback attachment'}
-                                  className="h-12 w-12 rounded-md border border-gray-200 object-cover"
+                              <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M2.25 15.75 8.69 9.31a1.125 1.125 0 0 1 1.591 0L15.75 15m-2.25-2.25 1.72-1.72a1.125 1.125 0 0 1 1.591 0L21.75 15m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6.75a1.5 1.5 0 0 0-1.5-1.5H3.75a1.5 1.5 0 0 0-1.5 1.5v10.5a1.5 1.5 0 0 0 1.5 1.5Z"
                                 />
-                              </a>
+                              </svg>
                             ) : (
+                              <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="m15.75 10.5 4.72-2.72a.75.75 0 0 1 1.28.53v7.38a.75.75 0 0 1-1.28.53l-4.72-2.72M4.5 18.75h9a1.5 1.5 0 0 0 1.5-1.5v-9a1.5 1.5 0 0 0-1.5-1.5h-9a1.5 1.5 0 0 0-1.5 1.5v9a1.5 1.5 0 0 0 1.5 1.5Z"
+                                />
+                              </svg>
+                            );
+
+                          if (mediaItem.url) {
+                            return (
                               <a
                                 key={mediaItem.id}
                                 href={mediaItem.url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 text-[10px] text-blue-600 hover:underline"
+                                className="flex max-w-[180px] items-center gap-1.5 text-blue-600 hover:underline"
                               >
-                                Video
+                                {icon}
+                                <span className="truncate">{label}</span>
                               </a>
-                            )
-                          ) : (
-                            <span
-                              key={mediaItem.id}
-                              className="flex h-12 w-12 items-center justify-center rounded-md border border-dashed border-gray-300 text-center text-[9px] text-gray-400"
-                            >
-                              {mediaItem.status === 'REJECTED' ? 'Rejected' : 'Unavailable'}
+                            );
+                          }
+
+                          return (
+                            <span key={mediaItem.id} className="flex max-w-[180px] items-center gap-1.5 text-gray-400">
+                              {icon}
+                              <span className="truncate">{label}</span>
+                              <span className="shrink-0 text-[10px] text-red-500">
+                                ({mediaItem.status === 'REJECTED' ? 'Rejected' : 'Unavailable'})
+                              </span>
                             </span>
-                          ),
-                        )}
+                          );
+                        })}
                       </div>
                     )}
                   </td>
