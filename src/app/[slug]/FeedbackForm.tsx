@@ -29,6 +29,29 @@ function formatMb(bytes: number): string {
   return `${Math.round(bytes / (1024 * 1024))}MB`;
 }
 
+/**
+ * crypto.randomUUID() only exists in a secure context (HTTPS, or
+ * specifically "localhost") - it's undefined on a plain-HTTP LAN address
+ * like http://192.168.x.x, which is exactly how this form gets tested on
+ * a real phone during local development. Calling the missing function
+ * threw during the very first render, crashing hydration for this whole
+ * component silently - the file picker and submit handler stopped
+ * working with no visible error, while the native text input kept
+ * working since that's plain browser behavior, not React. Production
+ * (Vercel, real HTTPS) won't hit this, but falling back keeps local
+ * phone testing - and any old/unusual browser - working too.
+ */
+function generateIdempotencyKey(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 type Status = 'idle' | 'uploading' | 'submitting' | 'success' | 'error';
 
 interface SubmitResponseMedia {
@@ -43,7 +66,7 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
   // Generated once per form load - reused on every retry, so a retry
   // after a network error is a safe idempotent replay, not a
   // duplicate submission.
-  const [idempotencyKey] = useState(() => crypto.randomUUID());
+  const [idempotencyKey] = useState(() => generateIdempotencyKey());
 
   const [feedback, setFeedback] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
