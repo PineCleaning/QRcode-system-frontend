@@ -10,7 +10,7 @@ export default async function EditSitePage({ params }: { params: Promise<{ id: s
   return (
     <div>
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Edit site</h1>
-      <SiteForm site={site} action={updateSiteAction.bind(null, siteId, id)} />
+      <SiteForm site={site} action={updateSiteAction.bind(null, siteId, id)} cancelHref={`/clients/${id}`} />
     </div>
   );
 }

@@ -10,7 +10,7 @@ export default async function EditClientPage({ params }: { params: Promise<{ id:
   return (
     <div>
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Edit client</h1>
-      <ClientForm client={client} action={updateClientAction.bind(null, id)} />
+      <ClientForm client={client} action={updateClientAction.bind(null, id)} cancelHref="/clients" />
     </div>
   );
 }

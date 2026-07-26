@@ -1,11 +1,20 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState } from 'react';
 import type { Site } from '@/lib/api/types';
 
 type FormAction = (prevState: string | null, formData: FormData) => Promise<string | null>;
 
-export function SiteForm({ site, action }: { site?: Site; action: FormAction }) {
+export function SiteForm({
+  site,
+  action,
+  cancelHref,
+}: {
+  site?: Site;
+  action: FormAction;
+  cancelHref: string;
+}) {
   const [error, formAction, isPending] = useActionState(action, null);
   const isEdit = Boolean(site);
 
@@ -61,13 +70,22 @@ export function SiteForm({ site, action }: { site?: Site; action: FormAction }) 
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
-      >
-        {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Add site'}
-      </button>
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        >
+          {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Add site'}
+        </button>
+        <Link
+          prefetch={false}
+          href={cancelHref}
+          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Cancel
+        </Link>
+      </div>
     </form>
   );
 }

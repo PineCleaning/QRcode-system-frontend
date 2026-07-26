@@ -90,6 +90,13 @@ export default async function ClientDetailPage({
             </div>
 
             <div className="mt-3 flex justify-center gap-3 text-xs">
+              <Link
+                prefetch={false}
+                href={`/clients/${id}/sites/${site.id}/feedback`}
+                className="text-gray-600 hover:underline"
+              >
+                Feedback
+              </Link>
               <Link prefetch={false} href={`/clients/${id}/sites/${site.id}/edit`} className="text-gray-600 hover:underline">
                 Edit
               </Link>
