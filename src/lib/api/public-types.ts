@@ -10,6 +10,8 @@ export interface SignedUploadParams {
   apiKey: string;
   cloudName: string;
   folder?: string;
+  /** Must be sent back to Cloudinary unmodified - it was part of what the backend signed. */
+  allowedFormats: string;
 }
 
 export interface FeedbackMediaInput {

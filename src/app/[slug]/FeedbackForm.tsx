@@ -8,7 +8,36 @@ import { BrandHeader } from './BrandHeader';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const MAX_FILES = 5;
 
+// Mirrors backend/src/cloudinary/media-limits.ts - kept in sync manually
+// since the two apps don't share code. The backend re-checks all of this
+// against the real uploaded file regardless (verifyResource), so this
+// copy only affects UX (catching mistakes before a slow mobile upload),
+// never security.
+const ALLOWED_IMAGE_EXT = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'];
+const ALLOWED_VIDEO_EXT = ['mp4', 'mov', 'webm'];
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+const MAX_TOTAL_BYTES = 60 * 1024 * 1024;
+const MAX_VIDEOS = 1;
+
+function extOf(filename: string): string {
+  const parts = filename.split('.');
+  return parts.length > 1 ? (parts.pop() ?? '').toLowerCase() : '';
+}
+
+function formatMb(bytes: number): string {
+  return `${Math.round(bytes / (1024 * 1024))}MB`;
+}
+
 type Status = 'idle' | 'uploading' | 'submitting' | 'success' | 'error';
+
+interface SubmitResponseMedia {
+  status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  rejectionReason?: string | null;
+}
+interface SubmitResponse {
+  media?: SubmitResponseMedia[];
+}
 
 export function FeedbackForm({ slug, siteName, clientName }: { slug: string; siteName: string; clientName: string }) {
   // Generated once per form load - reused on every retry, so a retry
@@ -22,16 +51,68 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [rejectedNotes, setRejectedNotes] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  /** Returns an error message if the combined file list breaks a limit, or null if it's fine. */
+  function validateFiles(list: File[]): string | null {
+    if (list.length > MAX_FILES) {
+      return `You can attach up to ${MAX_FILES} files.`;
+    }
+
+    let videoCount = 0;
+    let total = 0;
+    for (const file of list) {
+      const ext = extOf(file.name);
+      const isImage = ALLOWED_IMAGE_EXT.includes(ext);
+      const isVideo = ALLOWED_VIDEO_EXT.includes(ext);
+
+      if (!isImage && !isVideo) {
+        return `"${file.name}" isn't a supported file type. Use JPEG, PNG, WebP, or HEIC/HEIF photos, or MP4, MOV, or WebM video.`;
+      }
+      if (isImage && file.size > MAX_IMAGE_BYTES) {
+        return `"${file.name}" is too large. Photos must be ${formatMb(MAX_IMAGE_BYTES)} or smaller.`;
+      }
+      if (isVideo) {
+        videoCount += 1;
+        if (file.size > MAX_VIDEO_BYTES) {
+          return `"${file.name}" is too large. Videos must be ${formatMb(MAX_VIDEO_BYTES)} or smaller.`;
+        }
+      }
+      total += file.size;
+    }
+    if (videoCount > MAX_VIDEOS) {
+      return 'Only one video can be attached per submission.';
+    }
+    if (total > MAX_TOTAL_BYTES) {
+      return `These attachments add up to more than ${formatMb(MAX_TOTAL_BYTES)} total. Please remove one or choose smaller files.`;
+    }
+    return null;
+  }
+
   function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
-    const selected = Array.from(e.target.files ?? []);
-    if (selected.length > MAX_FILES) {
-      setError(`You can attach up to ${MAX_FILES} files.`);
+    const newlySelected = Array.from(e.target.files ?? []);
+    // The native file input replaces its selection on every dialog open,
+    // not adds to it - reset it here so re-selecting the same file later
+    // still fires onChange, and merge into the existing list ourselves
+    // so browsing multiple times (e.g. a video, then a photo) accumulates
+    // instead of the second selection wiping out the first.
+    e.target.value = '';
+
+    const combined = [...files, ...newlySelected];
+    const validationError = validateFiles(combined);
+    if (validationError) {
+      setError(validationError);
       return;
     }
+
     setError(null);
-    setFiles(selected);
+    setFiles(combined);
+  }
+
+  function removeFile(index: number) {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setError(null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -78,11 +159,22 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
         }),
       });
 
+      const feedbackBody = await feedbackRes.json().catch(() => null);
+
       if (!feedbackRes.ok) {
-        const body = await feedbackRes.json().catch(() => null);
-        const message = body?.message;
+        const message = feedbackBody?.message;
         throw new Error(Array.isArray(message) ? message.join(', ') : message || 'Something went wrong. Please try again.');
       }
+
+      // Individual bad attachments never fail the whole submission (the
+      // feedback itself is already saved) - but a customer standing at a
+      // job site deserves to know if a photo didn't make it through,
+      // rather than assuming it did.
+      const body = feedbackBody as SubmitResponse;
+      const rejected = (body?.media ?? [])
+        .filter((m) => m.status === 'REJECTED')
+        .map((m) => m.rejectionReason ?? 'One attachment could not be included.');
+      setRejectedNotes(rejected);
 
       setStatus('success');
     } catch (err) {
@@ -100,6 +192,16 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
         <div className="mx-auto w-full max-w-lg rounded-md border border-gray-300 bg-white p-6 text-center shadow-sm">
           <h1 className="text-xl font-bold text-slate-800">Thank you!</h1>
           <p className="mt-2 text-sm text-gray-600">Your feedback has been received.</p>
+          {rejectedNotes.length > 0 && (
+            <div className="mt-4 rounded-md bg-yellow-50 p-3 text-left text-xs text-yellow-800">
+              <p className="font-semibold">Your feedback was submitted, but not every attachment could be included:</p>
+              <ul className="mt-1 list-disc pl-4">
+                {rejectedNotes.map((note, i) => (
+                  <li key={i}>{note}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -154,7 +256,7 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*,video/*"
+              accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/quicktime,video/webm"
               multiple
               onChange={handleFilesSelected}
               className="hidden"
@@ -183,16 +285,28 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
               </span>
             </button>
 
-            {files.map((file) => (
-              <div key={file.name} className="mt-2">
-                <div className="flex justify-between text-xs text-gray-500">
+            {files.map((file, index) => (
+              <div key={`${file.name}-${index}`} className="mt-2">
+                <div className="flex justify-between gap-2 text-xs text-gray-500">
                   <span className="truncate">{file.name}</span>
-                  {/* Only show a percentage once the upload has actually
-                      started (status 'uploading') - otherwise a freshly
-                      selected file always reads "0%", which looks stuck
-                      even though nothing has happened yet (upload only
-                      begins on Submit). */}
-                  {status === 'uploading' && <span>{progress[file.name] ?? 0}%</span>}
+                  <div className="flex shrink-0 items-center gap-2">
+                    {/* Only show a percentage once the upload has actually
+                        started (status 'uploading') - otherwise a freshly
+                        selected file always reads "0%", which looks stuck
+                        even though nothing has happened yet (upload only
+                        begins on Submit). */}
+                    {status === 'uploading' && <span>{progress[file.name] ?? 0}%</span>}
+                    {!isBusy && (
+                      <button
+                        type="button"
+                        onClick={() => removeFile(index)}
+                        aria-label={`Remove ${file.name}`}
+                        className="text-gray-400 hover:text-red-600"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 </div>
                 {status === 'uploading' && (
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">

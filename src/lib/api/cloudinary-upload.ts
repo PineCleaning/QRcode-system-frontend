@@ -27,6 +27,7 @@ export function uploadToCloudinary(
     form.append('api_key', sig.apiKey);
     form.append('timestamp', String(sig.timestamp));
     form.append('signature', sig.signature);
+    form.append('allowed_formats', sig.allowedFormats);
     if (sig.folder) form.append('folder', sig.folder);
 
     const xhr = new XMLHttpRequest();
