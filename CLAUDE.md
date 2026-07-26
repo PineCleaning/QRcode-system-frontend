@@ -12,7 +12,7 @@ This is the **frontend repo** for the QR Feedback System. It is its own git repo
 - **Deployment:** Vercel
 
 ## Two Distinct Surfaces in This Repo
-1. **Admin Portal** (`/clients`, `/login`, etc.) — internal dashboard for the client's team (including a non-technical VA). Login required. Client/site CRUD, CSV bulk upload UI, QR preview/download, deactivate/delete flows. **Login + client/site CRUD + QR preview/download are built** (Phase A, see below) — CSV bulk upload UI and deactivate/delete *confirmation modals* are still pending (delete currently works but with no confirmation step yet).
+1. **Admin Portal** (`/clients`, `/login`, etc.) — internal dashboard for the client's team (including a non-technical VA). Login required. Client/site CRUD, CSV bulk upload UI, QR preview/download, deactivate/delete flows. **Login + client/site CRUD + QR preview/download + delete confirmation modals are built** (Phase A + Day 3 Hr 7, see below) — CSV bulk upload UI is still pending (Phase C, paused — see root `CLAUDE.md` for why).
 2. **Public Feedback Form** (`/{slug}`) — the page a customer lands on after scanning a QR code. No login. Auto-populates business/site name from the slug, collects feedback text + optional mobile number + photo/video upload. **Built 2026-07-25** (Day 4 Hr 1–4; Hr 6/8 hardening still pending) — see below.
 
 ## Dev Server Port
@@ -52,6 +52,16 @@ Built as one combined session since they're tightly coupled (nothing else works 
 4. **Dark-mode CSS var flip made form input text invisible.** `globals.css`'s scaffold-default `@media (prefers-color-scheme: dark)` block flipped the body's text color to near-white; form inputs have no explicit text color of their own, so on a white input background under a dark-mode browser/OS, typed text was white-on-white (invisible). Fixed by removing the dark-mode override entirely — this admin UI is explicitly light-themed throughout (`bg-white`, `text-gray-900`, etc. everywhere), it was never meant to adapt to OS dark mode, so the override was pure liability with no working dark theme behind it anyway.
 
 Verified end-to-end in a real browser 2026-07-25 (screenshots reviewed): login page renders with visible text, sign-in works, client list shows created clients, client detail page renders a real scannable QR code plus all three download links, edit/delete work, sign-out returns to `/login`.
+
+## Delete Confirmation Modals (Day 3 Hr 7 — implemented 2026-07-26)
+
+`src/components/ConfirmDeleteButton.tsx` — used on both the clients list (delete client) and the client detail page (delete site). Previously, "Delete" submitted a plain form immediately with no confirmation step.
+
+- Server Actions can be called **directly as functions** from a Client Component, not just via `<form action={...}>` — that's what makes this component possible. `handleConfirm` calls the bound action (e.g. `deleteClientAction.bind(null, client.id)`) inside `useTransition`, which gives a real pending state ("Deleting…") for the confirm button while the action runs.
+- The modal shows a **dynamic warning** when relevant, not just a generic "are you sure": deleting a client with sites shows the site count and a note that deletion will fail if any site has feedback history; deleting a site shows the same feedback-history caveat. This directly reflects the `ON DELETE RESTRICT` behavior already built and verified in the backend (Day 1 Hr 7/8) — the modal is explaining real backend behavior, not inventing a generic disclaimer.
+- **Deliberately scoped to Delete only, not "Deactivate."** The roadmap's Day 3 Hr 7 wording bundles "Deactivate/Delete confirmation modals" together, but deactivating happens through the Edit form's status dropdown (open edit page → change status → Save) — that multi-step flow is already a deliberate action with its own friction, so no separate confirmation modal was added for it. Delete is the one that's actually a quick single click with no undo, which is what a confirmation step is for.
+
+Structurally verified (build + page load), same limitation as other client-interactivity features (Server Actions, click-through flows) — the actual open/cancel/confirm click sequence needs a real browser to confirm.
 
 ## Public Feedback Form (Day 4 Hr 1–4 — implemented 2026-07-25; Hr 6/8 hardening still pending)
 

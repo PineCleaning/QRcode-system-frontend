@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client } from '@/lib/api/types';
 import { deleteClientAction } from './actions';
@@ -67,11 +68,15 @@ export default async function ClientsPage({
                   <Link prefetch={false} href={`/clients/${client.id}/edit`} className="mr-3 text-gray-600 hover:underline">
                     Edit
                   </Link>
-                  <form action={deleteClientAction.bind(null, client.id)} className="inline">
-                    <button type="submit" className="text-red-600 hover:underline">
-                      Delete
-                    </button>
-                  </form>
+                  <ConfirmDeleteButton
+                    action={deleteClientAction.bind(null, client.id)}
+                    itemLabel={client.name}
+                    warning={
+                      client._count.sites > 0
+                        ? `This client has ${client._count.sites} site(s) — deletion will fail if any of them have feedback history. Deactivate instead if you're not sure.`
+                        : undefined
+                    }
+                  />
                 </td>
               </tr>
             ))}
