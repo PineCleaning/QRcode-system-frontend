@@ -63,6 +63,16 @@ Verified end-to-end in a real browser 2026-07-25 (screenshots reviewed): login p
 
 Structurally verified (build + page load), same limitation as other client-interactivity features (Server Actions, click-through flows) — the actual open/cancel/confirm click sequence needs a real browser to confirm.
 
+## Admin Dashboard Responsive Polish (Day 3 Hr 8 — implemented 2026-07-26)
+
+The sidebar had no mobile handling at all before this — a fixed `w-56` persistent `<aside>` with no breakpoint logic, which would squeeze page content on any narrow viewport.
+
+- **`src/app/(dashboard)/DashboardNav.tsx`** — replaces the sidebar markup that used to live directly in `layout.tsx`. Below the `md` breakpoint: a slim top bar with a hamburger button that opens a slide-in drawer (backdrop + `Escape`-free close-on-backdrop-click) containing the same nav links. At `md` and above: the original persistent sidebar, unchanged in appearance. `NavLinks` is a single shared sub-component rendered in both places so the drawer and the desktop sidebar can't drift out of sync with each other.
+- Clients list table wrapped in `overflow-x-auto` with `min-w-[640px]` on the table itself, so it scrolls horizontally on narrow screens instead of squeezing columns unreadably — a `<table>` genuinely can't reflow into a mobile-friendly shape without becoming a different UI entirely, and horizontal scroll is the standard, low-risk fix.
+- Page header rows (clients list toolbar, client detail header, sites section header) changed from a fixed `flex justify-between` to `flex-col gap-3 sm:flex-row sm:justify-between` — stacks vertically on mobile instead of cramping a long client name against an action button.
+
+**A note on debugging this while live-testing:** partway through testing, the user hit a Next.js dev-overlay error ("An unexpected response was received from the server," flagged `(stale)` in the dev overlay) after clicking through the new hamburger menu. This was **not a real bug** — it was a stale-bundle artifact from the dev server having been restarted several times during the session while an old browser tab stayed open, referencing a Server Action ID from a prior server process. Confirmed by closing the tab, opening a fresh one, and reproducing the exact same flow successfully. If this resurfaces during future dev sessions after a server restart, a full tab close-and-reopen (not just a refresh) is the fix — not a code investigation.
+
 ## Public Feedback Form (Day 4 Hr 1–4 — implemented 2026-07-25; Hr 6/8 hardening still pending)
 
 - **`src/lib/supabase/middleware.ts` protection model inverted.** Previously "public unless in `PUBLIC_PATHS`" (just `/login`); now "protected only under `PROTECTED_PREFIXES`" (just `/clients`). This had to change the moment a second public surface (`/{slug}`, dynamic, can't be listed as a fixed path) existed — the old allowlist model doesn't work for a route that isn't a fixed string. `/`, `/login`, and every `/{slug}` are public by design now, not "public because nobody protected them."

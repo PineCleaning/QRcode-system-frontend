@@ -14,12 +14,12 @@ export default async function ClientsPage({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-semibold text-gray-900">Clients</h1>
         <Link
           prefetch={false}
           href="/clients/new"
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="inline-block rounded-md bg-gray-900 px-4 py-2 text-center text-sm font-medium text-white hover:bg-gray-800"
         >
           Add client
         </Link>
@@ -27,14 +27,14 @@ export default async function ClientsPage({
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+        <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Client code</th>
-              <th className="px-4 py-3">Sites</th>
-              <th className="px-4 py-3">Status</th>
+              <th className="whitespace-nowrap px-4 py-3">Name</th>
+              <th className="whitespace-nowrap px-4 py-3">Client code</th>
+              <th className="whitespace-nowrap px-4 py-3">Sites</th>
+              <th className="whitespace-nowrap px-4 py-3">Status</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>

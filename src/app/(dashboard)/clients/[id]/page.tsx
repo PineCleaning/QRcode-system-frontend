@@ -20,12 +20,12 @@ export default async function ClientDetailPage({
 
   return (
     <div>
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <Link prefetch={false} href="/clients" className="text-sm text-gray-500 hover:underline">
             ← Clients
           </Link>
-          <h1 className="mt-1 text-xl font-semibold text-gray-900">{client.name}</h1>
+          <h1 className="mt-1 text-xl font-semibold text-gray-900 break-words">{client.name}</h1>
           <p className="text-sm text-gray-500">
             {client.clientCode} ·{' '}
             <span className={client.status === 'ACTIVE' ? 'text-green-700' : 'text-gray-500'}>{client.status}</span>
@@ -34,7 +34,7 @@ export default async function ClientDetailPage({
         <Link
           prefetch={false}
           href={`/clients/${id}/edit`}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="inline-block shrink-0 rounded-md border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           Edit client
         </Link>
@@ -42,12 +42,12 @@ export default async function ClientDetailPage({
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-medium text-gray-900">Sites</h2>
         <Link
           prefetch={false}
           href={`/clients/${id}/sites/new`}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="inline-block rounded-md bg-gray-900 px-4 py-2 text-center text-sm font-medium text-white hover:bg-gray-800"
         >
           Add site
         </Link>
