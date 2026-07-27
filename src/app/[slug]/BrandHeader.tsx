@@ -1,14 +1,16 @@
-/**
- * Text placeholder for the client's actual logo (a pine-tree mark +
- * "PINE CLEANING CO." wordmark, per their Jotform). Swap this for an
- * <img> once the real logo file is available - layout/spacing here is
- * sized to drop one in without other changes.
- */
+import Image from 'next/image';
+
 export function BrandHeader() {
   return (
-    <div className="py-8 text-center">
-      <span className="text-3xl font-extrabold tracking-tight text-slate-800">PINE</span>{' '}
-      <span className="text-3xl font-extrabold tracking-tight text-slate-800">CLEANING CO.</span>
+    <div className="flex justify-center py-8">
+      <Image
+        src="/pine-cleaning-logo.webp"
+        alt="Pine Cleaning Co."
+        width={1462}
+        height={328}
+        priority
+        className="h-auto w-64 sm:w-72"
+      />
     </div>
   );
 }

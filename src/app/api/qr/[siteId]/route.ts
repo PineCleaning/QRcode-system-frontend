@@ -23,6 +23,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const search = request.nextUrl.search;
   const res = await fetch(`${API_BASE_URL}/sites/${siteId}/qr${search}`, {
     headers: { Authorization: `Bearer ${session.access_token}` },
+    // QR images are generated fresh per request - without this, Next's
+    // fetch() defaults to caching GET requests, which can silently keep
+    // serving a stale (or, worse, a previously-failed) response after
+    // the underlying data or backend code changes.
+    cache: 'no-store',
   });
 
   if (!res.ok) {
@@ -35,6 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     headers: {
       'Content-Type': res.headers.get('Content-Type') ?? 'application/octet-stream',
       'Content-Disposition': res.headers.get('Content-Disposition') ?? 'inline',
+      'Cache-Control': 'no-store',
     },
   });
 }
