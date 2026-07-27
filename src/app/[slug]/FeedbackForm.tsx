@@ -213,7 +213,7 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
       <div className="min-h-screen bg-gray-100 px-4 pb-12">
         <BrandHeader />
         <div className="mx-auto w-full max-w-lg rounded-md border border-gray-300 bg-white p-6 text-center shadow-sm">
-          <h1 className="text-xl font-bold text-slate-800">Thank you!</h1>
+          <h1 className="text-xl font-bold text-[#2d3660]">Thank you!</h1>
           <p className="mt-2 text-sm text-gray-600">Your feedback has been received.</p>
           {rejectedNotes.length > 0 && (
             <div className="mt-4 rounded-md bg-yellow-50 p-3 text-left text-xs text-yellow-800">
@@ -235,14 +235,34 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
       <BrandHeader />
 
       <div className="mx-auto w-full max-w-lg rounded-md border border-gray-300 bg-white p-6 shadow-sm sm:p-8">
-        <div className="mb-6">
-          <p className="text-lg font-bold text-slate-800">{clientName}</p>
-          <p className="text-sm text-gray-500">{siteName}</p>
+        <div className="mb-6 space-y-4">
+          <div>
+            <label htmlFor="clientName" className="mb-2 block text-base font-bold text-[#2d3660]">
+              Client
+            </label>
+            <input
+              id="clientName"
+              value={clientName}
+              disabled
+              className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="siteName" className="mb-2 block text-base font-bold text-[#2d3660]">
+              Site
+            </label>
+            <input
+              id="siteName"
+              value={siteName}
+              disabled
+              className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
+            />
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="feedback" className="mb-2 block text-base font-bold text-slate-800">
+            <label htmlFor="feedback" className="mb-2 block text-base font-bold text-[#2d3660]">
               Feedback: <span className="text-red-600">*</span>
             </label>
             <textarea
@@ -257,7 +277,7 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
           </div>
 
           <div>
-            <label htmlFor="mobileNumber" className="mb-2 block text-base font-bold text-slate-800">
+            <label htmlFor="mobileNumber" className="mb-2 block text-base font-bold text-[#2d3660]">
               Mobile Number <span className="font-normal text-gray-500">(optional)</span>
             </label>
             <input
@@ -267,13 +287,13 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
               onChange={(e) => setMobileNumber(e.target.value)}
               className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-blue-600 focus:outline-none"
             />
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-800">
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[#2d3660]">
               This lets us send you a text update
             </p>
           </div>
 
           <div>
-            <label className="mb-2 block text-base font-bold text-slate-800">
+            <label className="mb-2 block text-base font-bold text-[#2d3660]">
               Upload File / Image <span className="font-normal text-gray-500">(optional, up to {MAX_FILES})</span>
             </label>
             <input
