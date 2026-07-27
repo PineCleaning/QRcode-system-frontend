@@ -55,3 +55,8 @@ export interface FeedbackSubmission {
   deliveredAt: string | null;
   media: FeedbackMedia[];
 }
+
+/** Global feedback list (admin "Feedbacks" page) - each row also carries its site + client. */
+export interface AdminFeedbackSubmission extends FeedbackSubmission {
+  site: Pick<Site, 'id' | 'siteName' | 'slug'> & { client: Pick<Client, 'id' | 'name' | 'clientCode'> };
+}
