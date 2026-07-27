@@ -22,15 +22,24 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     throw new ApiError(401, 'Not authenticated');
   }
 
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
-      ...init?.headers,
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    cache: 'no-store',
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
+      headers: {
+        ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+        ...init?.headers,
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: 'no-store',
+    });
+  } catch {
+    // A genuine network failure (backend unreachable) throws a raw
+    // "fetch failed" TypeError rather than resolving - wrap it as an
+    // ApiError with a real message so callers (Server Actions,
+    // error.tsx) show something a non-technical admin can understand.
+    throw new ApiError(0, "Couldn't reach the server. Please check your connection and try again.");
+  }
 
   if (res.status === 204) {
     return undefined as T;

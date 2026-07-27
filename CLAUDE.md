@@ -95,6 +95,18 @@ The sidebar had no mobile handling at all before this — a fixed `w-56` persist
 
 Both were reproduced and confirmed fixed live on two different Android phones (Chrome), covering: keyboard/zoom behavior on inputs, file picker, adding/removing multiple files, submitting with and without attachments, and landscape rotation.
 
+**Note:** this machine's LAN IP has already changed once since (from `192.168.18.91` to `192.168.18.110`) — exactly the risk flagged above. If phone testing over LAN is needed again, update both `allowedDevOrigins` in `next.config.ts` and `NEXT_PUBLIC_API_BASE_URL` in `.env.local` to the current IP (check via `ipconfig`/the frontend dev server's own "Network:" log line) before assuming a bug.
+
+## Error Handling + Validation Pass (Day 4 Hr 7 — implemented 2026-07-27)
+
+Audited first — Server Actions (`clients/actions.ts`, `sites/actions.ts`) already handled `ApiError` correctly (catch, return the message to the form; `redirect()` always called outside the `try/catch`, never inside — a common Next.js footgun since `redirect()` works by throwing internally). Fixed the real gaps found:
+
+- **`src/app/login/actions.ts`** — a genuine Supabase network failure throws rather than returning `{ error }`, surfacing as a raw `"fetch failed"` string on screen (a real bug the user hit and reported). Now wrapped in `try/catch`, mapped to `"Couldn't reach the server. Please check your connection and try again."`
+- **`src/lib/api/server-fetch.ts` (`apiFetch`) and `src/lib/api/public-fetch.ts` (`publicFetch`)** — both had the same class of gap: `fetch()` itself throwing on a real network failure (backend unreachable) wasn't caught, so it would've propagated as a raw, unstyled crash instead of a handled error. `apiFetch` now throws a proper `ApiError` with a real message (consistent with every other error path callers already handle); `publicFetch` now returns `{ ok: false, status: 0, body: null }`, which the `[slug]/page.tsx` caller's existing `!ok → InactiveFallback` check already handles with zero page-level changes needed — meaning a backend outage during a real customer's QR scan now shows the friendly "unavailable" page instead of crashing.
+- **`src/app/(dashboard)/error.tsx`, `src/app/error.tsx`, `src/app/not-found.tsx`** — new. Previously **no `error.tsx` existed anywhere**, so any uncaught error (a thrown `ApiError`, or the raw fetch failures above before they were fixed) crashed straight to Next's generic unstyled error page with no way back into the app. The dashboard one is scoped to `(dashboard)/` so the sidebar/shell isn't affected by a content-area error; the root one is defense-in-depth for anything outside it (`/login`, `/[slug]`). `not-found.tsx`'s practical reach is small in this app specifically — the `[slug]` catch-all route absorbs almost every otherwise-invalid top-level path as "unknown/inactive site" (existing, correct, unrelated behavior) — but it's still correct to have in place for genuinely unmatched paths and any future explicit `notFound()` calls.
+
+Verified: full production build succeeds with all routes (including the new `/_not-found`) present; confirmed via curl that the `[slug]` catch-all and the auth proxy's redirect-before-404 behavior are unaffected.
+
 ## Working Style
 - One hour-block from the roadmap = one focused session/prompt.
 - Review diffs before running anything that writes to Supabase or calls the backend API.
