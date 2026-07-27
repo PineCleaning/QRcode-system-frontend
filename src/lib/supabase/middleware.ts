@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 // Everything under these prefixes requires an admin session. Everything
 // else - "/", "/login", and any "/{slug}" (the public feedback form) -
 // is public by design, not "public because we forgot to protect it".
-const PROTECTED_PREFIXES = ['/clients', '/feedback'];
+const PROTECTED_PREFIXES = ['/clients', '/feedback', '/assets'];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });

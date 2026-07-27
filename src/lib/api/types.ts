@@ -60,3 +60,9 @@ export interface FeedbackSubmission {
 export interface AdminFeedbackSubmission extends FeedbackSubmission {
   site: Pick<Site, 'id' | 'siteName' | 'slug'> & { client: Pick<Client, 'id' | 'name' | 'clientCode'> };
 }
+
+/** Global media library (admin "Assets" page) - VERIFIED-only, so url is never null here. */
+export interface AdminMediaItem extends Omit<FeedbackMedia, 'url'> {
+  url: string;
+  feedback: { id: string; site: Pick<Site, 'id' | 'siteName' | 'slug'> & { client: Pick<Client, 'id' | 'name' | 'clientCode'> } };
+}

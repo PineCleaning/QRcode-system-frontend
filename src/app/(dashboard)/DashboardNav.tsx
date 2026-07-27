@@ -45,6 +45,19 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
+  {
+    href: '/assets',
+    label: 'Assets',
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M18 12.75V6.75A2.25 2.25 0 0 0 15.75 4.5H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5A2.25 2.25 0 0 0 6.75 19.5h10.5A2.25 2.25 0 0 0 19.5 17.25V15M9 9h.008v.008H9V9Z"
+        />
+      </svg>
+    ),
+  },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {

@@ -51,7 +51,7 @@ export default async function FeedbackPage({
         <p className="mt-1 text-sm text-gray-500">All feedback across every client and site.</p>
       </div>
 
-      <FeedbackFilters clients={clients} sites={sites} clientId={clientId} siteId={siteId} />
+      <FeedbackFilters basePath="/feedback" clients={clients} sites={sites} clientId={clientId} siteId={siteId} />
 
       {feedback.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">

@@ -4,11 +4,13 @@ import { useRouter } from 'next/navigation';
 import type { Client, Site } from '@/lib/api/types';
 
 export function FeedbackFilters({
+  basePath,
   clients,
   sites,
   clientId,
   siteId,
 }: {
+  basePath: string;
   clients: Client[];
   sites: Site[];
   clientId?: string;
@@ -18,12 +20,12 @@ export function FeedbackFilters({
 
   function handleClientChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const value = e.target.value;
-    router.push(value ? `/feedback?clientId=${value}` : '/feedback');
+    router.push(value ? `${basePath}?clientId=${value}` : basePath);
   }
 
   function handleSiteChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const value = e.target.value;
-    router.push(value ? `/feedback?clientId=${clientId}&siteId=${value}` : `/feedback?clientId=${clientId}`);
+    router.push(value ? `${basePath}?clientId=${clientId}&siteId=${value}` : `${basePath}?clientId=${clientId}`);
   }
 
   return (
