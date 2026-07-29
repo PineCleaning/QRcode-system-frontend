@@ -107,6 +107,15 @@ Audited first — Server Actions (`clients/actions.ts`, `sites/actions.ts`) alre
 
 Verified: full production build succeeds with all routes (including the new `/_not-found`) present; confirmed via curl that the `[slug]` catch-all and the auth proxy's redirect-before-404 behavior are unaffected.
 
+## CSV Bulk Import (Day 3 Hr 5 — implemented 2026-07-28)
+
+`src/app/(dashboard)/clients/import/` - a "Bulk Import" button on the Clients list links here.
+
+- **`page.tsx`** — thin Server Component wrapper (header, back link); the actual interactivity lives in a client child, same pattern as everywhere else in this app (`SiteQrModal`, `ConfirmDeleteButton`).
+- **`BulkImportClient.tsx`** — `'use client'`, three-step flow: download template (static `public/client-import-template.csv`, no backend endpoint needed just to serve a static file) → pick a `.csv` file, parsed client-side with `papaparse` for an immediate preview table (first 20 rows, with a total-row count) so the admin can sanity-check before sending anything → "Confirm Upload" sends the real `File` via `FormData` to the new Server Action, then renders the per-row `SUCCESS`/`ERROR` results table directly from the response (no second fetch needed).
+- **`actions.ts`** — `bulkUploadAction(formData: FormData)`. **Deliberately does not use `apiFetch()`** — that helper always force-sets `Content-Type: application/json` whenever a body is present, which would break this multipart upload (the correct multipart boundary header has to come from the browser/undici automatically, not be overridden). Written as a small standalone fetch instead, reusing the same session-token-attachment pattern, rather than risk changing `apiFetch()`'s behavior for the 20+ other things that already call it.
+- Client-side preview parsing is just a UX convenience — the real, authoritative parsing/validation/header-alias-matching happens server-side (`backend/src/csv-import/`). Nothing about the preview needs to match the backend's header-alias logic exactly; it just shows the admin what's literally in their file before it's sent.
+
 ## Working Style
 - One hour-block from the roadmap = one focused session/prompt.
 - Review diffs before running anything that writes to Supabase or calls the backend API.

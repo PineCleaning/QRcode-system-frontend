@@ -66,3 +66,32 @@ export interface AdminMediaItem extends Omit<FeedbackMedia, 'url'> {
   url: string;
   feedback: { id: string; site: Pick<Site, 'id' | 'siteName' | 'slug'> & { client: Pick<Client, 'id' | 'name' | 'clientCode'> } };
 }
+
+export type CsvBatchStatus = 'PROCESSING' | 'COMPLETED' | 'FAILED';
+export type CsvRowStatus = 'SUCCESS' | 'ERROR';
+
+export interface CsvImportBatch {
+  id: string;
+  filename: string;
+  status: CsvBatchStatus;
+  totalRows: number;
+  successCount: number;
+  errorCount: number;
+  createdAt: string;
+}
+
+export interface CsvImportRow {
+  id: string;
+  batchId: string;
+  rowNumber: number;
+  clientId: string | null;
+  siteId: string | null;
+  status: CsvRowStatus;
+  errorMessage: string | null;
+  createdAt: string;
+}
+
+export interface CsvImportResult {
+  batch: CsvImportBatch;
+  rows: CsvImportRow[];
+}
