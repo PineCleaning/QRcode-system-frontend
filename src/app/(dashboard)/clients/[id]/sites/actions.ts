@@ -49,14 +49,16 @@ export async function updateSiteAction(
   redirect(`/clients/${clientId}`);
 }
 
-export async function deleteSiteAction(siteId: string, clientId: string) {
+export async function deactivateSiteAction(siteId: string, clientId: string) {
   try {
-    await apiFetch(`/sites/${siteId}`, { method: 'DELETE' });
+    await apiFetch<Site>(`/sites/${siteId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'INACTIVE' }),
+    });
   } catch (err) {
-    const message = err instanceof ApiError ? err.message : 'Failed to delete site';
+    const message = err instanceof ApiError ? err.message : 'Failed to deactivate site';
     revalidatePath(`/clients/${clientId}`);
     redirect(`/clients/${clientId}?error=${encodeURIComponent(message)}`);
   }
   revalidatePath(`/clients/${clientId}`);
-  redirect(`/clients/${clientId}`);
 }

@@ -48,14 +48,16 @@ export async function updateClientAction(
   redirect('/clients');
 }
 
-export async function deleteClientAction(id: string) {
+export async function deactivateClientAction(id: string) {
   try {
-    await apiFetch(`/clients/${id}`, { method: 'DELETE' });
+    await apiFetch<Client>(`/clients/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'INACTIVE' }),
+    });
   } catch (err) {
-    const message = err instanceof ApiError ? err.message : 'Failed to delete client';
+    const message = err instanceof ApiError ? err.message : 'Failed to deactivate client';
     revalidatePath('/clients');
     redirect(`/clients?error=${encodeURIComponent(message)}`);
   }
   revalidatePath('/clients');
-  redirect('/clients');
 }

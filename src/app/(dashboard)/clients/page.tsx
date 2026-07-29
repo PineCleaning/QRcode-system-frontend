@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
+import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client } from '@/lib/api/types';
-import { deleteClientAction } from './actions';
+import { deactivateClientAction } from './actions';
 
 function MiniStat({ label, value, icon, tone }: { label: string; value: number; icon: React.ReactNode; tone: 'green' | 'coral' | 'sky' }) {
   const toneClass = {
@@ -159,15 +159,15 @@ export default async function ClientsPage({
                         <Link prefetch={false} href={`/clients/${client.id}/edit`} className="mr-3.5 text-ink-muted hover:text-ink">
                           Edit
                         </Link>
-                        <ConfirmDeleteButton
-                          action={deleteClientAction.bind(null, client.id)}
+                        <ConfirmDeactivateButton
+                          action={deactivateClientAction.bind(null, client.id)}
                           itemLabel={client.name}
-                          warning={
+                          description={
                             client._count.sites > 0
-                              ? `This client has ${client._count.sites} site(s) — deletion will fail if any of them have feedback history. Deactivate instead if you're not sure.`
-                              : undefined
+                              ? `This will also stop every one of its ${client._count.sites} site(s) from accepting new feedback submissions — even if a site's own status is still Active. Nothing is deleted, and you can reactivate anytime from Edit.`
+                              : "Its QR codes will stop accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime from Edit."
                           }
-                          triggerClassName="text-coral hover:underline"
+                          triggerClassName="text-ink-muted hover:text-ink"
                         />
                       </td>
                     </tr>

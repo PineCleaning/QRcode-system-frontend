@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
+import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
 import { SiteQrModal } from '@/components/SiteQrModal';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, Site } from '@/lib/api/types';
-import { deleteSiteAction } from './sites/actions';
+import { deactivateSiteAction } from './sites/actions';
 
 export default async function ClientDetailPage({
   params,
@@ -91,11 +91,10 @@ export default async function ClientDetailPage({
                       >
                         Edit
                       </Link>
-                      <ConfirmDeleteButton
-                        action={deleteSiteAction.bind(null, site.id, id)}
+                      <ConfirmDeactivateButton
+                        action={deactivateSiteAction.bind(null, site.id, id)}
                         itemLabel={site.siteName}
-                        warning="This will fail if the site has any feedback history — deactivate instead if you're not sure."
-                        triggerClassName="text-coral hover:underline"
+                        triggerClassName="text-ink-muted hover:text-ink"
                       />
                     </div>
                   </td>
