@@ -6,3 +6,11 @@ out/
 .DS_Store
 *.log
 tsconfig.tsbuildinfo
+
+# Playwright E2E - credentials, saved auth state, and run artifacts
+# never belong in the repo.
+e2e/.env
+e2e/.auth/
+playwright-report/
+e2e-report/
+test-results/

@@ -48,7 +48,11 @@ export default async function AssetsPage({
             const itemLabel = item.originalFilename || (item.resourceType === 'IMAGE' ? 'this photo' : 'this video');
 
             return (
-              <div key={item.id} className="rounded-[22px] border border-line bg-surface p-3 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+              <div
+                key={item.id}
+                data-testid="asset-card"
+                className="rounded-[22px] border border-line bg-surface p-3 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+              >
                 {item.resourceType === 'IMAGE' ? (
                   <img
                     src={item.url}
