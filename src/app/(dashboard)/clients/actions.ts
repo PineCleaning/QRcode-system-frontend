@@ -45,7 +45,7 @@ export async function updateClientAction(
 
   revalidatePath('/clients');
   revalidatePath(`/clients/${id}`);
-  redirect(`/clients/${id}`);
+  redirect('/clients');
 }
 
 export async function deleteClientAction(id: string) {
