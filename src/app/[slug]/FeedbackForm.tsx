@@ -210,31 +210,34 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-gray-100 px-4 pb-12">
-        <BrandHeader />
-        <div className="mx-auto w-full max-w-lg rounded-md border border-gray-300 bg-white p-6 text-center shadow-sm">
-          <h1 className="text-xl font-bold text-[#2d3660]">Thank you!</h1>
-          <p className="mt-2 text-sm text-gray-600">Your feedback has been received.</p>
-          {rejectedNotes.length > 0 && (
-            <div className="mt-4 rounded-md bg-yellow-50 p-3 text-left text-xs text-yellow-800">
-              <p className="font-semibold">Your feedback was submitted, but not every attachment could be included:</p>
-              <ul className="mt-1 list-disc pl-4">
-                {rejectedNotes.map((note, i) => (
-                  <li key={i}>{note}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+      <div className="min-h-screen bg-gradient-to-b from-[#e6f0e3] to-[#c9ddc3] px-4 py-10 sm:py-16">
+        <div className="mx-auto w-full max-w-lg rounded-3xl bg-[#eaf3e7] p-4 shadow-lg sm:p-6">
+          <BrandHeader />
+          <div className="rounded-2xl bg-white p-6 text-center shadow-sm sm:p-8">
+            <h1 className="text-xl font-bold text-[#2d3660]">Thank you!</h1>
+            <p className="mt-2 text-sm text-gray-600">Your feedback has been received.</p>
+            {rejectedNotes.length > 0 && (
+              <div className="mt-4 rounded-md bg-yellow-50 p-3 text-left text-xs text-yellow-800">
+                <p className="font-semibold">Your feedback was submitted, but not every attachment could be included:</p>
+                <ul className="mt-1 list-disc pl-4">
+                  {rejectedNotes.map((note, i) => (
+                    <li key={i}>{note}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 px-4 pb-12">
-      <BrandHeader />
+    <div className="min-h-screen bg-gradient-to-b from-[#e6f0e3] to-[#c9ddc3] px-4 py-10 sm:py-16">
+      <div className="mx-auto w-full max-w-lg rounded-3xl bg-[#eaf3e7] p-4 shadow-lg sm:p-6">
+        <BrandHeader />
 
-      <div className="mx-auto w-full max-w-lg rounded-md border border-gray-300 bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-6 space-y-4">
           <div>
             <label htmlFor="clientName" className="mb-2 block text-base font-bold text-[#2d3660]">
@@ -272,8 +275,9 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
               required
               maxLength={5000}
               rows={6}
-              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-blue-600 focus:outline-none"
+              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
             />
+            <p className="mt-1 text-xs text-gray-500">{feedback.length} / 5000 characters</p>
           </div>
 
           <div>
@@ -283,13 +287,13 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
             <input
               id="mobileNumber"
               type="tel"
+              inputMode="tel"
               value={mobileNumber}
-              onChange={(e) => setMobileNumber(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-blue-600 focus:outline-none"
+              onChange={(e) => setMobileNumber(e.target.value.replace(/[^0-9+\-\s()]/g, ''))}
+              maxLength={32}
+              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
             />
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[#2d3660]">
-              This lets us send you a text update
-            </p>
+            <p className="mt-1 text-xs text-gray-500">Max 32 characters</p>
           </div>
 
           <div>
@@ -307,7 +311,7 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex w-full flex-col items-center justify-center rounded border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center hover:border-blue-500 hover:bg-blue-50"
+              className="flex w-full flex-col items-center justify-center rounded border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center hover:border-[#3a6b47] hover:bg-green-50"
             >
               <svg
                 className="mb-2 h-8 w-8 text-gray-400"
@@ -354,7 +358,7 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
                 {status === 'uploading' && (
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                     <div
-                      className="h-full bg-blue-700 transition-all"
+                      className="h-full bg-[#3a6b47] transition-all"
                       style={{ width: `${progress[file.name] ?? 0}%` }}
                     />
                   </div>
@@ -368,11 +372,12 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
           <button
             type="submit"
             disabled={isBusy}
-            className="w-full rounded-md bg-blue-700 px-3 py-3 text-base font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
+            className="w-full rounded-md bg-[#3a6b47] px-3 py-3 text-base font-semibold text-white hover:bg-[#2f5639] disabled:opacity-50"
           >
             {status === 'uploading' ? 'Uploading…' : status === 'submitting' ? 'Submitting…' : 'Submit'}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );
