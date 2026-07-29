@@ -1,5 +1,13 @@
-import { PageLoading } from '@/components/PageLoading';
+import { FiltersSkeleton } from '@/components/skeletons/FiltersSkeleton';
+import { HeaderSkeleton } from '@/components/skeletons/HeaderSkeleton';
+import { TableRowsSkeleton } from '@/components/skeletons/TableRowsSkeleton';
 
 export default function Loading() {
-  return <PageLoading />;
+  return (
+    <div>
+      <HeaderSkeleton titleWidth="w-28" withBadge />
+      <FiltersSkeleton />
+      <TableRowsSkeleton />
+    </div>
+  );
 }
