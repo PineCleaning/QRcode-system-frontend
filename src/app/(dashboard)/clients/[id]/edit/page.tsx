@@ -10,10 +10,10 @@ export default async function EditClientPage({ params }: { params: Promise<{ id:
 
   return (
     <div>
-      <Link prefetch={false} href={`/clients/${id}`} className="mb-2 inline-block text-sm text-gray-500 hover:text-primary">
+      <Link prefetch={false} href={`/clients/${id}`} className="mb-2 inline-block text-sm text-ink-muted hover:text-ink">
         ← {client.name}
       </Link>
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">Edit client</h1>
+      <h1 className="mb-6 text-xl font-extrabold">Edit client</h1>
       <ClientForm client={client} action={updateClientAction.bind(null, id)} cancelHref="/clients" />
     </div>
   );

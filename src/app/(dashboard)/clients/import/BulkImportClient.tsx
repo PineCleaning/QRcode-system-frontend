@@ -63,54 +63,55 @@ export function BulkImportClient() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-[26px] border border-line bg-surface p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-gray-900">1. Download the template</h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <h2 className="text-sm font-extrabold">1. Download the template</h2>
+            <p className="mt-1 text-sm text-ink-muted">
               Columns: Client Name, Client Code (optional), Contact Email, Contact Phone, Site Name, Address.
             </p>
+            <p className="mt-1 text-xs text-ink-muted">Contact Phone: digits only, optionally with + or - (no spaces, letters, or brackets).</p>
           </div>
           <a
             href="/client-import-template.csv"
             download
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
           >
             Download Template
           </a>
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-900">2. Choose your completed CSV file</h2>
+      <div className="rounded-[26px] border border-line bg-surface p-6 shadow-sm">
+        <h2 className="text-sm font-extrabold">2. Choose your completed CSV file</h2>
         <input
           type="file"
           accept=".csv"
           onChange={handleFileSelected}
-          className="mt-3 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
+          className="mt-3 block w-full text-sm text-ink file:mr-3 file:rounded-xl file:border file:border-line file:bg-page file:px-3 file:py-2 file:text-sm file:font-bold file:text-ink hover:file:bg-line/40"
         />
         {previewError && <p className="mt-2 text-sm text-red-600">{previewError}</p>}
       </div>
 
       {previewRows.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-[26px] border border-line bg-surface p-6 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-gray-900">
+            <h2 className="text-sm font-extrabold">
               3. Preview ({previewTotal} row{previewTotal === 1 ? '' : 's'} total{previewTotal > PREVIEW_LIMIT ? `, showing first ${PREVIEW_LIMIT}` : ''})
             </h2>
             <button
               type="button"
               onClick={handleUpload}
               disabled={isPending}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              className="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-page hover:opacity-90 disabled:opacity-50"
             >
               {isPending ? 'Uploading…' : 'Confirm Upload'}
             </button>
           </div>
 
-          <div className="mt-4 overflow-x-auto rounded-md border border-gray-200">
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-line">
             <table className="w-full min-w-[640px] text-left text-xs">
-              <thead className="border-b border-gray-200 bg-gray-50 uppercase text-gray-500">
+              <thead className="border-b border-line uppercase text-ink-muted">
                 <tr>
                   {previewHeaders.map((header) => (
                     <th key={header} className="whitespace-nowrap px-3 py-2">
@@ -121,10 +122,10 @@ export function BulkImportClient() {
               </thead>
               <tbody>
                 {previewRows.map((row, i) => (
-                  <tr key={i} className="border-b border-gray-100 last:border-0">
+                  <tr key={i} className="border-b border-line last:border-0">
                     {previewHeaders.map((header) => (
-                      <td key={header} className="whitespace-nowrap px-3 py-2 text-gray-700">
-                        {row[header] || <span className="text-gray-300">—</span>}
+                      <td key={header} className="whitespace-nowrap px-3 py-2 text-ink-muted">
+                        {row[header] || <span className="text-ink-muted/40">—</span>}
                       </td>
                     ))}
                   </tr>
@@ -138,22 +139,22 @@ export function BulkImportClient() {
       {uploadError && <p className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{uploadError}</p>}
 
       {result && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-900">Results</h2>
-          <p className="mt-1 text-sm text-gray-600">
+        <div className="rounded-[26px] border border-line bg-surface p-6 shadow-sm">
+          <h2 className="text-sm font-extrabold">Results</h2>
+          <p className="mt-1 text-sm text-ink-muted">
             {result.batch.totalRows} row{result.batch.totalRows === 1 ? '' : 's'} processed —{' '}
-            <span className="text-accent">{result.batch.successCount} succeeded</span>
+            <span className="text-green">{result.batch.successCount} succeeded</span>
             {result.batch.errorCount > 0 && (
               <>
-                , <span className="text-red-600">{result.batch.errorCount} failed</span>
+                , <span className="text-coral">{result.batch.errorCount} failed</span>
               </>
             )}
             .
           </p>
 
-          <div className="mt-4 overflow-x-auto rounded-md border border-gray-200">
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-line">
             <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+              <thead className="border-b border-line text-xs uppercase text-ink-muted">
                 <tr>
                   <th className="whitespace-nowrap px-3 py-2">Row</th>
                   <th className="whitespace-nowrap px-3 py-2">Status</th>
@@ -162,18 +163,18 @@ export function BulkImportClient() {
               </thead>
               <tbody>
                 {result.rows.map((row) => (
-                  <tr key={row.id} className="border-b border-gray-100 last:border-0">
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-500">{row.rowNumber}</td>
+                  <tr key={row.id} className="border-b border-line last:border-0">
+                    <td className="whitespace-nowrap px-3 py-2 text-ink-muted">{row.rowNumber}</td>
                     <td className="whitespace-nowrap px-3 py-2">
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          row.status === 'SUCCESS' ? 'bg-accent/10 text-accent' : 'bg-red-100 text-red-700'
+                        className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                          row.status === 'SUCCESS' ? 'bg-green/15 text-green' : 'bg-coral/15 text-coral'
                         }`}
                       >
                         {row.status}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-gray-700">{row.errorMessage ?? '—'}</td>
+                    <td className="px-3 py-2 text-ink-muted">{row.errorMessage ?? '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -181,7 +182,7 @@ export function BulkImportClient() {
           </div>
 
           <div className="mt-4">
-            <Link prefetch={false} href="/clients" className="text-sm text-blue-600 hover:underline">
+            <Link prefetch={false} href="/clients" className="text-sm text-sky hover:underline">
               ← Back to Clients
             </Link>
           </div>

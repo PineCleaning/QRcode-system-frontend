@@ -4,17 +4,27 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { logout } from '../login/actions';
 
 function Logo({ className }: { className: string }) {
   return (
-    <Image
-      src="/pine-cleaning-logo.webp"
-      alt="Pine Cleaning Co."
-      width={1462}
-      height={328}
-      className={`h-auto ${className}`}
-    />
+    <>
+      <Image
+        src="/pine-cleaning-logo.webp"
+        alt="Pine Cleaning Co."
+        width={1462}
+        height={328}
+        className={`h-auto ${className} dark:hidden`}
+      />
+      <Image
+        src="/pine-cleaning-logo-dark.webp"
+        alt="Pine Cleaning Co."
+        width={1462}
+        height={328}
+        className={`hidden h-auto ${className} dark:block`}
+      />
+    </>
   );
 }
 
@@ -74,10 +84,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
               prefetch={false}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm font-medium ${
-                active
-                  ? 'border-accent bg-primary text-primary-foreground'
-                  : 'border-transparent text-gray-700 hover:bg-gray-100'
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-semibold ${
+                active ? 'bg-ink text-page' : 'text-ink-muted hover:bg-line/50'
               }`}
             >
               {item.icon}
@@ -86,21 +94,24 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           );
         })}
       </nav>
-      <form action={logout} className="border-t border-gray-200 pt-4">
-        <button
-          type="submit"
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-        >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
-            />
-          </svg>
-          Sign out
-        </button>
-      </form>
+      <div className="flex items-center justify-between gap-2 border-t border-line pt-4">
+        <form action={logout} className="flex-1">
+          <button
+            type="submit"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-semibold text-ink-muted hover:bg-line/50 hover:text-ink"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+              />
+            </svg>
+            Sign out
+          </button>
+        </form>
+        <ThemeToggle />
+      </div>
     </div>
   );
 }
@@ -111,13 +122,13 @@ export function DashboardNav() {
   return (
     <>
       {/* Mobile top bar - hidden on md+ where the persistent sidebar takes over */}
-      <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 md:hidden">
+      <header className="flex items-center justify-between border-b border-line bg-page px-4 py-3 md:hidden">
         <Logo className="w-28" />
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
           aria-label="Open menu"
-          className="rounded-md p-2 text-gray-600 hover:bg-gray-100"
+          className="rounded-md p-2 text-ink-muted hover:bg-line/50"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
@@ -129,14 +140,14 @@ export function DashboardNav() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-white p-4 shadow-lg">
+          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-surface p-4 shadow-lg">
             <div className="mb-6 flex items-center justify-between">
               <Logo className="w-28" />
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
                 aria-label="Close menu"
-                className="rounded-md p-1 text-gray-500 hover:bg-gray-100"
+                className="rounded-md p-1 text-ink-muted hover:bg-line/50"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -151,7 +162,7 @@ export function DashboardNav() {
       )}
 
       {/* Persistent desktop sidebar */}
-      <aside className="hidden w-56 shrink-0 flex-col border-r border-gray-200 bg-gray-50/80 p-4 md:flex">
+      <aside className="hidden w-56 shrink-0 flex-col border-r border-line p-4 md:flex">
         <div className="mb-6">
           <Logo className="w-40" />
         </div>

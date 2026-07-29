@@ -55,9 +55,9 @@ export function ClientForm({
   const [codeManuallyEdited, setCodeManuallyEdited] = useState(isEdit);
 
   return (
-    <form action={formAction} className="max-w-md space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <form action={formAction} className="max-w-md space-y-4 rounded-[26px] border border-line bg-surface p-6 shadow-sm">
       <div>
-        <label htmlFor="clientCode" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="clientCode" className="mb-1 block text-sm font-bold text-ink">
           Client code
         </label>
         <div className="flex gap-2">
@@ -73,7 +73,7 @@ export function ClientForm({
             disabled={isEdit}
             pattern="[a-z0-9]+(-[a-z0-9]+)*"
             title="Lowercase alphanumeric with optional hyphens (e.g. acme001)"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-gray-100 disabled:text-gray-500"
+            className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green disabled:bg-line/40 disabled:text-ink-muted"
           />
           {!isEdit && (
             <button
@@ -81,7 +81,7 @@ export function ClientForm({
               onClick={() => setClientCode(buildClientCode(nameValue))}
               disabled={!nameValue.trim()}
               title="Regenerate"
-              className="flex shrink-0 items-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              className="flex shrink-0 items-center gap-1 rounded-xl border border-line px-3 py-2 text-sm text-ink-muted hover:bg-line/40 disabled:opacity-50"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path
@@ -95,16 +95,16 @@ export function ClientForm({
           )}
         </div>
         {isEdit ? (
-          <p className="mt-1 text-xs text-gray-500">Client code can&apos;t be changed once created.</p>
+          <p className="mt-1 text-xs text-ink-muted">Client code can&apos;t be changed once created.</p>
         ) : (
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-ink-muted">
             Auto-generated from the client name below — you can still edit it, or regenerate a new random suffix.
           </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="mb-1 block text-sm font-bold text-ink">
           Name
         </label>
         <input
@@ -118,12 +118,12 @@ export function ClientForm({
             }
           }}
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />
       </div>
 
       <div>
-        <label htmlFor="contactEmail" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="contactEmail" className="mb-1 block text-sm font-bold text-ink">
           Contact email
         </label>
         <input
@@ -131,32 +131,32 @@ export function ClientForm({
           name="contactEmail"
           type="email"
           defaultValue={client?.contactEmail ?? ''}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />
       </div>
 
       <div>
-        <label htmlFor="contactPhone" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="contactPhone" className="mb-1 block text-sm font-bold text-ink">
           Contact phone
         </label>
         <input
           id="contactPhone"
           name="contactPhone"
           defaultValue={client?.contactPhone ?? ''}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />
       </div>
 
       {isEdit && (
         <div>
-          <label htmlFor="status" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="status" className="mb-1 block text-sm font-bold text-ink">
             Status
           </label>
           <select
             id="status"
             name="status"
             defaultValue={client?.status}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
           >
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
@@ -170,14 +170,14 @@ export function ClientForm({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          className="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-page hover:opacity-90 disabled:opacity-50"
         >
           {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create client'}
         </button>
         <Link
           prefetch={false}
           href={cancelHref}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
         >
           Cancel
         </Link>

@@ -19,9 +19,9 @@ export function SiteForm({
   const isEdit = Boolean(site);
 
   return (
-    <form action={formAction} className="max-w-md space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <form action={formAction} className="max-w-md space-y-4 rounded-[26px] border border-line bg-surface p-6 shadow-sm">
       <div>
-        <label htmlFor="siteName" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="siteName" className="mb-1 block text-sm font-bold text-ink">
           Site name
         </label>
         <input
@@ -29,32 +29,32 @@ export function SiteForm({
           name="siteName"
           defaultValue={site?.siteName}
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />
       </div>
 
       <div>
-        <label htmlFor="address" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="address" className="mb-1 block text-sm font-bold text-ink">
           Address
         </label>
         <input
           id="address"
           name="address"
           defaultValue={site?.address ?? ''}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />
       </div>
 
       {isEdit && (
         <div>
-          <label htmlFor="status" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="status" className="mb-1 block text-sm font-bold text-ink">
             Status
           </label>
           <select
             id="status"
             name="status"
             defaultValue={site?.status}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
           >
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
@@ -63,7 +63,7 @@ export function SiteForm({
       )}
 
       {isEdit && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-ink-muted">
           Slug ({site?.slug}) and site code are permanent once created — they&apos;re printed on the QR code.
         </p>
       )}
@@ -74,14 +74,14 @@ export function SiteForm({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          className="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-page hover:opacity-90 disabled:opacity-50"
         >
           {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Add site'}
         </button>
         <Link
           prefetch={false}
           href={cancelHref}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
         >
           Cancel
         </Link>

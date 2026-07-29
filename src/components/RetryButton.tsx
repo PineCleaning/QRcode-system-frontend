@@ -13,7 +13,7 @@ export function RetryButton({ action }: { action: () => Promise<void> }) {
       disabled={isPending}
       aria-label="Retry delivery"
       title="Retry delivery"
-      className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-primary hover:text-primary disabled:opacity-50"
+      className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-line text-ink-muted hover:border-green hover:text-green disabled:opacity-50"
     >
       <svg className={`h-3.5 w-3.5 ${isPending ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path

@@ -21,12 +21,12 @@ export default async function ClientDetailPage({
 
   return (
     <div>
-      <div className="mb-6 flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <h1 className="text-xl font-bold text-gray-900 break-words">{client.name}</h1>
+      <div className="mb-6 flex flex-col gap-3 rounded-[26px] border border-line bg-surface px-5 py-4.5 sm:flex-row sm:items-center sm:justify-between sm:px-6.5">
+        <h1 className="text-xl font-extrabold break-words">{client.name}</h1>
         <Link
           prefetch={false}
           href="/clients"
-          className="inline-block shrink-0 rounded-md border border-gray-300 bg-white px-4 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="inline-flex shrink-0 items-center rounded-xl border border-line px-4 py-2 text-center text-[13.5px] font-bold transition hover:-translate-y-px"
         >
           ← Clients
         </Link>
@@ -35,59 +35,59 @@ export default async function ClientDetailPage({
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-lg font-medium text-gray-900">Sites</h2>
+        <h2 className="text-lg font-bold">Sites</h2>
         <Link
           prefetch={false}
           href={`/clients/${id}/sites/new`}
-          className="inline-block rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:opacity-90"
+          className="inline-flex items-center rounded-xl bg-ink px-4 py-2 text-center text-[13.5px] font-bold text-page transition hover:-translate-y-px"
         >
-          Add site
+          + Add site
         </Link>
       </div>
 
       {sites.length === 0 ? (
-        <p className="text-sm text-gray-500">No sites yet.</p>
+        <p className="text-sm text-ink-muted">No sites yet.</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-          <table className="w-full min-w-[760px] text-left text-sm">
-            <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+        <div className="overflow-x-auto rounded-[26px] border border-line bg-surface shadow-sm">
+          <table className="w-full min-w-[760px] text-left text-[13.5px]">
+            <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
               <tr>
-                <th className="whitespace-nowrap px-4 py-3">Site name</th>
-                <th className="whitespace-nowrap px-4 py-3">Address</th>
-                <th className="whitespace-nowrap px-4 py-3 text-center">Slug</th>
-                <th className="whitespace-nowrap px-4 py-3 text-center">Status</th>
-                <th className="whitespace-nowrap px-4 py-3 text-center">Actions</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Site name</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Address</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Slug</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Status</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Actions</th>
               </tr>
             </thead>
             <tbody>
               {sites.map((site) => (
-                <tr key={site.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{site.siteName}</td>
-                  <td className="px-4 py-3 text-gray-500">{site.address || <span className="text-gray-300">—</span>}</td>
-                  <td className="px-4 py-3 text-center text-gray-500">{site.slug}</td>
-                  <td className="px-4 py-3 text-center">
+                <tr key={site.id} className="border-b border-line last:border-0 hover:bg-ink/[0.03]">
+                  <td className="px-5.5 py-3.5 font-bold">{site.siteName}</td>
+                  <td className="px-5.5 py-3.5 text-ink-muted">{site.address || <span className="text-ink-muted/40">—</span>}</td>
+                  <td className="px-5.5 py-3.5 font-mono text-[12.5px] text-ink-muted">{site.slug}</td>
+                  <td className="px-5.5 py-3.5">
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        site.status === 'ACTIVE' ? 'bg-accent/10 text-accent' : 'bg-gray-100 text-gray-600'
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold before:h-1.5 before:w-1.5 before:rounded-full before:bg-current ${
+                        site.status === 'ACTIVE' ? 'bg-green/15 text-green' : 'bg-ink-muted/15 text-ink-muted'
                       }`}
                     >
                       {site.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-center gap-3 text-xs">
+                  <td className="px-5.5 py-3.5 font-bold">
+                    <div className="flex gap-3 text-[12.5px]">
                       <SiteQrModal siteId={site.id} siteName={site.siteName} slug={site.slug} status={site.status} />
                       <Link
                         prefetch={false}
                         href={`/clients/${id}/sites/${site.id}/feedback`}
-                        className="text-gray-600 hover:underline"
+                        className="text-ink-muted hover:text-ink"
                       >
                         Feedback
                       </Link>
                       <Link
                         prefetch={false}
                         href={`/clients/${id}/sites/${site.id}/edit`}
-                        className="text-gray-600 hover:underline"
+                        className="text-ink-muted hover:text-ink"
                       >
                         Edit
                       </Link>
@@ -95,6 +95,7 @@ export default async function ClientDetailPage({
                         action={deleteSiteAction.bind(null, site.id, id)}
                         itemLabel={site.siteName}
                         warning="This will fail if the site has any feedback history — deactivate instead if you're not sure."
+                        triggerClassName="text-coral hover:underline"
                       />
                     </div>
                   </td>

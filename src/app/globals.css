@@ -1,16 +1,59 @@
 @import "tailwindcss";
 
+/* `dark:` utilities are keyed off a `.dark` class on <html>, toggled by
+   ThemeToggle.tsx and set before paint by the inline script in
+   layout.tsx (avoids a flash of the wrong theme). Public pages that
+   never render the toggle (login, the [slug] feedback form) simply
+   never get the class - they stay on the light tokens below. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 
-  /* Brand tokens (navy + green, from the Pine Cleaning Co. logo) -
-     available as bg-primary/text-accent/etc. utilities via the @theme
-     block below (Tailwind v4 auto-generates them from --color-*). */
-  --color-primary: #2d3660;
-  --color-primary-foreground: #ffffff;
-  --color-accent: #16a34a;
+  /* Bento design system - light (default). Matches the approved
+     "Modular Mint" mockup exactly (light-locked variant). */
+  --bg: #f6f6f3;
+  --card: #ffffff;
+  --ink: #17181c;
+  --ink-muted: #6f7278;
+  --line: #e7e6e1;
+  --green: #16a34a;
+  --sky: #0ea5e9;
+  --amber: #f59e0b;
+  --coral: #f4633a;
+  --hero-grad-1: #86efac;
+  --hero-grad-2: #16a34a;
+  --hero-text: var(--ink);
+  --hero-tag: var(--ink);
+
+  /* Existing bg-primary/text-accent/etc. utilities across the app now
+     resolve through these two - primary is the "invert" pill button
+     (ink-on-bg, matching the mockup's .btn-primary), accent is the
+     brand green used for active badges/status pills/icons. Repointing
+     these two tokens is what makes the already-tokenized buttons and
+     badges pick up the new design system with no per-file className
+     changes needed. */
+  --color-primary: var(--ink);
+  --color-primary-foreground: var(--bg);
+  --color-accent: var(--green);
   --color-accent-foreground: #ffffff;
+}
+
+.dark {
+  /* Bento design system - dark. Matches the approved toggleable
+     mockup's dark-mode tokens exactly. */
+  --bg: #121214;
+  --card: #1b1b1e;
+  --ink: #f1f1ef;
+  --ink-muted: #94969c;
+  --line: #2c2c30;
+  --green: #4ade80;
+  --sky: #38bdf8;
+  --amber: #fbbf24;
+  --coral: #fb7857;
+  --hero-text: #ffffff;
+  --hero-tag: #ffffff;
 }
 
 @theme inline {
@@ -21,23 +64,23 @@
   --color-accent: var(--color-accent);
   --color-accent-foreground: var(--color-accent-foreground);
   --font-sans: var(--font-inter);
+
+  /* Bento neutrals + tones, exposed as bg-page/bg-surface/text-ink/
+     text-ink-muted/border-line/bg-green/text-sky/etc. utilities. */
+  --color-page: var(--bg);
+  --color-surface: var(--card);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-green: var(--green);
+  --color-sky: var(--sky);
+  --color-amber: var(--amber);
+  --color-coral: var(--coral);
 }
 
-/* This admin UI is explicitly light-themed throughout (bg-white,
-   text-gray-900, etc.) - it doesn't adapt to OS dark mode. An earlier
-   prefers-color-scheme override here flipped body text to near-white,
-   which made form inputs (no explicit text color of their own)
-   invisible against their white background. */
-
 body {
-  /* Subtle brand-tinted mesh over the near-white page background - keeps
-     the admin UI professional/flat rather than a visible "gradient",
-     just enough depth so pages don't read as pure white/gray. */
-  background:
-    radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--color-accent) 6%, transparent), transparent 45%),
-    radial-gradient(circle at 0% 100%, color-mix(in oklab, var(--color-primary) 5%, transparent), transparent 50%),
-    #f8fafc;
-  background-attachment: fixed;
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--ink);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-variant-numeric: tabular-nums;
 }

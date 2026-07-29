@@ -31,14 +31,14 @@ export function FeedbackFilters({
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row">
       <div>
-        <label htmlFor="clientFilter" className="mb-1 block text-xs font-medium text-gray-500">
+        <label htmlFor="clientFilter" className="mb-1 block text-xs font-bold text-ink-muted">
           Client
         </label>
         <select
           id="clientFilter"
           value={clientId ?? ''}
           onChange={handleClientChange}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink"
         >
           <option value="">All clients</option>
           {clients.map((client) => (
@@ -50,7 +50,7 @@ export function FeedbackFilters({
       </div>
 
       <div>
-        <label htmlFor="siteFilter" className="mb-1 block text-xs font-medium text-gray-500">
+        <label htmlFor="siteFilter" className="mb-1 block text-xs font-bold text-ink-muted">
           Site
         </label>
         <select
@@ -58,7 +58,7 @@ export function FeedbackFilters({
           value={siteId ?? ''}
           onChange={handleSiteChange}
           disabled={!clientId}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100 disabled:text-gray-400"
+          className="rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink disabled:bg-line/40 disabled:text-ink-muted"
         >
           <option value="">{clientId ? 'All sites' : 'Select a client first'}</option>
           {sites.map((site) => (

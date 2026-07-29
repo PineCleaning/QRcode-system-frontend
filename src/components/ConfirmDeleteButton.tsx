@@ -13,7 +13,7 @@ export function ConfirmDeleteButton({
   action,
   itemLabel,
   warning,
-  triggerClassName = 'text-red-600 hover:underline',
+  triggerClassName = 'text-coral hover:underline',
 }: {
   action: () => Promise<void>;
   itemLabel: string;
@@ -38,15 +38,15 @@ export function ConfirmDeleteButton({
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
-            <h2 className="text-base font-semibold text-gray-900">Delete {itemLabel}?</h2>
-            <p className="mt-2 text-sm text-gray-500">This can&apos;t be undone.{warning ? ` ${warning}` : ''}</p>
+          <div className="w-full max-w-sm rounded-[26px] bg-surface p-6 shadow-lg">
+            <h2 className="text-base font-extrabold">Delete {itemLabel}?</h2>
+            <p className="mt-2 text-sm text-ink-muted">This can&apos;t be undone.{warning ? ` ${warning}` : ''}</p>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 disabled={isPending}
-                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -54,7 +54,7 @@ export function ConfirmDeleteButton({
                 type="button"
                 onClick={handleConfirm}
                 disabled={isPending}
-                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                className="rounded-xl bg-coral px-4 py-2 text-sm font-bold text-white hover:opacity-90 disabled:opacity-50"
               >
                 {isPending ? 'Deleting…' : 'Delete'}
               </button>

@@ -25,14 +25,12 @@ export default async function AssetsPage({
 
   return (
     <div>
-      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 sm:px-6">
+      <div className="mb-6 rounded-[26px] border border-line bg-surface px-5 py-4.5 sm:px-6.5">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-bold text-gray-900">Assets</h1>
-          <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground">
-            {media.length}
-          </span>
+          <h1 className="text-xl font-extrabold">Assets</h1>
+          <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{media.length}</span>
         </div>
-        <p className="mt-1 text-sm text-gray-500">All feedback attachments across every client and site.</p>
+        <p className="mt-1 text-[13.5px] text-ink-muted">All feedback attachments across every client and site.</p>
       </div>
 
       <FeedbackFilters basePath="/assets" clients={clients} sites={sites} clientId={clientId} siteId={siteId} />
@@ -40,7 +38,7 @@ export default async function AssetsPage({
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
       {media.length === 0 ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
+        <div className="rounded-[26px] border border-line bg-surface p-8 text-center text-sm text-ink-muted shadow-sm">
           No Assets
         </div>
       ) : (
@@ -50,16 +48,16 @@ export default async function AssetsPage({
             const itemLabel = item.originalFilename || (item.resourceType === 'IMAGE' ? 'this photo' : 'this video');
 
             return (
-              <div key={item.id} className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
+              <div key={item.id} className="rounded-[22px] border border-line bg-surface p-3 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
                 {item.resourceType === 'IMAGE' ? (
                   <img
                     src={item.url}
                     alt={label}
-                    className="aspect-square w-full rounded-md border border-gray-100 object-cover"
+                    className="aspect-square w-full rounded-2xl border border-line object-cover"
                   />
                 ) : (
-                  <div className="flex aspect-square w-full items-center justify-center rounded-md border border-gray-100 bg-gray-50">
-                    <svg className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-line bg-page">
+                    <svg className="h-10 w-10 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -69,8 +67,8 @@ export default async function AssetsPage({
                   </div>
                 )}
 
-                <p className="mt-2 truncate text-sm font-medium text-gray-900">{label}</p>
-                <p className="truncate text-xs text-gray-500">
+                <p className="mt-2 truncate text-sm font-bold">{label}</p>
+                <p className="truncate text-xs text-ink-muted">
                   <Link prefetch={false} href={`/clients/${item.feedback.site.client.id}`} className="hover:underline">
                     {item.feedback.site.client.name}
                   </Link>
@@ -89,7 +87,7 @@ export default async function AssetsPage({
                     href={item.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 rounded-md border border-primary py-1.5 text-center font-medium text-primary hover:bg-primary/5"
+                    className="flex-1 rounded-xl border border-green py-1.5 text-center font-bold text-green hover:bg-green/10"
                   >
                     Review
                   </a>
@@ -97,7 +95,7 @@ export default async function AssetsPage({
                     action={deleteMediaAction.bind(null, item.id)}
                     itemLabel={itemLabel}
                     warning="This permanently deletes the file from Cloudinary storage, not just from this list."
-                    triggerClassName="flex-1 rounded-md border border-red-200 py-1.5 text-center font-medium text-red-600 hover:bg-red-50"
+                    triggerClassName="flex-1 rounded-xl border border-coral/40 py-1.5 text-center font-bold text-coral hover:bg-coral/10"
                   />
                 </div>
               </div>
