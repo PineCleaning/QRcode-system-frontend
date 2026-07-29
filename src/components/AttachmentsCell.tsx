@@ -39,7 +39,7 @@ function mediaLabel(item: MediaItem): string {
   return item.originalFilename || (item.resourceType === 'IMAGE' ? 'Photo' : 'Video');
 }
 
-function AttachmentLink({ item }: { item: MediaItem }) {
+function AttachmentLink({ item, underlineOnHover = true }: { item: MediaItem; underlineOnHover?: boolean }) {
   const icon = item.resourceType === 'IMAGE' ? <ImageIcon /> : <VideoIcon />;
   const label = mediaLabel(item);
 
@@ -49,7 +49,7 @@ function AttachmentLink({ item }: { item: MediaItem }) {
         href={item.url}
         target="_blank"
         rel="noreferrer"
-        className="flex items-center gap-1.5 text-sky hover:underline"
+        className={`flex items-center gap-1.5 text-sky ${underlineOnHover ? 'hover:underline' : ''}`}
       >
         {icon}
         <span className="truncate">{label}</span>
@@ -177,12 +177,12 @@ export function AttachmentsCell({ media }: { media: MediaItem[] }) {
           <div
             ref={panelRef}
             style={{ position: 'fixed', top: position.top, left: position.left, width: PANEL_WIDTH, zIndex: 100 }}
-            className="rounded-xl border border-line bg-surface p-2 shadow-lg"
+            className="rounded-xl border border-line bg-surface p-1.5 shadow-lg"
           >
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-0.5">
               {media.map((item) => (
-                <div key={item.id}>
-                  <AttachmentLink item={item} />
+                <div key={item.id} className="rounded-lg px-2 py-1.5 transition-colors hover:bg-ink/[0.06]">
+                  <AttachmentLink item={item} underlineOnHover={false} />
                 </div>
               ))}
             </div>

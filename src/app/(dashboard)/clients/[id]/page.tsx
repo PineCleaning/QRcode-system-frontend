@@ -21,12 +21,12 @@ export default async function ClientDetailPage({
 
   return (
     <div>
-      <div className="mb-6 flex flex-col gap-3 rounded-[26px] border border-line bg-surface px-5 py-4.5 sm:flex-row sm:items-center sm:justify-between sm:px-6.5">
-        <h1 className="text-xl font-extrabold break-words">{client.name}</h1>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-extrabold tracking-tight break-words">{client.name}</h1>
         <Link
           prefetch={false}
           href="/clients"
-          className="inline-flex shrink-0 items-center rounded-xl border border-line px-4 py-2 text-center text-[13.5px] font-bold transition hover:-translate-y-px"
+          className="inline-flex shrink-0 items-center rounded-xl border border-line bg-surface px-4 py-2 text-center text-[13.5px] font-bold transition hover:-translate-y-px"
         >
           ← Clients
         </Link>

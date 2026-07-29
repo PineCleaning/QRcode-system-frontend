@@ -28,9 +28,9 @@ export default async function AssetsPage({
 
   return (
     <div>
-      <div className="mb-6 rounded-[26px] border border-line bg-surface px-5 py-4.5 sm:px-6.5">
+      <div className="mb-6">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-extrabold">Assets</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-balance">Assets</h1>
           <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{media.length}</span>
         </div>
         <p className="mt-1 text-[13.5px] text-ink-muted">All feedback attachments across every client and site.</p>

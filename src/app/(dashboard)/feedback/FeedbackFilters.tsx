@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import type { Client, Site } from '@/lib/api/types';
 import { useFilterPending } from '@/components/FilterPending';
+import { Select } from '@/components/Select';
 
 export function FeedbackFilters({
   basePath,
@@ -20,15 +21,13 @@ export function FeedbackFilters({
   const router = useRouter();
   const { isPending, startTransition } = useFilterPending();
 
-  function handleClientChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
+  function handleClientChange(value: string) {
     startTransition(() => {
       router.push(value ? `${basePath}?clientId=${value}` : basePath);
     });
   }
 
-  function handleSiteChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
+  function handleSiteChange(value: string) {
     startTransition(() => {
       router.push(value ? `${basePath}?clientId=${clientId}&siteId=${value}` : `${basePath}?clientId=${clientId}`);
     });
@@ -36,44 +35,35 @@ export function FeedbackFilters({
 
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-      <div>
+      <div className="w-full sm:w-56">
         <label htmlFor="clientFilter" className="mb-1 block text-xs font-bold text-ink-muted">
           Client
         </label>
-        <select
+        <Select
           id="clientFilter"
           value={clientId ?? ''}
           onChange={handleClientChange}
           disabled={isPending}
-          className="rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink disabled:bg-line/40 disabled:text-ink-muted"
-        >
-          <option value="">All clients</option>
-          {clients.map((client) => (
-            <option key={client.id} value={client.id}>
-              {client.name}
-            </option>
-          ))}
-        </select>
+          placeholder="All clients"
+          options={[{ value: '', label: 'All clients' }, ...clients.map((c) => ({ value: c.id, label: c.name }))]}
+        />
       </div>
 
-      <div>
+      <div className="w-full sm:w-56">
         <label htmlFor="siteFilter" className="mb-1 block text-xs font-bold text-ink-muted">
           Site
         </label>
-        <select
+        <Select
           id="siteFilter"
           value={siteId ?? ''}
           onChange={handleSiteChange}
           disabled={!clientId || isPending}
-          className="rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink disabled:bg-line/40 disabled:text-ink-muted"
-        >
-          <option value="">{clientId ? 'All sites' : 'Select a client first'}</option>
-          {sites.map((site) => (
-            <option key={site.id} value={site.id}>
-              {site.siteName}
-            </option>
-          ))}
-        </select>
+          placeholder={clientId ? 'All sites' : 'Select a client first'}
+          options={[
+            { value: '', label: clientId ? 'All sites' : 'Select a client first' },
+            ...sites.map((s) => ({ value: s.id, label: s.siteName })),
+          ]}
+        />
       </div>
     </div>
   );

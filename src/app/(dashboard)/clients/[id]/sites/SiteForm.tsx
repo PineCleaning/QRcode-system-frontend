@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
+import { Select } from '@/components/Select';
 import type { Site } from '@/lib/api/types';
 
 type FormAction = (prevState: string | null, formData: FormData) => Promise<string | null>;
@@ -17,6 +18,7 @@ export function SiteForm({
 }) {
   const [error, formAction, isPending] = useActionState(action, null);
   const isEdit = Boolean(site);
+  const [status, setStatus] = useState<string>(site?.status ?? 'ACTIVE');
 
   return (
     <form action={formAction} className="max-w-md space-y-4 rounded-[26px] border border-line bg-surface p-6 shadow-sm">
@@ -50,15 +52,17 @@ export function SiteForm({
           <label htmlFor="status" className="mb-1 block text-sm font-bold text-ink">
             Status
           </label>
-          <select
+          <input type="hidden" name="status" value={status} />
+          <Select
             id="status"
-            name="status"
-            defaultValue={site?.status}
-            className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
-          >
-            <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Inactive</option>
-          </select>
+            value={status}
+            onChange={setStatus}
+            placeholder="Active"
+            options={[
+              { value: 'ACTIVE', label: 'Active' },
+              { value: 'INACTIVE', label: 'Inactive' },
+            ]}
+          />
         </div>
       )}
 
