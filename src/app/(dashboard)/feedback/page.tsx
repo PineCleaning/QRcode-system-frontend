@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AttachmentsCell } from '@/components/AttachmentsCell';
 import { RetryButton } from '@/components/RetryButton';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { AdminFeedbackSubmission, Client, Site } from '@/lib/api/types';
@@ -90,59 +91,7 @@ export default async function FeedbackPage({
                     {item.mobileNumber ?? <span className="text-xs italic text-ink-muted/70">Not provided</span>}
                   </td>
                   <td className="px-5.5 py-3.5">
-                    {item.media.length === 0 ? (
-                      <span className="text-xs italic text-ink-muted/70">No attachments</span>
-                    ) : (
-                      <div className="flex flex-col gap-1">
-                        {item.media.map((mediaItem) => {
-                          const label =
-                            mediaItem.originalFilename || (mediaItem.resourceType === 'IMAGE' ? 'Photo' : 'Video');
-                          const icon =
-                            mediaItem.resourceType === 'IMAGE' ? (
-                              <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M2.25 15.75 8.69 9.31a1.125 1.125 0 0 1 1.591 0L15.75 15m-2.25-2.25 1.72-1.72a1.125 1.125 0 0 1 1.591 0L21.75 15m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6.75a1.5 1.5 0 0 0-1.5-1.5H3.75a1.5 1.5 0 0 0-1.5 1.5v10.5a1.5 1.5 0 0 0 1.5 1.5Z"
-                                />
-                              </svg>
-                            ) : (
-                              <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="m15.75 10.5 4.72-2.72a.75.75 0 0 1 1.28.53v7.38a.75.75 0 0 1-1.28.53l-4.72-2.72M4.5 18.75h9a1.5 1.5 0 0 0 1.5-1.5v-9a1.5 1.5 0 0 0-1.5-1.5h-9a1.5 1.5 0 0 0-1.5 1.5v9a1.5 1.5 0 0 0 1.5 1.5Z"
-                                />
-                              </svg>
-                            );
-
-                          if (mediaItem.url) {
-                            return (
-                              <a
-                                key={mediaItem.id}
-                                href={mediaItem.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex max-w-[180px] items-center gap-1.5 text-sky hover:underline"
-                              >
-                                {icon}
-                                <span className="truncate">{label}</span>
-                              </a>
-                            );
-                          }
-
-                          return (
-                            <span key={mediaItem.id} className="flex max-w-[180px] items-center gap-1.5 text-ink-muted/70">
-                              {icon}
-                              <span className="truncate">{label}</span>
-                              <span className="shrink-0 text-[10px] text-coral">
-                                ({mediaItem.status === 'REJECTED' ? 'Rejected' : 'Unavailable'})
-                              </span>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
+                    <AttachmentsCell media={item.media} />
                   </td>
                   <td className="px-5.5 py-3.5">
                     <div className="flex items-center justify-center gap-1.5">
