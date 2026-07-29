@@ -11,7 +11,7 @@ export function ConfirmDeactivateButton({
   action,
   itemLabel,
   description = "Its QR code will stop accepting new feedback submissions. Nothing is deleted - existing feedback stays intact, and you can reactivate this site anytime from Edit.",
-  triggerClassName = 'text-ink-muted hover:text-ink',
+  triggerClassName = 'text-coral',
 }: {
   action: () => Promise<void>;
   itemLabel: string;

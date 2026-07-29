@@ -167,7 +167,7 @@ export default async function ClientsPage({
                               ? `This will also stop every one of its ${client._count.sites} site(s) from accepting new feedback submissions — even if a site's own status is still Active. Nothing is deleted, and you can reactivate anytime from Edit.`
                               : "Its QR codes will stop accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime from Edit."
                           }
-                          triggerClassName="text-ink-muted hover:text-ink"
+                          triggerClassName="text-coral"
                         />
                       </td>
                     </tr>

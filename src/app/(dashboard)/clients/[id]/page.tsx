@@ -94,7 +94,7 @@ export default async function ClientDetailPage({
                       <ConfirmDeactivateButton
                         action={deactivateSiteAction.bind(null, site.id, id)}
                         itemLabel={site.siteName}
-                        triggerClassName="text-ink-muted hover:text-ink"
+                        triggerClassName="text-coral"
                       />
                     </div>
                   </td>
