@@ -7,6 +7,8 @@ out/
 *.log
 tsconfig.tsbuildinfo
 
+CLAUDE.md
+
 # Playwright E2E - credentials, saved auth state, and run artifacts
 # never belong in the repo.
 e2e/.env
