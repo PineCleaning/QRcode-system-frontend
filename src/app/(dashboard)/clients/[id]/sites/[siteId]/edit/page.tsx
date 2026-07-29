@@ -10,10 +10,16 @@ export default async function EditSitePage({ params }: { params: Promise<{ id: s
 
   return (
     <div>
-      <Link prefetch={false} href={`/clients/${id}`} className="mb-2 inline-block text-sm text-ink-muted hover:text-ink">
-        ← {site.siteName}
-      </Link>
-      <h1 className="mb-6 text-xl font-extrabold">Edit site</h1>
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <h1 className="text-xl font-extrabold">Edit site</h1>
+        <Link
+          prefetch={false}
+          href={`/clients/${id}`}
+          className="inline-flex shrink-0 items-center rounded-xl border border-line px-4 py-2 text-center text-[13.5px] font-bold transition hover:-translate-y-px"
+        >
+          ← {site.siteName}
+        </Link>
+      </div>
       <SiteForm site={site} action={updateSiteAction.bind(null, siteId, id)} cancelHref={`/clients/${id}`} />
     </div>
   );

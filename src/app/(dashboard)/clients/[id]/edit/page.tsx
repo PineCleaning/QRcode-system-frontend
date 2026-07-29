@@ -10,10 +10,16 @@ export default async function EditClientPage({ params }: { params: Promise<{ id:
 
   return (
     <div>
-      <Link prefetch={false} href={`/clients/${id}`} className="mb-2 inline-block text-sm text-ink-muted hover:text-ink">
-        ← {client.name}
-      </Link>
-      <h1 className="mb-6 text-xl font-extrabold">Edit client</h1>
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <h1 className="text-xl font-extrabold">Edit client</h1>
+        <Link
+          prefetch={false}
+          href={`/clients/${id}`}
+          className="inline-flex shrink-0 items-center rounded-xl border border-line px-4 py-2 text-center text-[13.5px] font-bold transition hover:-translate-y-px"
+        >
+          ← {client.name}
+        </Link>
+      </div>
       <ClientForm client={client} action={updateClientAction.bind(null, id)} cancelHref="/clients" />
     </div>
   );
