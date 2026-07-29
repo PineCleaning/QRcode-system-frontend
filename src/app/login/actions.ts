@@ -30,6 +30,10 @@ export async function login(_prevState: string | null, formData: FormData): Prom
 
 export async function logout() {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  // Explicit 'local' scope - the default is 'global', which revokes the
+  // admin's session on every device/tab they're logged in on, not just
+  // this one. Signing out on a phone shouldn't silently log you out of
+  // a laptop session too.
+  await supabase.auth.signOut({ scope: 'local' });
   redirect('/login');
 }
