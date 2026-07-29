@@ -94,8 +94,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           );
         })}
       </nav>
-      <div className="flex items-center justify-between gap-2 border-t border-line pt-4">
-        <form action={logout} className="flex-1">
+      <div className="border-t border-line pt-4">
+        <form action={logout}>
           <button
             type="submit"
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-semibold text-ink-muted hover:bg-line/50 hover:text-ink"
@@ -110,7 +110,6 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             Sign out
           </button>
         </form>
-        <ThemeToggle />
       </div>
     </div>
   );
@@ -124,16 +123,19 @@ export function DashboardNav() {
       {/* Mobile top bar - hidden on md+ where the persistent sidebar takes over */}
       <header className="flex items-center justify-between border-b border-line bg-page px-4 py-3 md:hidden">
         <Logo className="w-28" />
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Open menu"
-          className="rounded-md p-2 text-ink-muted hover:bg-line/50"
-        >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
+            className="rounded-md p-2 text-ink-muted hover:bg-line/50"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+            </svg>
+          </button>
+        </div>
       </header>
 
       {/* Mobile slide-in drawer */}
