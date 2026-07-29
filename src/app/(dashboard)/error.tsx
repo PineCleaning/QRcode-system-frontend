@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function DashboardError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-gray-200 bg-white px-6 py-16 text-center">
+    <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-gray-200 bg-white px-6 py-16 text-center shadow-sm">
       <h1 className="text-lg font-semibold text-gray-900">Something went wrong</h1>
       <p className="max-w-sm text-sm text-gray-500">
         {error.message || 'An unexpected error occurred. Please try again.'}
@@ -13,7 +13,7 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
         <button
           type="button"
           onClick={() => reset()}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
         >
           Try again
         </button>

@@ -19,7 +19,7 @@ export function SiteForm({
   const isEdit = Boolean(site);
 
   return (
-    <form action={formAction} className="max-w-md space-y-4">
+    <form action={formAction} className="max-w-md space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <div>
         <label htmlFor="siteName" className="mb-1 block text-sm font-medium text-gray-700">
           Site name
@@ -29,7 +29,7 @@ export function SiteForm({
           name="siteName"
           defaultValue={site?.siteName}
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -41,7 +41,7 @@ export function SiteForm({
           id="address"
           name="address"
           defaultValue={site?.address ?? ''}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -54,7 +54,7 @@ export function SiteForm({
             id="status"
             name="status"
             defaultValue={site?.status}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
@@ -74,7 +74,7 @@ export function SiteForm({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
         >
           {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Add site'}
         </button>

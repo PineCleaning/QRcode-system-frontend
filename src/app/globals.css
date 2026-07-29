@@ -3,13 +3,24 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Brand tokens (navy + green, from the Pine Cleaning Co. logo) -
+     available as bg-primary/text-accent/etc. utilities via the @theme
+     block below (Tailwind v4 auto-generates them from --color-*). */
+  --color-primary: #2d3660;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #16a34a;
+  --color-accent-foreground: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-accent: var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --font-sans: var(--font-inter);
 }
 
 /* This admin UI is explicitly light-themed throughout (bg-white,
@@ -19,7 +30,14 @@
    invisible against their white background. */
 
 body {
-  background: var(--background);
+  /* Subtle brand-tinted mesh over the near-white page background - keeps
+     the admin UI professional/flat rather than a visible "gradient",
+     just enough depth so pages don't read as pure white/gray. */
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--color-accent) 6%, transparent), transparent 45%),
+    radial-gradient(circle at 0% 100%, color-mix(in oklab, var(--color-primary) 5%, transparent), transparent 50%),
+    #f8fafc;
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }

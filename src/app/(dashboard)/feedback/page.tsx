@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import { RetryButton } from '@/components/RetryButton';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { AdminFeedbackSubmission, Client, Site } from '@/lib/api/types';
+import { retryFeedbackAction } from './actions';
 import { FeedbackFilters } from './FeedbackFilters';
 
 const STATUS_STYLES: Record<string, string> = {
-  DELIVERED: 'bg-green-100 text-green-700',
+  DELIVERED: 'bg-accent/10 text-accent',
   SUBMITTED: 'bg-gray-100 text-gray-600',
   DELIVERY_PENDING: 'bg-yellow-100 text-yellow-700',
   DELIVERY_FAILED: 'bg-red-100 text-red-700',
@@ -24,9 +26,9 @@ function formatDate(iso: string) {
 export default async function FeedbackPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string; siteId?: string }>;
+  searchParams: Promise<{ clientId?: string; siteId?: string; error?: string }>;
 }) {
-  const { clientId, siteId } = await searchParams;
+  const { clientId, siteId, error } = await searchParams;
 
   const query = new URLSearchParams();
   if (clientId) query.set('clientId', clientId);
@@ -44,7 +46,7 @@ export default async function FeedbackPage({
       <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 sm:px-6">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl font-bold text-gray-900">Feedback</h1>
-          <span className="rounded-full bg-gray-900 px-2.5 py-0.5 text-xs font-semibold text-white">
+          <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground">
             {feedback.length}
           </span>
         </div>
@@ -53,12 +55,14 @@ export default async function FeedbackPage({
 
       <FeedbackFilters basePath="/feedback" clients={clients} sites={sites} clientId={clientId} siteId={siteId} />
 
+      {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
+
       {feedback.length === 0 ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
           No Feedback Submitted
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
           <table className="w-full min-w-[880px] text-left text-sm">
             <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
               <tr>
@@ -72,7 +76,7 @@ export default async function FeedbackPage({
             </thead>
             <tbody>
               {feedback.map((item) => (
-                <tr key={item.id} className="border-b border-gray-100 align-top last:border-0">
+                <tr key={item.id} className="border-b border-gray-100 align-top last:border-0 hover:bg-gray-50">
                   <td className="whitespace-nowrap px-4 py-3">
                     <Link
                       prefetch={false}
@@ -152,14 +156,19 @@ export default async function FeedbackPage({
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <span
-                      className={`inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${
-                        STATUS_STYLES[item.status] ?? 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {item.status.replace('_', ' ')}
-                    </span>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <span
+                        className={`inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${
+                          STATUS_STYLES[item.status] ?? 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {item.status.replace('_', ' ')}
+                      </span>
+                      {item.status === 'DELIVERY_FAILED' && (
+                        <RetryButton action={retryFeedbackAction.bind(null, item.id, '/feedback')} />
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

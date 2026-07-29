@@ -13,10 +13,13 @@ export function ConfirmDeleteButton({
   action,
   itemLabel,
   warning,
+  triggerClassName = 'text-red-600 hover:underline',
 }: {
   action: () => Promise<void>;
   itemLabel: string;
   warning?: string;
+  /** Defaults to the plain text-link style used in tables; pass a pill/button style for card layouts (e.g. the Assets grid). */
+  triggerClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -29,7 +32,7 @@ export function ConfirmDeleteButton({
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="text-red-600 hover:underline">
+      <button type="button" onClick={() => setOpen(true)} className={triggerClassName}>
         Delete
       </button>
 

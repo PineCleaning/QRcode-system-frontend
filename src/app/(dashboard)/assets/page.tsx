@@ -28,7 +28,7 @@ export default async function AssetsPage({
       <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 sm:px-6">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl font-bold text-gray-900">Assets</h1>
-          <span className="rounded-full bg-gray-900 px-2.5 py-0.5 text-xs font-semibold text-white">
+          <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground">
             {media.length}
           </span>
         </div>
@@ -40,7 +40,7 @@ export default async function AssetsPage({
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
       {media.length === 0 ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
           No Assets
         </div>
       ) : (
@@ -50,7 +50,7 @@ export default async function AssetsPage({
             const itemLabel = item.originalFilename || (item.resourceType === 'IMAGE' ? 'this photo' : 'this video');
 
             return (
-              <div key={item.id} className="rounded-lg border border-gray-200 bg-white p-3">
+              <div key={item.id} className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
                 {item.resourceType === 'IMAGE' ? (
                   <img
                     src={item.url}
@@ -84,14 +84,20 @@ export default async function AssetsPage({
                   </Link>
                 </p>
 
-                <div className="mt-2 flex items-center gap-3 text-xs">
-                  <a href={item.url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                <div className="mt-3 flex items-center gap-2 text-xs">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 rounded-md border border-primary py-1.5 text-center font-medium text-primary hover:bg-primary/5"
+                  >
                     Review
                   </a>
                   <ConfirmDeleteButton
                     action={deleteMediaAction.bind(null, item.id)}
                     itemLabel={itemLabel}
                     warning="This permanently deletes the file from Cloudinary storage, not just from this list."
+                    triggerClassName="flex-1 rounded-md border border-red-200 py-1.5 text-center font-medium text-red-600 hover:bg-red-50"
                   />
                 </div>
               </div>

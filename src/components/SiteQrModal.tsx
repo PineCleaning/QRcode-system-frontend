@@ -44,7 +44,7 @@ export function SiteQrModal({
 
             <span
               className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                status === 'ACTIVE' ? 'bg-accent/10 text-accent' : 'bg-gray-100 text-gray-600'
               }`}
             >
               {status}

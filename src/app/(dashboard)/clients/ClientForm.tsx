@@ -55,7 +55,7 @@ export function ClientForm({
   const [codeManuallyEdited, setCodeManuallyEdited] = useState(isEdit);
 
   return (
-    <form action={formAction} className="max-w-md space-y-4">
+    <form action={formAction} className="max-w-md space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <div>
         <label htmlFor="clientCode" className="mb-1 block text-sm font-medium text-gray-700">
           Client code
@@ -73,7 +73,7 @@ export function ClientForm({
             disabled={isEdit}
             pattern="[a-z0-9]+(-[a-z0-9]+)*"
             title="Lowercase alphanumeric with optional hyphens (e.g. acme001)"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100 disabled:text-gray-500"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-gray-100 disabled:text-gray-500"
           />
           {!isEdit && (
             <button
@@ -118,7 +118,7 @@ export function ClientForm({
             }
           }}
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -131,7 +131,7 @@ export function ClientForm({
           name="contactEmail"
           type="email"
           defaultValue={client?.contactEmail ?? ''}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -143,7 +143,7 @@ export function ClientForm({
           id="contactPhone"
           name="contactPhone"
           defaultValue={client?.contactPhone ?? ''}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -156,7 +156,7 @@ export function ClientForm({
             id="status"
             name="status"
             defaultValue={client?.status}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
@@ -170,7 +170,7 @@ export function ClientForm({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
         >
           {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create client'}
         </button>
