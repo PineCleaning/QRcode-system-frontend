@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client } from '@/lib/api/types';
+import { AddClientModal } from './AddClientModal';
+import { EditClientModal } from './EditClientModal';
 import { deactivateClientAction } from './actions';
 
 function MiniStat({ label, value, icon, tone }: { label: string; value: number; icon: React.ReactNode; tone: 'green' | 'coral' | 'sky' }) {
@@ -74,13 +76,7 @@ export default async function ClientsPage({
           >
             Bulk Import
           </Link>
-          <Link
-            prefetch={false}
-            href="/clients/new"
-            className="inline-flex items-center rounded-xl bg-ink px-4.5 py-2.5 text-[13.5px] font-bold text-page transition hover:-translate-y-px"
-          >
-            + Add client
-          </Link>
+          <AddClientModal />
         </div>
       </div>
 
@@ -96,13 +92,10 @@ export default async function ClientsPage({
             />
           </svg>
           <p className="text-sm text-ink-muted">No clients yet.</p>
-          <Link
-            prefetch={false}
-            href="/clients/new"
-            className="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-page transition hover:-translate-y-px"
-          >
-            Add your first client
-          </Link>
+          <AddClientModal
+            triggerLabel="Add your first client"
+            triggerClassName="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page transition hover:-translate-y-px"
+          />
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
@@ -156,9 +149,7 @@ export default async function ClientsPage({
                         <Link prefetch={false} href={`/clients/${client.id}`} className="mr-3.5 text-ink-muted hover:text-ink">
                           View
                         </Link>
-                        <Link prefetch={false} href={`/clients/${client.id}/edit`} className="mr-3.5 text-ink-muted hover:text-ink">
-                          Edit
-                        </Link>
+                        <EditClientModal client={client} />
                         <ConfirmDeactivateButton
                           action={deactivateClientAction.bind(null, client.id)}
                           itemLabel={client.name}

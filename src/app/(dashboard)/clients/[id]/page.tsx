@@ -3,6 +3,8 @@ import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
 import { SiteQrModal } from '@/components/SiteQrModal';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, Site } from '@/lib/api/types';
+import { AddSiteModal } from './sites/AddSiteModal';
+import { EditSiteModal } from './sites/EditSiteModal';
 import { deactivateSiteAction } from './sites/actions';
 
 export default async function ClientDetailPage({
@@ -21,32 +23,31 @@ export default async function ClientDetailPage({
 
   return (
     <div>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-extrabold tracking-tight break-words">{client.name}</h1>
+      <div className="mb-6 flex items-center gap-3">
         <Link
           prefetch={false}
           href="/clients"
-          className="inline-flex shrink-0 items-center rounded-xl border border-line bg-surface px-4 py-2 text-center text-[13.5px] font-bold transition hover:-translate-y-px"
+          aria-label="Back to Clients"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink transition hover:-translate-y-px"
         >
-          ← Clients
+          <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
         </Link>
+        <h1 className="text-2xl font-extrabold tracking-tight break-words">{client.name}</h1>
       </div>
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-bold">Sites</h2>
-        <Link
-          prefetch={false}
-          href={`/clients/${id}/sites/new`}
-          className="inline-flex items-center rounded-xl bg-ink px-4 py-2 text-center text-[13.5px] font-bold text-page transition hover:-translate-y-px"
-        >
-          + Add site
-        </Link>
+        <AddSiteModal clientId={id} />
       </div>
 
       {sites.length === 0 ? (
-        <p className="text-sm text-ink-muted">No sites yet.</p>
+        <div className="rounded-[26px] border border-line bg-surface p-8 text-center text-sm text-ink-muted shadow-sm">
+          No Sites Yet
+        </div>
       ) : (
         <div className="overflow-x-auto rounded-[26px] border border-line bg-surface shadow-sm">
           <table className="w-full min-w-[760px] text-left text-[13.5px]">
@@ -84,13 +85,7 @@ export default async function ClientDetailPage({
                       >
                         Feedback
                       </Link>
-                      <Link
-                        prefetch={false}
-                        href={`/clients/${id}/sites/${site.id}/edit`}
-                        className="text-ink-muted hover:text-ink"
-                      >
-                        Edit
-                      </Link>
+                      <EditSiteModal site={site} clientId={id} />
                       <ConfirmDeactivateButton
                         action={deactivateSiteAction.bind(null, site.id, id)}
                         itemLabel={site.siteName}

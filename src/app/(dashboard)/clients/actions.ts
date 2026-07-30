@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { ApiError, apiFetch } from '@/lib/api/server-fetch';
 import type { Client } from '@/lib/api/types';
 
-export async function createClientAction(_prevState: string | null, formData: FormData): Promise<string | null> {
+async function createClient(formData: FormData): Promise<string | null> {
   const clientCode = (formData.get('clientCode') as string)?.trim();
   const name = (formData.get('name') as string)?.trim();
   const contactEmail = (formData.get('contactEmail') as string)?.trim() || undefined;
@@ -21,14 +21,21 @@ export async function createClientAction(_prevState: string | null, formData: Fo
   }
 
   revalidatePath('/clients');
+  return null;
+}
+
+export async function createClientAction(_prevState: string | null, formData: FormData): Promise<string | null> {
+  const error = await createClient(formData);
+  if (error) return error;
   redirect('/clients');
 }
 
-export async function updateClientAction(
-  id: string,
-  _prevState: string | null,
-  formData: FormData,
-): Promise<string | null> {
+/** Same as createClientAction but never redirects - used by the "Add client" modal, which stays on /clients and just closes itself on success. */
+export async function createClientModalAction(_prevState: string | null, formData: FormData): Promise<string | null> {
+  return createClient(formData);
+}
+
+async function updateClient(id: string, formData: FormData): Promise<string | null> {
   const name = (formData.get('name') as string)?.trim();
   const contactEmail = (formData.get('contactEmail') as string)?.trim() || undefined;
   const contactPhone = (formData.get('contactPhone') as string)?.trim() || undefined;
@@ -45,7 +52,26 @@ export async function updateClientAction(
 
   revalidatePath('/clients');
   revalidatePath(`/clients/${id}`);
+  return null;
+}
+
+export async function updateClientAction(
+  id: string,
+  _prevState: string | null,
+  formData: FormData,
+): Promise<string | null> {
+  const error = await updateClient(id, formData);
+  if (error) return error;
   redirect('/clients');
+}
+
+/** Same as updateClientAction but never redirects - used by the "Edit" modal, which stays on /clients and just closes itself on success. */
+export async function updateClientModalAction(
+  id: string,
+  _prevState: string | null,
+  formData: FormData,
+): Promise<string | null> {
+  return updateClient(id, formData);
 }
 
 export async function deactivateClientAction(id: string) {

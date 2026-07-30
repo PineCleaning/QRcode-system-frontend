@@ -5,11 +5,7 @@ import { redirect } from 'next/navigation';
 import { ApiError, apiFetch } from '@/lib/api/server-fetch';
 import type { Site } from '@/lib/api/types';
 
-export async function createSiteAction(
-  clientId: string,
-  _prevState: string | null,
-  formData: FormData,
-): Promise<string | null> {
+async function createSite(clientId: string, formData: FormData): Promise<string | null> {
   const siteName = (formData.get('siteName') as string)?.trim();
   const address = (formData.get('address') as string)?.trim() || undefined;
 
@@ -23,15 +19,29 @@ export async function createSiteAction(
   }
 
   revalidatePath(`/clients/${clientId}`);
-  redirect(`/clients/${clientId}`);
+  return null;
 }
 
-export async function updateSiteAction(
-  siteId: string,
+export async function createSiteAction(
   clientId: string,
   _prevState: string | null,
   formData: FormData,
 ): Promise<string | null> {
+  const error = await createSite(clientId, formData);
+  if (error) return error;
+  redirect(`/clients/${clientId}`);
+}
+
+/** Same as createSiteAction but never redirects - used by the "Add site" modal, which stays on /clients/[id] and just closes itself on success. */
+export async function createSiteModalAction(
+  clientId: string,
+  _prevState: string | null,
+  formData: FormData,
+): Promise<string | null> {
+  return createSite(clientId, formData);
+}
+
+async function updateSite(siteId: string, clientId: string, formData: FormData): Promise<string | null> {
   const siteName = (formData.get('siteName') as string)?.trim();
   const address = (formData.get('address') as string)?.trim() || undefined;
   const status = formData.get('status') as string;
@@ -46,7 +56,28 @@ export async function updateSiteAction(
   }
 
   revalidatePath(`/clients/${clientId}`);
+  return null;
+}
+
+export async function updateSiteAction(
+  siteId: string,
+  clientId: string,
+  _prevState: string | null,
+  formData: FormData,
+): Promise<string | null> {
+  const error = await updateSite(siteId, clientId, formData);
+  if (error) return error;
   redirect(`/clients/${clientId}`);
+}
+
+/** Same as updateSiteAction but never redirects - used by the "Edit" site modal. */
+export async function updateSiteModalAction(
+  siteId: string,
+  clientId: string,
+  _prevState: string | null,
+  formData: FormData,
+): Promise<string | null> {
+  return updateSite(siteId, clientId, formData);
 }
 
 export async function deactivateSiteAction(siteId: string, clientId: string) {

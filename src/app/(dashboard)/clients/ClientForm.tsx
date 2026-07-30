@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { Select } from '@/components/Select';
 import type { Client } from '@/lib/api/types';
 
@@ -40,10 +40,20 @@ export function ClientForm({
   client,
   action,
   cancelHref,
+  onCancel,
+  onSuccess,
+  bare = false,
 }: {
   client?: Client;
   action: FormAction;
-  cancelHref: string;
+  /** Rendered as a Link when there's no onCancel - used by the two full-page routes. */
+  cancelHref?: string;
+  /** Rendered as a button instead of a Link when provided - used by the "Add client" modal to close itself. */
+  onCancel?: () => void;
+  /** Called once the action resolves with no error - the modal uses this to close itself instead of relying on a redirect. */
+  onSuccess?: () => void;
+  /** Omits the outer card styling - the modal supplies its own card around the form. */
+  bare?: boolean;
 }) {
   const [error, formAction, isPending] = useActionState(action, null);
   const isEdit = Boolean(client);
@@ -56,8 +66,25 @@ export function ClientForm({
   const [codeManuallyEdited, setCodeManuallyEdited] = useState(isEdit);
   const [status, setStatus] = useState<string>(client?.status ?? 'ACTIVE');
 
+  // useActionState has no discrete "just succeeded" event - only a value
+  // that stays null both before the first submit and after a successful
+  // one. Track whether a submission is actually in flight so onSuccess
+  // fires once, only after a real submit resolves without an error.
+  const submittedRef = useRef(false);
+  useEffect(() => {
+    if (isPending) {
+      submittedRef.current = true;
+    } else if (submittedRef.current && !error) {
+      submittedRef.current = false;
+      onSuccess?.();
+    }
+  }, [isPending, error, onSuccess]);
+
   return (
-    <form action={formAction} className="max-w-md space-y-4 rounded-[26px] border border-line bg-surface p-6 shadow-sm">
+    <form
+      action={formAction}
+      className={bare ? 'space-y-4' : 'max-w-md space-y-4 rounded-[26px] border border-line bg-surface p-6 shadow-sm'}
+    >
       <div>
         <label htmlFor="clientCode" className="mb-1 block text-sm font-bold text-ink">
           Client code
@@ -174,17 +201,27 @@ export function ClientForm({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-page hover:opacity-90 disabled:opacity-50"
+          className="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page hover:opacity-90 disabled:opacity-50"
         >
           {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create client'}
         </button>
-        <Link
-          prefetch={false}
-          href={cancelHref}
-          className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
-        >
-          Cancel
-        </Link>
+        {onCancel ? (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
+          >
+            Cancel
+          </button>
+        ) : (
+          <Link
+            prefetch={false}
+            href={cancelHref!}
+            className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
+          >
+            Cancel
+          </Link>
+        )}
       </div>
     </form>
   );
