@@ -29,12 +29,12 @@
 
   /* Existing bg-primary/text-accent/etc. utilities across the app now
      resolve through these two - primary is the "invert" pill button
-     (ink-on-bg, matching the mockup's .btn-primary), accent is the
-     brand green used for active badges/status pills/icons. Repointing
-     these two tokens is what makes the already-tokenized buttons and
-     badges pick up the new design system with no per-file className
-     changes needed. */
-  --color-primary: var(--ink);
+     (brand-navy-on-bg in light mode, see below; ink-on-bg in dark mode),
+     accent is the brand green used for active badges/status pills/icons.
+     Repointing these two tokens is what makes the already-tokenized
+     buttons and badges pick up the new design system with no per-file
+     className changes needed. */
+  --color-primary: #2d3660;
   --color-primary-foreground: var(--bg);
   --color-accent: var(--green);
   --color-accent-foreground: #ffffff;
@@ -54,6 +54,10 @@
   --coral: #fb7857;
   --hero-text: #ffffff;
   --hero-tag: #ffffff;
+  /* Dark mode keeps the original ink-on-bg primary button (near-white
+     pill) - the light-mode brand navy above is deliberately not applied
+     here. */
+  --color-primary: var(--ink);
 }
 
 @theme inline {

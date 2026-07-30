@@ -13,7 +13,7 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
         <button
           type="button"
           onClick={() => reset()}
-          className="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-page hover:opacity-90"
+          className="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page hover:opacity-90"
         >
           Try again
         </button>

@@ -159,7 +159,7 @@ export function Select({
                   onMouseEnter={() => setHighlightedIndex(index)}
                   onClick={() => selectOption(option)}
                   className={`cursor-pointer truncate rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isSelected ? 'bg-ink text-page' : isHighlighted ? 'bg-ink/[0.06] text-ink' : 'text-ink'
+                    isSelected ? 'bg-primary text-page' : isHighlighted ? 'bg-ink/[0.06] text-ink' : 'text-ink'
                   }`}
                 >
                   {option.label}

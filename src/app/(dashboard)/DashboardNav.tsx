@@ -85,7 +85,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
               href={item.href}
               onClick={onNavigate}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-semibold ${
-                active ? 'bg-ink text-page' : 'text-ink-muted hover:bg-line/50'
+                active ? 'bg-primary text-page' : 'text-ink-muted hover:bg-line/50'
               }`}
             >
               {item.icon}
