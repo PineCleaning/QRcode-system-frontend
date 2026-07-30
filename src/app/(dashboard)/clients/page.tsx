@@ -129,7 +129,7 @@ export default async function ClientsPage({
                 <tbody>
                   {clients.map((client) => (
                     <tr key={client.id} className="border-b border-line last:border-0 hover:bg-ink/[0.03]">
-                      <td className="px-5.5 py-3.5 font-bold">
+                      <td className="max-w-[220px] px-5.5 py-3.5 font-bold">
                         <Link prefetch={false} href={`/clients/${client.id}`} className="hover:underline">
                           {client.name}
                         </Link>

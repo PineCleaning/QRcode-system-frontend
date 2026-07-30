@@ -45,8 +45,20 @@ export default async function ClientDetailPage({
       </div>
 
       {sites.length === 0 ? (
-        <div className="rounded-[26px] border border-line bg-surface p-8 text-center text-sm text-ink-muted shadow-sm">
-          No Sites Yet
+        <div className="flex flex-col items-center justify-center gap-3 rounded-[26px] border border-line bg-surface p-12 text-center shadow-sm">
+          <svg className="h-10 w-10 text-ink-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 10.5c0 7.14-7.5 11.25-7.5 11.25S4.5 17.64 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+            />
+          </svg>
+          <p className="text-sm text-ink-muted">No sites yet.</p>
+          <AddSiteModal
+            clientId={id}
+            triggerClassName="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page transition hover:-translate-y-px"
+          />
         </div>
       ) : (
         <div className="overflow-x-auto rounded-[26px] border border-line bg-surface shadow-sm">
@@ -63,8 +75,8 @@ export default async function ClientDetailPage({
             <tbody>
               {sites.map((site) => (
                 <tr key={site.id} className="border-b border-line last:border-0 hover:bg-ink/[0.03]">
-                  <td className="px-5.5 py-3.5 font-bold">{site.siteName}</td>
-                  <td className="px-5.5 py-3.5 text-ink-muted">{site.address || <span className="text-ink-muted/40">—</span>}</td>
+                  <td className="max-w-[180px] px-5.5 py-3.5 font-bold">{site.siteName}</td>
+                  <td className="max-w-[200px] px-5.5 py-3.5 text-ink-muted">{site.address || <span className="text-ink-muted/40">—</span>}</td>
                   <td className="px-5.5 py-3.5 font-mono text-[12.5px] text-ink-muted">{site.slug}</td>
                   <td className="px-5.5 py-3.5">
                     <span
