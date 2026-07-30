@@ -40,7 +40,17 @@ export default async function SiteFeedbackPage({
 
   return (
     <div>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex items-start gap-3">
+        <Link
+          prefetch={false}
+          href={`/clients/${id}`}
+          aria-label={`Back to ${client.name}`}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink transition hover:-translate-y-px"
+        >
+          <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+        </Link>
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-extrabold tracking-tight">Feedback</h1>
@@ -49,13 +59,6 @@ export default async function SiteFeedbackPage({
           <p className="mt-1 text-[13.5px] text-ink-muted">{site.siteName}</p>
           <p className="mt-1 text-xs text-ink-muted/70">{site.slug}</p>
         </div>
-        <Link
-          prefetch={false}
-          href={`/clients/${id}`}
-          className="inline-flex shrink-0 items-center rounded-xl border border-line bg-surface px-4 py-2 text-center text-[13.5px] font-bold transition hover:-translate-y-px"
-        >
-          ← {client.name}
-        </Link>
       </div>
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
