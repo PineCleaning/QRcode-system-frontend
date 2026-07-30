@@ -123,6 +123,7 @@ export function ClientForm({
             </button>
           )}
         </div>
+        <p className="mt-1 text-xs text-ink-muted">Lowercase letters, numbers, and hyphens only — no spaces, capitals, or punctuation.</p>
         {isEdit ? (
           <p className="mt-1 text-xs text-ink-muted">Client code can&apos;t be changed once created.</p>
         ) : (
