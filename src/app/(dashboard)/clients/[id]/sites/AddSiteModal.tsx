@@ -5,7 +5,7 @@ import { Modal } from '@/components/Modal';
 import { createSiteModalAction } from './actions';
 import { SiteForm } from './SiteForm';
 
-/** "+ Add site" opens this instead of navigating to /clients/[id]/sites/new - same reasoning as AddClientModal. */
+/** "+ Add site" opens this instead of navigating to a full page. */
 export function AddSiteModal({
   clientId,
   triggerClassName = 'inline-flex items-center rounded-xl bg-primary px-4 py-2 text-center text-[13.5px] font-bold text-page transition hover:-translate-y-px',
@@ -27,7 +27,6 @@ export function AddSiteModal({
             action={createSiteModalAction.bind(null, clientId)}
             onCancel={() => setOpen(false)}
             onSuccess={() => setOpen(false)}
-            bare
           />
         </Modal>
       )}

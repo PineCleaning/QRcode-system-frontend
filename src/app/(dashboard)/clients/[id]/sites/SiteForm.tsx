@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { Select } from '@/components/Select';
 import type { Site } from '@/lib/api/types';
@@ -10,21 +9,15 @@ type FormAction = (prevState: string | null, formData: FormData) => Promise<stri
 export function SiteForm({
   site,
   action,
-  cancelHref,
   onCancel,
   onSuccess,
-  bare = false,
 }: {
   site?: Site;
   action: FormAction;
-  /** Rendered as a Link when there's no onCancel - used by the two full-page routes. */
-  cancelHref?: string;
-  /** Rendered as a button instead of a Link when provided - used by the Add/Edit site modals to close themselves. */
-  onCancel?: () => void;
-  /** Called once the action resolves with no error - the modal uses this to close itself instead of relying on a redirect. */
+  /** Closes the modal without submitting. */
+  onCancel: () => void;
+  /** Called once the action resolves with no error - the modal uses this to close itself. */
   onSuccess?: () => void;
-  /** Omits the outer card styling - the modal supplies its own card around the form. */
-  bare?: boolean;
 }) {
   const [error, formAction, isPending] = useActionState(action, null);
   const isEdit = Boolean(site);
@@ -41,10 +34,7 @@ export function SiteForm({
   }, [isPending, error, onSuccess]);
 
   return (
-    <form
-      action={formAction}
-      className={bare ? 'space-y-4' : 'max-w-md space-y-4 rounded-[26px] border border-line bg-surface p-6 shadow-sm'}
-    >
+    <form action={formAction} className="space-y-4">
       <div>
         <label htmlFor="siteName" className="mb-1 block text-sm font-bold text-ink">
           Site name
@@ -105,23 +95,13 @@ export function SiteForm({
         >
           {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Add site'}
         </button>
-        {onCancel ? (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
-          >
-            Cancel
-          </button>
-        ) : (
-          <Link
-            prefetch={false}
-            href={cancelHref!}
-            className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
-          >
-            Cancel
-          </Link>
-        )}
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40"
+        >
+          Cancel
+        </button>
       </div>
     </form>
   );

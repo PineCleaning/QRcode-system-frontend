@@ -22,17 +22,7 @@ async function createSite(clientId: string, formData: FormData): Promise<string 
   return null;
 }
 
-export async function createSiteAction(
-  clientId: string,
-  _prevState: string | null,
-  formData: FormData,
-): Promise<string | null> {
-  const error = await createSite(clientId, formData);
-  if (error) return error;
-  redirect(`/clients/${clientId}`);
-}
-
-/** Same as createSiteAction but never redirects - used by the "Add site" modal, which stays on /clients/[id] and just closes itself on success. */
+/** Used by the "Add site" modal - stays on /clients/[id] and closes itself on success. */
 export async function createSiteModalAction(
   clientId: string,
   _prevState: string | null,
@@ -59,18 +49,7 @@ async function updateSite(siteId: string, clientId: string, formData: FormData):
   return null;
 }
 
-export async function updateSiteAction(
-  siteId: string,
-  clientId: string,
-  _prevState: string | null,
-  formData: FormData,
-): Promise<string | null> {
-  const error = await updateSite(siteId, clientId, formData);
-  if (error) return error;
-  redirect(`/clients/${clientId}`);
-}
-
-/** Same as updateSiteAction but never redirects - used by the "Edit" site modal. */
+/** Used by the "Edit" site modal - stays on /clients/[id] and closes itself on success. */
 export async function updateSiteModalAction(
   siteId: string,
   clientId: string,

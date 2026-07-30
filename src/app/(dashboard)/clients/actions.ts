@@ -24,13 +24,7 @@ async function createClient(formData: FormData): Promise<string | null> {
   return null;
 }
 
-export async function createClientAction(_prevState: string | null, formData: FormData): Promise<string | null> {
-  const error = await createClient(formData);
-  if (error) return error;
-  redirect('/clients');
-}
-
-/** Same as createClientAction but never redirects - used by the "Add client" modal, which stays on /clients and just closes itself on success. */
+/** Used by the "Add client" modal - stays on /clients and closes itself on success. */
 export async function createClientModalAction(_prevState: string | null, formData: FormData): Promise<string | null> {
   return createClient(formData);
 }
@@ -55,17 +49,7 @@ async function updateClient(id: string, formData: FormData): Promise<string | nu
   return null;
 }
 
-export async function updateClientAction(
-  id: string,
-  _prevState: string | null,
-  formData: FormData,
-): Promise<string | null> {
-  const error = await updateClient(id, formData);
-  if (error) return error;
-  redirect('/clients');
-}
-
-/** Same as updateClientAction but never redirects - used by the "Edit" modal, which stays on /clients and just closes itself on success. */
+/** Used by the "Edit" modal - stays on /clients and closes itself on success. */
 export async function updateClientModalAction(
   id: string,
   _prevState: string | null,
