@@ -15,6 +15,7 @@ function Logo({ className }: { className: string }) {
         alt="Pine Cleaning Co."
         width={1462}
         height={328}
+        priority
         className={`h-auto ${className} dark:hidden`}
       />
       <Image
@@ -22,6 +23,7 @@ function Logo({ className }: { className: string }) {
         alt="Pine Cleaning Co."
         width={1462}
         height={328}
+        priority
         className={`hidden h-auto ${className} dark:block`}
       />
     </>
