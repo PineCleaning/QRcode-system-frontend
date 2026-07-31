@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
 import { FilterPendingProvider } from '@/components/FilterPending';
+import { Pagination } from '@/components/Pagination';
 import { RetryButton } from '@/components/RetryButton';
 import { ResultsContainer } from '@/components/ResultsContainer';
 import { TableRowsSkeleton } from '@/components/skeletons/TableRowsSkeleton';
 import { apiFetch } from '@/lib/api/server-fetch';
-import type { AdminFeedbackSubmission, Client, Site } from '@/lib/api/types';
+import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types';
 import { retryFeedbackAction } from './actions';
 import { FeedbackFilters } from './FeedbackFilters';
 
@@ -17,30 +18,40 @@ const STATUS_STYLES: Record<string, string> = {
   DRAFT: 'bg-ink-muted/15 text-ink-muted',
 };
 
+const PAGE_SIZE = 50;
+
 export default async function FeedbackPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string; siteId?: string; error?: string }>;
+  searchParams: Promise<{ clientId?: string; siteId?: string; error?: string; page?: string }>;
 }) {
-  const { clientId, siteId, error } = await searchParams;
+  const { clientId, siteId, error, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
 
   const query = new URLSearchParams();
   if (clientId) query.set('clientId', clientId);
   if (siteId) query.set('siteId', siteId);
-  const queryString = query.toString() ? `?${query.toString()}` : '';
+  query.set('page', String(page));
+  query.set('pageSize', String(PAGE_SIZE));
 
-  const [clients, sites, feedback] = await Promise.all([
+  const [clients, sitesResult, { data: feedback, total }] = await Promise.all([
     apiFetch<Client[]>('/clients'),
-    clientId ? apiFetch<Site[]>(`/clients/${clientId}/sites`) : Promise.resolve<Site[]>([]),
-    apiFetch<AdminFeedbackSubmission[]>(`/admin/feedback${queryString}`),
+    clientId ? apiFetch<PaginatedSites>(`/clients/${clientId}/sites?pageSize=200`) : Promise.resolve<PaginatedSites>({ data: [], total: 0, page: 1, pageSize: 0 }),
+    apiFetch<PaginatedFeedback>(`/admin/feedback?${query.toString()}`),
   ]);
+  const sites = sitesResult.data;
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const filterQuery = new URLSearchParams();
+  if (clientId) filterQuery.set('clientId', clientId);
+  if (siteId) filterQuery.set('siteId', siteId);
 
   return (
     <div>
       <div className="mb-6">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-extrabold tracking-tight text-balance">Feedback</h1>
-          <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{feedback.length}</span>
+          <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{total}</span>
         </div>
         <p className="mt-1 text-[13.5px] text-ink-muted">All feedback across every client and site.</p>
       </div>
@@ -51,7 +62,7 @@ export default async function FeedbackPage({
         {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
         <ResultsContainer skeleton={<TableRowsSkeleton />}>
-          {feedback.length === 0 ? (
+          {total === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 rounded-[26px] border border-line bg-surface p-12 text-center shadow-sm">
               <svg className="h-10 w-10 text-ink-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path
@@ -63,7 +74,8 @@ export default async function FeedbackPage({
               <p className="text-sm text-ink-muted">No feedback submitted yet.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-[26px] border border-line bg-surface shadow-sm">
+            <div className="overflow-hidden rounded-[26px] border border-line bg-surface shadow-sm">
+              <div className="overflow-x-auto">
               <table className="w-full min-w-[880px] text-left text-[13.5px]">
                 <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
                   <tr>
@@ -123,6 +135,16 @@ export default async function FeedbackPage({
                   ))}
                 </tbody>
               </table>
+              </div>
+
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                total={total}
+                pageSize={PAGE_SIZE}
+                itemLabel="feedback submissions"
+                buildHref={(p) => `/feedback?${new URLSearchParams({ ...Object.fromEntries(filterQuery), page: String(p) }).toString()}`}
+              />
             </div>
           )}
         </ResultsContainer>

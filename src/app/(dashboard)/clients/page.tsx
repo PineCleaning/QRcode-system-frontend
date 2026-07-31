@@ -1,10 +1,13 @@
 import Link from 'next/link';
 import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
+import { Pagination } from '@/components/Pagination';
 import { apiFetch } from '@/lib/api/server-fetch';
-import type { Client } from '@/lib/api/types';
+import type { PaginatedClients } from '@/lib/api/types';
 import { AddClientModal } from './AddClientModal';
 import { EditClientModal } from './EditClientModal';
-import { deactivateClientAction } from './actions';
+import { setClientStatusAction } from './actions';
+
+const PAGE_SIZE = 50;
 
 function MiniStat({ label, value, icon, tone }: { label: string; value: number; icon: React.ReactNode; tone: 'green' | 'coral' | 'sky' }) {
   const toneClass = {
@@ -51,15 +54,16 @@ const ICONS = {
 export default async function ClientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; page?: string }>;
 }) {
-  const { error } = await searchParams;
-  const clients = await apiFetch<Client[]>('/clients');
+  const { error, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
 
-  const activeCount = clients.filter((c) => c.status === 'ACTIVE').length;
-  const inactiveCount = clients.length - activeCount;
-  const totalSites = clients.reduce((sum, c) => sum + c._count.sites, 0);
-  const multiSiteCount = clients.filter((c) => c._count.sites > 1).length;
+  const { data: clients, total, activeCount, inactiveCount, totalSites, multiSiteCount } = await apiFetch<PaginatedClients>(
+    `/clients?page=${page}&pageSize=${PAGE_SIZE}`,
+  );
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div>
@@ -82,7 +86,7 @@ export default async function ClientsPage({
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
-      {clients.length === 0 ? (
+      {total === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-[26px] border border-line bg-surface p-12 text-center shadow-sm">
           <svg className="h-10 w-10 text-ink-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path
@@ -103,7 +107,7 @@ export default async function ClientsPage({
             <span className="text-xs font-bold uppercase tracking-wide" style={{ color: 'var(--hero-tag)', opacity: 0.85 }}>
               Total Clients
             </span>
-            <span className="text-[52px] font-extrabold tracking-tight">{clients.length}</span>
+            <span className="text-[52px] font-extrabold tracking-tight">{total}</span>
             <span className="text-[12.5px]" style={{ color: 'var(--hero-tag)', opacity: 0.85 }}>
               Across {totalSites} site{totalSites === 1 ? '' : 's'} on the network
             </span>
@@ -151,14 +155,19 @@ export default async function ClientsPage({
                         </Link>
                         <EditClientModal client={client} />
                         <ConfirmDeactivateButton
-                          action={deactivateClientAction.bind(null, client.id)}
+                          currentStatus={client.status}
+                          action={setClientStatusAction.bind(null, client.id)}
                           itemLabel={client.name}
-                          description={
+                          deactivateDescription={
                             client._count.sites > 0
                               ? `This will also stop every one of its ${client._count.sites} site(s) from accepting new feedback submissions — even if a site's own status is still Active. Nothing is deleted, and you can reactivate anytime from Edit.`
                               : "Its QR codes will stop accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime from Edit."
                           }
-                          triggerClassName="text-coral"
+                          activateDescription={
+                            client._count.sites > 0
+                              ? "Its QR codes will start accepting new feedback submissions again — but only for sites that are also Active; reactivate any inactive sites individually from this client's page."
+                              : 'Its QR codes will start accepting new feedback submissions again.'
+                          }
                         />
                       </td>
                     </tr>
@@ -166,6 +175,15 @@ export default async function ClientsPage({
                 </tbody>
               </table>
             </div>
+
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              pageSize={PAGE_SIZE}
+              itemLabel="clients"
+              buildHref={(p) => `/clients?page=${p}`}
+            />
           </div>
         </div>
       )}
