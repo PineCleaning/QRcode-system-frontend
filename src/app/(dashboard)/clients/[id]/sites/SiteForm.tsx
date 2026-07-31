@@ -37,7 +37,7 @@ export function SiteForm({
     <form action={formAction} className="space-y-4">
       <div>
         <label htmlFor="siteName" className="mb-1 block text-sm font-bold text-ink">
-          Site name
+          Site name <span className="text-coral">*</span>
         </label>
         <input
           id="siteName"
@@ -50,7 +50,7 @@ export function SiteForm({
 
       <div>
         <label htmlFor="address" className="mb-1 block text-sm font-bold text-ink">
-          Address
+          Address <span className="text-coral">*</span>
         </label>
         <input
           id="address"

@@ -77,7 +77,7 @@ export function ClientForm({
     <form action={formAction} className="space-y-4">
       <div>
         <label htmlFor="clientCode" className="mb-1 block text-sm font-bold text-ink">
-          Client code
+          Client code <span className="text-coral">*</span>
         </label>
         <div className="flex gap-2">
           <input
@@ -125,7 +125,7 @@ export function ClientForm({
 
       <div>
         <label htmlFor="name" className="mb-1 block text-sm font-bold text-ink">
-          Name
+          Name <span className="text-coral">*</span>
         </label>
         <input
           id="name"
