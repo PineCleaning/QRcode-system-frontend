@@ -162,7 +162,10 @@ export function ClientForm({
         <input
           id="contactPhone"
           name="contactPhone"
+          type="tel"
           defaultValue={client?.contactPhone ?? ''}
+          pattern="[0-9+-]+"
+          title="Only digits, + and - are allowed (e.g. +61-2-1111-1111)"
           className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />
       </div>

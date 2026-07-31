@@ -56,6 +56,7 @@ export function SiteForm({
           id="address"
           name="address"
           defaultValue={site?.address ?? ''}
+          required
           className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />
       </div>
