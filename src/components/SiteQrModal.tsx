@@ -24,7 +24,7 @@ export function SiteQrModal({
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-xs rounded-[26px] bg-surface p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-[26px] bg-surface p-6 shadow-lg">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-base font-extrabold">{siteName}</h2>
@@ -50,7 +50,7 @@ export function SiteQrModal({
               {status}
             </span>
 
-            <img src={qrSrc} alt={`QR code for ${siteName}`} width={200} height={200} className="mx-auto mt-4" />
+            <img src={qrSrc} alt={`QR code for ${siteName}`} width={200} height={200} className="mt-4 h-auto w-full" />
 
             <div className="mt-4 flex justify-center gap-3 text-sm">
               <a href={qrSrc} download className="text-sky hover:underline">
