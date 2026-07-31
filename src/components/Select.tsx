@@ -72,7 +72,12 @@ export function Select({
     // Scroll/resize invalidate the computed position - closing is
     // simpler and safer than trying to keep a fixed-position portal
     // element glued to a trigger that just moved out from under it.
-    function handleScrollOrResize() {
+    // Capture phase sees every scroll on the page, including the
+    // option list's own internal scroll (it's overflow-y-auto) - that
+    // one must NOT close the panel, or scrolling the list itself was
+    // impossible to do without it closing mid-scroll.
+    function handleScrollOrResize(e: Event) {
+      if (panelRef.current?.contains(e.target as Node)) return;
       setOpen(false);
     }
 
