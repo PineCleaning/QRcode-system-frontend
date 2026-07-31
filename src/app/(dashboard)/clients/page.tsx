@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ClickableRow } from '@/components/ClickableRow';
 import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
 import { Pagination } from '@/components/Pagination';
 import { apiFetch } from '@/lib/api/server-fetch';
@@ -132,12 +133,12 @@ export default async function ClientsPage({
                 </thead>
                 <tbody>
                   {clients.map((client) => (
-                    <tr key={client.id} className="border-b border-line last:border-0 hover:bg-ink/[0.03]">
-                      <td className="max-w-[220px] px-5.5 py-3.5 font-bold">
-                        <Link prefetch={false} href={`/clients/${client.id}`} className="hover:underline">
-                          {client.name}
-                        </Link>
-                      </td>
+                    <ClickableRow
+                      key={client.id}
+                      href={`/clients/${client.id}`}
+                      className="border-b border-line last:border-0 hover:bg-ink/[0.03]"
+                    >
+                      <td className="max-w-[220px] px-5.5 py-3.5 font-bold">{client.name}</td>
                       <td className="px-5.5 py-3.5 font-mono text-[12.5px] text-ink-muted">{client.clientCode}</td>
                       <td className="px-5.5 py-3.5 text-ink-muted">{client._count.sites}</td>
                       <td className="px-5.5 py-3.5">
@@ -150,9 +151,6 @@ export default async function ClientsPage({
                         </span>
                       </td>
                       <td className="px-5.5 py-3.5 font-bold">
-                        <Link prefetch={false} href={`/clients/${client.id}`} className="mr-3.5 text-ink-muted hover:text-ink">
-                          View
-                        </Link>
                         <EditClientModal client={client} />
                         <ConfirmDeactivateButton
                           currentStatus={client.status}
@@ -170,7 +168,7 @@ export default async function ClientsPage({
                           }
                         />
                       </td>
-                    </tr>
+                    </ClickableRow>
                   ))}
                 </tbody>
               </table>

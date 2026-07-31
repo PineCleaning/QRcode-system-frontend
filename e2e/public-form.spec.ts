@@ -28,7 +28,7 @@ test.describe('Public feedback form (anonymous, no login)', () => {
   });
 
   test('active slug pre-fills client/site name and submits successfully with no attachment', async ({ page }) => {
-    await page.goto(`/qr/feedback/${activeSlug}`);
+    await page.goto(`/qrfeedback/${activeSlug}`);
     await expect(page.getByLabel('Client')).toHaveValue(/E2E Public Form Client/);
     await expect(page.getByLabel('Site')).toHaveValue('Active Site');
 
@@ -39,14 +39,14 @@ test.describe('Public feedback form (anonymous, no login)', () => {
   });
 
   test('mobile number field strips non-numeric characters as typed', async ({ page }) => {
-    await page.goto(`/qr/feedback/${activeSlug}`);
+    await page.goto(`/qrfeedback/${activeSlug}`);
     const mobileInput = page.getByLabel(/mobile number/i);
     await mobileInput.fill('abc0412-345 678xyz');
     await expect(mobileInput).toHaveValue('0412-345 678');
   });
 
   test('character counter updates as feedback is typed', async ({ page }) => {
-    await page.goto(`/qr/feedback/${activeSlug}`);
+    await page.goto(`/qrfeedback/${activeSlug}`);
     await page.getByLabel(/^Feedback/).fill('Hello');
     await expect(page.getByText('5 / 5000 characters')).toBeVisible();
   });
@@ -58,7 +58,7 @@ test.describe('Public feedback form (anonymous, no login)', () => {
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
     fs.writeFileSync(imgPath, Buffer.from(pngBase64, 'base64'));
 
-    await page.goto(`/qr/feedback/${activeSlug}`);
+    await page.goto(`/qrfeedback/${activeSlug}`);
     await page.getByLabel(/^Feedback/).fill('E2E test: submitting with a real photo attached.');
     await page.getByRole('button', { name: 'Browse Files' }).click();
     // The native chooser is triggered by a hidden <input type=file>; setInputFiles targets it directly.
@@ -74,13 +74,13 @@ test.describe('Public feedback form (anonymous, no login)', () => {
   });
 
   test('inactive site shows the generic fallback, not the form', async ({ page }) => {
-    await page.goto(`/qr/feedback/${inactiveSlug}`);
+    await page.goto(`/qrfeedback/${inactiveSlug}`);
     await expect(page.getByText(/this page isn.t available/i)).toBeVisible();
     await expect(page.getByLabel(/^Feedback/)).not.toBeVisible();
   });
 
   test('nonexistent slug shows the identical fallback (no way to distinguish from deactivated)', async ({ page }) => {
-    await page.goto('/qr/feedback/this-slug-does-not-exist-e2e');
+    await page.goto('/qrfeedback/this-slug-does-not-exist-e2e');
     await expect(page.getByText(/this page isn.t available/i)).toBeVisible();
   });
 });

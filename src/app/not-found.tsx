@@ -1,4 +1,4 @@
-import { BrandHeader } from './qr/feedback/[slug]/BrandHeader';
+import { BrandHeader } from './qrfeedback/[slug]/BrandHeader';
 
 export default function NotFound() {
   return (

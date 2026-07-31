@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { createPortal } from 'react-dom';
 
 /**
  * Wraps a bound Server Action (e.g. `deleteMediaAction.bind(null, id)`)
@@ -36,32 +37,35 @@ export function ConfirmDeleteButton({
         Delete
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-[26px] bg-surface p-6 shadow-lg">
-            <h2 className="text-base font-extrabold">Delete {itemLabel}?</h2>
-            <p className="mt-2 text-sm text-ink-muted">This can&apos;t be undone.{warning ? ` ${warning}` : ''}</p>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
-                className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirm}
-                disabled={isPending}
-                className="rounded-xl bg-coral px-4 py-2 text-sm font-bold text-white hover:opacity-90 disabled:opacity-50"
-              >
-                {isPending ? 'Deleting…' : 'Delete'}
-              </button>
+      {open &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+            <div className="w-full max-w-sm rounded-[26px] bg-surface p-6 shadow-lg">
+              <h2 className="text-base font-extrabold">Delete {itemLabel}?</h2>
+              <p className="mt-2 text-sm text-ink-muted">This can&apos;t be undone.{warning ? ` ${warning}` : ''}</p>
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  disabled={isPending}
+                  className="rounded-xl border border-line px-4 py-2 text-sm font-bold text-ink hover:bg-line/40 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  disabled={isPending}
+                  className="rounded-xl bg-coral px-4 py-2 text-sm font-bold text-white hover:opacity-90 disabled:opacity-50"
+                >
+                  {isPending ? 'Deleting…' : 'Delete'}
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
