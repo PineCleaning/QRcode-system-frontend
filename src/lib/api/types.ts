@@ -13,6 +13,18 @@ export interface Client {
   _count: { sites: number };
 }
 
+/** Shape returned by GET /clients?page=&pageSize= - the unpaginated Client[] shape stays for callers that never send those params. */
+export interface PaginatedClients {
+  data: Client[];
+  total: number;
+  page: number;
+  pageSize: number;
+  activeCount: number;
+  inactiveCount: number;
+  totalSites: number;
+  multiSiteCount: number;
+}
+
 export interface Site {
   id: string;
   clientId: string;
@@ -59,6 +71,22 @@ export interface FeedbackSubmission {
 /** Global feedback list (admin "Feedbacks" page) - each row also carries its site + client. */
 export interface AdminFeedbackSubmission extends FeedbackSubmission {
   site: Pick<Site, 'id' | 'siteName' | 'slug'> & { client: Pick<Client, 'id' | 'name' | 'clientCode'> };
+}
+
+/** Shape returned by GET /admin/feedback?page=&pageSize= - the unpaginated array shape stays for callers that never send those params. */
+export interface PaginatedFeedback {
+  data: AdminFeedbackSubmission[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Shape returned by GET /clients/:id/sites?page=&pageSize= - the unpaginated Site[] shape stays for the Feedback/Assets filter dropdowns. */
+export interface PaginatedSites {
+  data: Site[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 /** Global media library (admin "Assets" page) - VERIFIED-only, so url is never null here. */

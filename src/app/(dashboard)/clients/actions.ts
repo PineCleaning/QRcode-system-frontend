@@ -58,14 +58,15 @@ export async function updateClientModalAction(
   return updateClient(id, formData);
 }
 
-export async function deactivateClientAction(id: string) {
+export async function setClientStatusAction(id: string, status: 'ACTIVE' | 'INACTIVE') {
   try {
     await apiFetch<Client>(`/clients/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ status: 'INACTIVE' }),
+      body: JSON.stringify({ status }),
     });
   } catch (err) {
-    const message = err instanceof ApiError ? err.message : 'Failed to deactivate client';
+    const verb = status === 'ACTIVE' ? 'activate' : 'deactivate';
+    const message = err instanceof ApiError ? err.message : `Failed to ${verb} client`;
     revalidatePath('/clients');
     redirect(`/clients?error=${encodeURIComponent(message)}`);
   }

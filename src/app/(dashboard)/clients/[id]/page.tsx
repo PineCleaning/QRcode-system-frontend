@@ -1,25 +1,31 @@
 import Link from 'next/link';
 import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
+import { Pagination } from '@/components/Pagination';
 import { SiteQrModal } from '@/components/SiteQrModal';
 import { apiFetch } from '@/lib/api/server-fetch';
-import type { Client, Site } from '@/lib/api/types';
+import type { Client, PaginatedSites } from '@/lib/api/types';
 import { AddSiteModal } from './sites/AddSiteModal';
 import { EditSiteModal } from './sites/EditSiteModal';
-import { deactivateSiteAction } from './sites/actions';
+import { setSiteStatusAction } from './sites/actions';
+
+const PAGE_SIZE = 50;
 
 export default async function ClientDetailPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; page?: string }>;
 }) {
   const { id } = await params;
-  const { error } = await searchParams;
-  const [client, sites] = await Promise.all([
+  const { error, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const [client, { data: sites, total }] = await Promise.all([
     apiFetch<Client>(`/clients/${id}`),
-    apiFetch<Site[]>(`/clients/${id}/sites`),
+    apiFetch<PaginatedSites>(`/clients/${id}/sites?page=${page}&pageSize=${PAGE_SIZE}`),
   ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div>
@@ -44,7 +50,7 @@ export default async function ClientDetailPage({
         <AddSiteModal clientId={id} />
       </div>
 
-      {sites.length === 0 ? (
+      {total === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-[26px] border border-line bg-surface p-12 text-center shadow-sm">
           <svg className="h-10 w-10 text-ink-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -61,7 +67,8 @@ export default async function ClientDetailPage({
           />
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-[26px] border border-line bg-surface shadow-sm">
+        <div className="overflow-hidden rounded-[26px] border border-line bg-surface shadow-sm">
+          <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left text-[13.5px]">
             <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
               <tr>
@@ -99,9 +106,9 @@ export default async function ClientDetailPage({
                       </Link>
                       <EditSiteModal site={site} clientId={id} />
                       <ConfirmDeactivateButton
-                        action={deactivateSiteAction.bind(null, site.id, id)}
+                        currentStatus={site.status}
+                        action={setSiteStatusAction.bind(null, site.id, id)}
                         itemLabel={site.siteName}
-                        triggerClassName="text-coral"
                       />
                     </div>
                   </td>
@@ -109,6 +116,16 @@ export default async function ClientDetailPage({
               ))}
             </tbody>
           </table>
+          </div>
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            pageSize={PAGE_SIZE}
+            itemLabel="sites"
+            buildHref={(p) => `/clients/${id}?page=${p}`}
+          />
         </div>
       )}
     </div>

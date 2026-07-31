@@ -59,14 +59,15 @@ export async function updateSiteModalAction(
   return updateSite(siteId, clientId, formData);
 }
 
-export async function deactivateSiteAction(siteId: string, clientId: string) {
+export async function setSiteStatusAction(siteId: string, clientId: string, status: 'ACTIVE' | 'INACTIVE') {
   try {
     await apiFetch<Site>(`/sites/${siteId}`, {
       method: 'PUT',
-      body: JSON.stringify({ status: 'INACTIVE' }),
+      body: JSON.stringify({ status }),
     });
   } catch (err) {
-    const message = err instanceof ApiError ? err.message : 'Failed to deactivate site';
+    const verb = status === 'ACTIVE' ? 'activate' : 'deactivate';
+    const message = err instanceof ApiError ? err.message : `Failed to ${verb} site`;
     revalidatePath(`/clients/${clientId}`);
     redirect(`/clients/${clientId}?error=${encodeURIComponent(message)}`);
   }

@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Pine Cleaning Co. — Admin",
+  title: "Pine Cleaning Co: Admin",
   description: "QR feedback admin portal for Pine Cleaning Co.",
 };
 
