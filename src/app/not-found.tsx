@@ -1,16 +1,15 @@
-import Link from 'next/link';
+import { BrandHeader } from './qr/feedback/[slug]/BrandHeader';
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-page px-4 text-center text-ink">
-      <h1 className="text-lg font-extrabold">Page not found</h1>
-      <p className="max-w-sm text-sm text-ink-muted">The page you&apos;re looking for doesn&apos;t exist.</p>
-      <Link
-        href="/clients"
-        className="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page hover:opacity-90"
-      >
-        Back to Clients
-      </Link>
+    <div className="min-h-screen bg-gradient-to-b from-[#e6f0e3] to-[#c9ddc3] px-4 py-10 sm:py-16">
+      <div className="mx-auto w-full max-w-lg rounded-3xl bg-[#eaf3e7] p-4 shadow-lg sm:p-6">
+        <BrandHeader />
+        <div className="rounded-2xl bg-white p-6 text-center shadow-sm sm:p-8">
+          <h1 className="text-xl font-bold text-[#2d3660]">Page not found</h1>
+          <p className="mt-2 text-sm text-gray-600">The page you&apos;re looking for doesn&apos;t exist.</p>
+        </div>
+      </div>
     </div>
   );
 }
