@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
 import { FilterPendingProvider } from '@/components/FilterPending';
+import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { Pagination } from '@/components/Pagination';
 import { RetryButton } from '@/components/RetryButton';
 import { ResultsContainer } from '@/components/ResultsContainer';
 import { TableRowsSkeleton } from '@/components/skeletons/TableRowsSkeleton';
+import { TruncatedFeedback } from '@/components/TruncatedFeedback';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types';
 import { retryFeedbackAction } from './actions';
@@ -46,6 +48,23 @@ export default async function FeedbackPage({
   if (clientId) filterQuery.set('clientId', clientId);
   if (siteId) filterQuery.set('siteId', siteId);
 
+  // Every verified attachment across every row on this page, flattened
+  // into one shared list - lets any attachment link open the lightbox
+  // and Prev/Next through every other one, not just the ones in its
+  // own row. mediaIndexMap maps a media id back to its position in
+  // this flat list so AttachmentsCell can open the right item.
+  const verifiedMedia = feedback.flatMap((item) => item.media.filter((m) => m.url));
+  const mediaIndexMap = new Map(verifiedMedia.map((m, i) => [m.id, i]));
+  const lightboxItems = verifiedMedia.map((m) => {
+    const parentFeedback = feedback.find((f) => f.media.some((fm) => fm.id === m.id))!;
+    return {
+      url: m.url!,
+      label: m.originalFilename || (m.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
+      resourceType: m.resourceType,
+      caption: `${parentFeedback.site.client.name} · ${parentFeedback.site.siteName}`,
+    };
+  });
+
   return (
     <div>
       <div className="mb-6">
@@ -74,6 +93,7 @@ export default async function FeedbackPage({
               <p className="text-sm text-ink-muted">No feedback submitted yet.</p>
             </div>
           ) : (
+            <MediaLightboxProvider items={lightboxItems}>
             <div className="overflow-hidden rounded-[26px] border border-line bg-surface shadow-sm">
               <div className="overflow-x-auto">
               <table className="w-full min-w-[880px] text-left text-[13.5px]">
@@ -109,13 +129,13 @@ export default async function FeedbackPage({
                         </Link>
                       </td>
                       <td className="max-w-md px-5.5 py-3.5">
-                        <p className="whitespace-pre-wrap">{item.feedback}</p>
+                        <TruncatedFeedback text={item.feedback} />
                       </td>
                       <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">
                         {item.mobileNumber ?? <span className="text-xs italic text-ink-muted/70">Not provided</span>}
                       </td>
                       <td className="px-5.5 py-3.5">
-                        <AttachmentsCell media={item.media} />
+                        <AttachmentsCell media={item.media} pathToRevalidate="/feedback" mediaIndexMap={mediaIndexMap} />
                       </td>
                       <td className="px-5.5 py-3.5">
                         <div className="flex items-center justify-center gap-1.5">
@@ -146,6 +166,7 @@ export default async function FeedbackPage({
                 buildHref={(p) => `/feedback?${new URLSearchParams({ ...Object.fromEntries(filterQuery), page: String(p) }).toString()}`}
               />
             </div>
+            </MediaLightboxProvider>
           )}
         </ResultsContainer>
       </FilterPendingProvider>

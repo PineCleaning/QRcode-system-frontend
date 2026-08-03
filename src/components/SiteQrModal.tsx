@@ -1,17 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { CopyLinkButton } from './CopyLinkButton';
 
 export function SiteQrModal({
   siteId,
   siteName,
   slug,
   status,
+  feedbackUrl,
 }: {
   siteId: string;
   siteName: string;
   slug: string;
   status: 'ACTIVE' | 'INACTIVE';
+  /** Server-computed from BASE_DOMAIN (same value baked into the QR image) - never guessed from window.location, which would be wrong if the admin portal and public form aren't on the same host. */
+  feedbackUrl: string;
 }) {
   const [open, setOpen] = useState(false);
   const qrSrc = `/api/qr/${siteId}`;
@@ -28,7 +32,10 @@ export function SiteQrModal({
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-base font-extrabold">{siteName}</h2>
-                <p className="text-xs text-ink-muted">{slug}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs text-ink-muted">{slug}</p>
+                  <CopyLinkButton url={feedbackUrl} />
+                </div>
               </div>
               <button
                 type="button"

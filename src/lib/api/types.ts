@@ -34,6 +34,8 @@ export interface Site {
   address: string | null;
   status: ClientSiteStatus;
   clickupEntityId: string | null;
+  /** Full public feedback form URL for this site - server-computed from BASE_DOMAIN, same value baked into the generated QR image. */
+  feedbackUrl: string;
   createdAt: string;
   updatedAt: string;
 }

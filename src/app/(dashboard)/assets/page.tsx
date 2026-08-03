@@ -1,12 +1,23 @@
 import Link from 'next/link';
 import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { FilterPendingProvider } from '@/components/FilterPending';
+import { MediaLightboxProvider, MediaReviewButton } from '@/components/MediaLightbox';
 import { ResultsContainer } from '@/components/ResultsContainer';
 import { CardGridSkeleton } from '@/components/skeletons/CardGridSkeleton';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { AdminMediaItem, Client, Site } from '@/lib/api/types';
 import { deleteMediaAction } from './actions';
 import { FeedbackFilters } from '../feedback/FeedbackFilters';
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleString('en-AU', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export default async function AssetsPage({
   searchParams,
@@ -54,8 +65,16 @@ export default async function AssetsPage({
               <p className="text-sm text-ink-muted">No assets yet.</p>
             </div>
           ) : (
+            <MediaLightboxProvider
+              items={media.map((item) => ({
+                url: item.url,
+                label: item.originalFilename || (item.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
+                resourceType: item.resourceType,
+                caption: `${item.feedback.site.client.name} · ${item.feedback.site.siteName}`,
+              }))}
+            >
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {media.map((item) => {
+              {media.map((item, index) => {
                 const label = item.originalFilename || (item.resourceType === 'IMAGE' ? 'Photo' : 'Video');
                 const itemLabel = item.originalFilename || (item.resourceType === 'IMAGE' ? 'this photo' : 'this video');
 
@@ -97,16 +116,10 @@ export default async function AssetsPage({
                         {item.feedback.site.siteName}
                       </Link>
                     </p>
+                    <p className="mt-0.5 text-[11px] text-ink-muted/70">{formatDate(item.createdAt)}</p>
 
                     <div className="mt-3 flex items-center gap-2 text-xs">
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex-1 rounded-xl border border-green py-1.5 text-center font-bold text-green hover:bg-green/10"
-                      >
-                        Review
-                      </a>
+                      <MediaReviewButton index={index} />
                       <ConfirmDeleteButton
                         action={deleteMediaAction.bind(null, item.id)}
                         itemLabel={itemLabel}
@@ -118,6 +131,7 @@ export default async function AssetsPage({
                 );
               })}
             </div>
+            </MediaLightboxProvider>
           )}
         </ResultsContainer>
       </FilterPendingProvider>

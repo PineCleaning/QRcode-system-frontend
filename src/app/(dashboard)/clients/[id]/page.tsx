@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
+import { CopyLinkButton } from '@/components/CopyLinkButton';
 import { Pagination } from '@/components/Pagination';
 import { SiteQrModal } from '@/components/SiteQrModal';
 import { apiFetch } from '@/lib/api/server-fetch';
@@ -26,6 +27,14 @@ export default async function ClientDetailPage({
     apiFetch<PaginatedSites>(`/clients/${id}/sites?page=${page}&pageSize=${PAGE_SIZE}`),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  // Deactivating a client never touches its sites' own status rows (see
+  // setSiteStatusAction) - a site's real ACTIVE/INACTIVE value is
+  // untouched the whole time. This only changes what's *displayed*:
+  // every site under an inactive client shows "Client Inactive"
+  // regardless of its own real status, and reverts to showing that
+  // real status the instant the client is reactivated - nothing to
+  // restore, since it was never overwritten.
+  const clientInactive = client.status === 'INACTIVE';
 
   return (
     <div>
@@ -84,19 +93,35 @@ export default async function ClientDetailPage({
                 <tr key={site.id} className="border-b border-line last:border-0 hover:bg-ink/[0.03]">
                   <td className="max-w-[180px] px-5.5 py-3.5 font-bold">{site.siteName}</td>
                   <td className="max-w-[200px] px-5.5 py-3.5 text-ink-muted">{site.address || <span className="text-ink-muted/40">—</span>}</td>
-                  <td className="px-5.5 py-3.5 font-mono text-[12.5px] text-ink-muted">{site.slug}</td>
+                  <td className="px-5.5 py-3.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-[12.5px] text-ink-muted">{site.slug}</span>
+                      <CopyLinkButton url={site.feedbackUrl} />
+                    </div>
+                  </td>
                   <td className="px-5.5 py-3.5">
                     <span
+                      title={clientInactive ? `This site's own status is ${site.status}, but its QR code is blocked because ${client.name} is deactivated.` : undefined}
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold before:h-1.5 before:w-1.5 before:rounded-full before:bg-current ${
-                        site.status === 'ACTIVE' ? 'bg-green/15 text-green' : 'bg-ink-muted/15 text-ink-muted'
+                        clientInactive
+                          ? 'bg-coral/15 text-coral'
+                          : site.status === 'ACTIVE'
+                            ? 'bg-green/15 text-green'
+                            : 'bg-ink-muted/15 text-ink-muted'
                       }`}
                     >
-                      {site.status}
+                      {clientInactive ? 'CLIENT INACTIVE' : site.status}
                     </span>
                   </td>
                   <td className="px-5.5 py-3.5 font-bold">
                     <div className="flex gap-3 text-[12.5px]">
-                      <SiteQrModal siteId={site.id} siteName={site.siteName} slug={site.slug} status={site.status} />
+                      <SiteQrModal
+                        siteId={site.id}
+                        siteName={site.siteName}
+                        slug={site.slug}
+                        status={site.status}
+                        feedbackUrl={site.feedbackUrl}
+                      />
                       <Link
                         prefetch={false}
                         href={`/clients/${id}/sites/${site.id}/feedback`}
@@ -104,12 +129,16 @@ export default async function ClientDetailPage({
                       >
                         Feedback
                       </Link>
-                      <EditSiteModal site={site} clientId={id} />
-                      <ConfirmDeactivateButton
-                        currentStatus={site.status}
-                        action={setSiteStatusAction.bind(null, site.id, id)}
-                        itemLabel={site.siteName}
-                      />
+                      {!clientInactive && (
+                        <>
+                          <EditSiteModal site={site} clientId={id} />
+                          <ConfirmDeactivateButton
+                            currentStatus={site.status}
+                            action={setSiteStatusAction.bind(null, site.id, id)}
+                            itemLabel={site.siteName}
+                          />
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -42,7 +42,10 @@ export async function createTestClient(clientCode: string, name: string) {
 }
 
 export async function createTestSite(clientId: string, siteName: string) {
-  const res = await apiFetch(`/clients/${clientId}/sites`, { method: 'POST', body: JSON.stringify({ siteName }) });
+  const res = await apiFetch(`/clients/${clientId}/sites`, {
+    method: 'POST',
+    body: JSON.stringify({ siteName, address: '123 Test St' }),
+  });
   if (!res.ok) throw new Error(`Failed to create test site: ${res.status} ${await res.text()}`);
   return res.json();
 }

@@ -150,7 +150,12 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
         const sigRes = await fetch(`${API_BASE_URL}/uploads/cloudinary-signature`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ folder: `feedback/${slug}` }),
+          // Date-nested (feedback/{slug}/{YYYY-MM-DD}/...) purely for
+          // easier browsing in the Cloudinary dashboard - the app never
+          // parses this path back out, it always treats public_id as an
+          // opaque reference (see buildDeliveryUrl/verifyResource/destroy),
+          // so nesting it deeper here needs no changes anywhere else.
+          body: JSON.stringify({ folder: `feedback/${slug}/${new Date().toISOString().slice(0, 10)}` }),
         });
         if (!sigRes.ok) throw new Error('Could not prepare file upload. Please try again.');
         const sig: SignedUploadParams = await sigRes.json();
