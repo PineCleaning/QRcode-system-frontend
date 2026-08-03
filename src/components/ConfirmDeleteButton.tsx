@@ -15,12 +15,18 @@ export function ConfirmDeleteButton({
   itemLabel,
   warning,
   triggerClassName = 'text-coral hover:underline',
+  triggerLabel = 'Delete',
+  triggerAriaLabel,
 }: {
   action: () => Promise<void>;
   itemLabel: string;
   warning?: string;
   /** Defaults to the plain text-link style used in tables; pass a pill/button style for card layouts (e.g. the Assets grid). */
   triggerClassName?: string;
+  /** Defaults to the literal "Delete" text; pass an icon (e.g. a trash SVG) for icon-only triggers. */
+  triggerLabel?: React.ReactNode;
+  /** Required when triggerLabel isn't plain text (e.g. an icon), so the button still has an accessible name. */
+  triggerAriaLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -33,8 +39,8 @@ export function ConfirmDeleteButton({
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={triggerClassName}>
-        Delete
+      <button type="button" onClick={() => setOpen(true)} aria-label={triggerAriaLabel} className={triggerClassName}>
+        {triggerLabel}
       </button>
 
       {open &&
