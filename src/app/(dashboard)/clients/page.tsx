@@ -158,12 +158,12 @@ export default async function ClientsPage({
                           itemLabel={client.name}
                           deactivateDescription={
                             client._count.sites > 0
-                              ? `This will also stop every one of its ${client._count.sites} site(s) from accepting new feedback submissions — even if a site's own status is still Active. Nothing is deleted, and you can reactivate anytime from Edit.`
-                              : "Its QR codes will stop accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime from Edit."
+                              ? `This will also stop every one of its ${client._count.sites} site(s) from accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime using the Activate button.`
+                              : 'Its QR codes will stop accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime using the Activate button.'
                           }
                           activateDescription={
                             client._count.sites > 0
-                              ? "Its QR codes will start accepting new feedback submissions again — but only for sites that are also Active; reactivate any inactive sites individually from this client's page."
+                              ? "Its QR codes will start accepting new feedback submissions again, but only for sites that are also Active; reactivate any inactive sites individually from the site page."
                               : 'Its QR codes will start accepting new feedback submissions again.'
                           }
                         />

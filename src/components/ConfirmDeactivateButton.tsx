@@ -13,7 +13,7 @@ export function ConfirmDeactivateButton({
   currentStatus,
   action,
   itemLabel,
-  deactivateDescription = "Its QR code will stop accepting new feedback submissions. Nothing is deleted - existing feedback stays intact, and you can reactivate this site anytime from Edit.",
+  deactivateDescription = "Its QR code will stop accepting new feedback submissions. Nothing is deleted - existing feedback stays intact, and you can reactivate this site anytime using the Activate button.",
   activateDescription = 'Its QR code will start accepting new feedback submissions again.',
 }: {
   currentStatus: 'ACTIVE' | 'INACTIVE';
