@@ -19,3 +19,23 @@ export async function retryFeedbackAction(feedbackId: string, pathToRevalidate: 
   }
   revalidatePath(pathToRevalidate);
 }
+
+/**
+ * Deletes a single attachment (from Cloudinary and the DB, via the same
+ * DELETE /admin/media/:id the Assets page already uses) from wherever
+ * it's shown - the Feedback page's attachments dropdown, in this case.
+ * Always revalidates /assets too, since the deleted file must also
+ * disappear from there, not just from the page this was called on.
+ */
+export async function deleteAttachmentAction(mediaId: string, pathToRevalidate: string) {
+  try {
+    await apiFetch(`/admin/media/${mediaId}`, { method: 'DELETE' });
+  } catch (err) {
+    const message = err instanceof ApiError ? err.message : 'Failed to delete attachment';
+    revalidatePath(pathToRevalidate);
+    revalidatePath('/assets');
+    redirect(`${pathToRevalidate}?error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath(pathToRevalidate);
+  revalidatePath('/assets');
+}

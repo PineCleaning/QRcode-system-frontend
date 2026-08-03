@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
+import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { RetryButton } from '@/components/RetryButton';
+import { TruncatedFeedback } from '@/components/TruncatedFeedback';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, FeedbackSubmission, Site } from '@/lib/api/types';
 import { retryFeedbackAction } from '@/app/(dashboard)/feedback/actions';
@@ -37,6 +39,17 @@ export default async function SiteFeedbackPage({
     apiFetch<Site>(`/sites/${siteId}`),
     apiFetch<FeedbackSubmission[]>(`/sites/${siteId}/feedback`),
   ]);
+
+  // Same shared-lightbox setup as the main Feedback page, scoped to
+  // this one site's rows only.
+  const verifiedMedia = feedback.flatMap((item) => item.media.filter((m) => m.url));
+  const mediaIndexMap = new Map(verifiedMedia.map((m, i) => [m.id, i]));
+  const lightboxItems = verifiedMedia.map((m) => ({
+    url: m.url!,
+    label: m.originalFilename || (m.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
+    resourceType: m.resourceType,
+    caption: site.siteName,
+  }));
 
   return (
     <div>
@@ -75,6 +88,7 @@ export default async function SiteFeedbackPage({
           <p className="text-sm text-ink-muted">No feedback submitted yet.</p>
         </div>
       ) : (
+        <MediaLightboxProvider items={lightboxItems}>
         <div className="overflow-x-auto rounded-[26px] border border-line bg-surface shadow-sm">
           <table className="w-full min-w-[720px] text-left text-[13.5px]">
             <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
@@ -91,13 +105,17 @@ export default async function SiteFeedbackPage({
                 <tr key={item.id} className="border-b border-line align-top last:border-0 hover:bg-ink/[0.03]">
                   <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">{formatDate(item.submittedAt)}</td>
                   <td className="max-w-md px-5.5 py-3.5">
-                    <p className="whitespace-pre-wrap">{item.feedback}</p>
+                    <TruncatedFeedback text={item.feedback} />
                   </td>
                   <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">
                     {item.mobileNumber ?? <span className="text-xs italic text-ink-muted/70">Not provided</span>}
                   </td>
                   <td className="px-5.5 py-3.5">
-                    <AttachmentsCell media={item.media} />
+                    <AttachmentsCell
+                      media={item.media}
+                      pathToRevalidate={`/clients/${id}/sites/${siteId}/feedback`}
+                      mediaIndexMap={mediaIndexMap}
+                    />
                   </td>
                   <td className="px-5.5 py-3.5">
                     <div className="flex items-center justify-center gap-1.5">
@@ -120,6 +138,7 @@ export default async function SiteFeedbackPage({
             </tbody>
           </table>
         </div>
+        </MediaLightboxProvider>
       )}
     </div>
   );
