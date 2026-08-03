@@ -45,7 +45,14 @@ test.describe('Authenticated navigation', () => {
     // there would silently invalidate the shared session every other test
     // in the run depends on. This is purely a test-isolation concern, not
     // something the app fix needed to solve.
-    const context = await browser.newContext();
+    // Must explicitly override the project's default storageState (an
+    // already-authenticated session, e2e/.auth/admin.json) to a logged-out
+    // one - browser.newContext() otherwise inherits it too, meaning
+    // page.goto('/login') would just redirect straight back to /clients
+    // (the app correctly redirecting an authenticated visitor away from
+    // /login), and this test would hang waiting for an Email field that
+    // never appears.
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
     const page = await context.newPage();
     await page.goto('/login');
     await page.getByLabel('Email').fill(process.env.E2E_ADMIN_EMAIL!);
