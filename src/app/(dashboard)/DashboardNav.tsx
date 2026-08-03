@@ -166,7 +166,7 @@ export function DashboardNav() {
       )}
 
       {/* Persistent desktop sidebar */}
-      <aside className="hidden w-56 shrink-0 flex-col border-r border-line p-4 md:flex">
+      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col overflow-y-auto border-r border-line p-4 md:flex">
         <div className="mb-6">
           <Logo className="w-40" />
         </div>
