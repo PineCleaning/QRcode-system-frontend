@@ -45,12 +45,6 @@ test.describe('Public feedback form (anonymous, no login)', () => {
     await expect(mobileInput).toHaveValue('0412-345 678');
   });
 
-  test('character counter updates as feedback is typed', async ({ page }) => {
-    await page.goto(`/qrfeedback/${activeSlug}`);
-    await page.getByLabel(/^Feedback/).fill('Hello');
-    await expect(page.getByText('5 / 5000 characters')).toBeVisible();
-  });
-
   test('submitting with a real uploaded image attaches it and is reported VERIFIED', async ({ page }) => {
     const imgPath = path.join(os.tmpdir(), `e2e-attachment-${RUN_ID}.png`);
     // 1x1 transparent PNG

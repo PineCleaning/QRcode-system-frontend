@@ -270,22 +270,6 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="feedback" className="mb-2 block text-base font-bold text-[#2d3660]">
-              Feedback: <span className="text-red-600">*</span>
-            </label>
-            <textarea
-              id="feedback"
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              required
-              maxLength={5000}
-              rows={6}
-              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
-            />
-            <p className="mt-1 text-xs text-gray-500">{feedback.length} / 5000 characters</p>
-          </div>
-
-          <div>
             <label htmlFor="mobileNumber" className="mb-2 block text-base font-bold text-[#2d3660]">
               Mobile Number <span className="font-normal text-gray-500">(optional)</span>
             </label>
@@ -296,9 +280,24 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
               value={mobileNumber}
               onChange={(e) => setMobileNumber(e.target.value.replace(/[^0-9+\-\s()]/g, ''))}
               maxLength={32}
+              placeholder="Max 32 characters"
               className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
             />
-            <p className="mt-1 text-xs text-gray-500">Max 32 characters</p>
+            <p className="mt-1 text-xs text-gray-500">THIS LETS US SENDS YOU A TEXT UPDATE</p>
+          </div>
+
+          <div>
+            <label htmlFor="feedback" className="mb-2 block text-base font-bold text-[#2d3660]">
+              Feedback: <span className="text-red-600">*</span>
+            </label>
+            <textarea
+              id="feedback"
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              required
+              rows={6}
+              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
+            />
           </div>
 
           <div>
