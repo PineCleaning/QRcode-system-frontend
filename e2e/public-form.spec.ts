@@ -5,7 +5,7 @@ import os from 'node:os';
 import { createTestClient, createTestSite, deleteTestClient, apiFetch } from './backend-client';
 
 const RUN_ID = Date.now();
-let clientId: string;
+let clientCode: string;
 let activeSlug: string;
 let inactiveSlug: string;
 
@@ -15,16 +15,16 @@ test.use({ storageState: { cookies: [], origins: [] } });
 test.describe('Public feedback form (anonymous, no login)', () => {
   test.beforeAll(async () => {
     const client = await createTestClient(`e2e-public-${RUN_ID}`, `E2E Public Form Client ${RUN_ID}`);
-    clientId = client.id;
-    const activeSite = await createTestSite(clientId, 'Active Site');
+    clientCode = client.id;
+    const activeSite = await createTestSite(clientCode, 'Active Site');
     activeSlug = activeSite.slug;
-    const inactiveSite = await createTestSite(clientId, 'Inactive Site');
+    const inactiveSite = await createTestSite(clientCode, 'Inactive Site');
     inactiveSlug = inactiveSite.slug;
     await apiFetch(`/sites/${inactiveSite.id}`, { method: 'PUT', body: JSON.stringify({ status: 'INACTIVE' }) });
   });
 
   test.afterAll(async () => {
-    await deleteTestClient(clientId);
+    await deleteTestClient(clientCode);
   });
 
   test('active slug pre-fills client/site name and submits successfully with no attachment', async ({ page }) => {

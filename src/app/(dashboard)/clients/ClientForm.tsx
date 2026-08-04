@@ -30,7 +30,7 @@ function randomSuffix(): string {
   return String(Math.floor(1000 + Math.random() * 9000));
 }
 
-function buildClientCode(name: string): string {
+function buildClientId(name: string): string {
   const base = slugify(name);
   return base ? `${base}-${randomSuffix()}` : '';
 }
@@ -51,9 +51,9 @@ export function ClientForm({
   const [error, formAction, isPending] = useActionState(action, null);
   const isEdit = Boolean(client);
 
-  const [clientCode, setClientCode] = useState(client?.clientCode ?? '');
+  const [clientId, setClientId] = useState(client?.clientId ?? '');
   const [nameValue, setNameValue] = useState(client?.name ?? '');
-  // Once the admin types directly into Client code, stop overwriting it
+  // Once the admin types directly into Client ID, stop overwriting it
   // from Name changes - same "auto-slug until manually touched" pattern
   // used by most CMS permalink fields.
   const [codeManuallyEdited, setCodeManuallyEdited] = useState(isEdit);
@@ -76,28 +76,28 @@ export function ClientForm({
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label htmlFor="clientCode" className="mb-1 block text-sm font-bold text-ink">
-          Client code <span className="text-coral">*</span>
+        <label htmlFor="clientId" className="mb-1 block text-sm font-bold text-ink">
+          Client ID <span className="text-coral">*</span>
         </label>
         <div className="flex gap-2">
           <input
-            id="clientCode"
-            name="clientCode"
-            value={clientCode}
+            id="clientId"
+            name="clientId"
+            value={clientId}
             onChange={(e) => {
-              setClientCode(e.target.value);
+              setClientId(e.target.value);
               setCodeManuallyEdited(true);
             }}
             required
             disabled={isEdit}
-            pattern="[a-z0-9]+(-[a-z0-9]+)*"
-            title="Lowercase alphanumeric with optional hyphens (e.g. acme001)"
+            pattern="[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*"
+            title="Alphanumeric with optional hyphens (e.g. acme001) - will be saved in lowercase"
             className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green disabled:bg-line/40 disabled:text-ink-muted"
           />
           {!isEdit && (
             <button
               type="button"
-              onClick={() => setClientCode(buildClientCode(nameValue))}
+              onClick={() => setClientId(buildClientId(nameValue))}
               disabled={!nameValue.trim()}
               title="Regenerate"
               className="flex shrink-0 items-center gap-1 rounded-xl border border-line px-3 py-2 text-sm text-ink-muted hover:bg-line/40 disabled:opacity-50"
@@ -113,9 +113,9 @@ export function ClientForm({
             </button>
           )}
         </div>
-        <p className="mt-1 text-xs text-ink-muted">Lowercase letters, numbers, and hyphens only — no spaces, capitals, or punctuation.</p>
+        <p className="mt-1 text-xs text-ink-muted">Letters, numbers, and hyphens only — no spaces or punctuation. Always saved in lowercase.</p>
         {isEdit ? (
-          <p className="mt-1 text-xs text-ink-muted">Client code can&apos;t be changed once created.</p>
+          <p className="mt-1 text-xs text-ink-muted">Client ID can&apos;t be changed once created.</p>
         ) : (
           <p className="mt-1 text-xs text-ink-muted">
             Auto-generated from the client name below — you can still edit it, or regenerate a new random suffix.
@@ -134,7 +134,7 @@ export function ClientForm({
           onChange={(e) => {
             setNameValue(e.target.value);
             if (!isEdit && !codeManuallyEdited) {
-              setClientCode(buildClientCode(e.target.value));
+              setClientId(buildClientId(e.target.value));
             }
           }}
           required

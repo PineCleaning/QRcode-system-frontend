@@ -4,7 +4,7 @@ import { TableRowsSkeleton } from '@/components/skeletons/TableRowsSkeleton';
 
 const CLIENTS_COLUMNS = [
   { label: 'Name', width: 'w-28' },
-  { label: 'Client code', width: 'w-32' },
+  { label: 'Client ID', width: 'w-32' },
   { label: 'Sites', width: 'w-8' },
   { label: 'Status', width: 'w-16' },
   { label: 'Actions', width: 'w-32' },

@@ -56,7 +56,7 @@ export default async function ClientDetailPage({
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-bold">Sites</h2>
-        <AddSiteModal clientId={id} />
+        <AddSiteModal clientCode={id} />
       </div>
 
       {total === 0 ? (
@@ -71,7 +71,7 @@ export default async function ClientDetailPage({
           </svg>
           <p className="text-sm text-ink-muted">No sites yet.</p>
           <AddSiteModal
-            clientId={id}
+            clientCode={id}
             triggerClassName="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page transition hover:-translate-y-px"
           />
         </div>
@@ -81,7 +81,7 @@ export default async function ClientDetailPage({
           <table className="w-full min-w-[760px] text-left text-[13.5px]">
             <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
               <tr>
-                <th className="whitespace-nowrap px-5.5 py-4">Site name</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Business Name</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Address</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Slug</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Status</th>
@@ -91,7 +91,7 @@ export default async function ClientDetailPage({
             <tbody>
               {sites.map((site) => (
                 <tr key={site.id} className="border-b border-line last:border-0 hover:bg-ink/[0.03]">
-                  <td className="max-w-[180px] px-5.5 py-3.5 font-bold">{site.siteName}</td>
+                  <td className="max-w-[180px] px-5.5 py-3.5 font-bold">{site.businessName}</td>
                   <td className="max-w-[200px] px-5.5 py-3.5 text-ink-muted">{site.address || <span className="text-ink-muted/40">—</span>}</td>
                   <td className="px-5.5 py-3.5">
                     <div className="flex items-center gap-1.5">
@@ -117,7 +117,7 @@ export default async function ClientDetailPage({
                     <div className="flex gap-3 text-[12.5px]">
                       <SiteQrModal
                         siteId={site.id}
-                        siteName={site.siteName}
+                        businessName={site.businessName}
                         slug={site.slug}
                         status={site.status}
                         feedbackUrl={site.feedbackUrl}
@@ -131,11 +131,11 @@ export default async function ClientDetailPage({
                       </Link>
                       {!clientInactive && (
                         <>
-                          <EditSiteModal site={site} clientId={id} />
+                          <EditSiteModal site={site} clientCode={id} />
                           <ConfirmDeactivateButton
                             currentStatus={site.status}
                             action={setSiteStatusAction.bind(null, site.id, id)}
-                            itemLabel={site.siteName}
+                            itemLabel={site.businessName}
                           />
                         </>
                       )}

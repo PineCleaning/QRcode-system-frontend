@@ -62,7 +62,7 @@ interface SubmitResponse {
   media?: SubmitResponseMedia[];
 }
 
-export function FeedbackForm({ slug, siteName, clientName }: { slug: string; siteName: string; clientName: string }) {
+export function FeedbackForm({ slug, businessName, clientName }: { slug: string; businessName: string; clientName: string }) {
   // Generated once per form load - reused on every retry, so a retry
   // after a network error is a safe idempotent replay, not a
   // duplicate submission.
@@ -256,12 +256,12 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
             />
           </div>
           <div>
-            <label htmlFor="siteName" className="mb-2 block text-base font-bold text-[#2d3660]">
-              Site
+            <label htmlFor="businessName" className="mb-2 block text-base font-bold text-[#2d3660]">
+              Business Name
             </label>
             <input
-              id="siteName"
-              value={siteName}
+              id="businessName"
+              value={businessName}
               disabled
               className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
             />

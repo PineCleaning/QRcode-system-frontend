@@ -6,21 +6,21 @@ const CLIENT_NAME = `E2E Feedback Client ${RUN_ID}`;
 const SITE_NAME = `E2E Feedback Site ${RUN_ID}`;
 const FEEDBACK_TEXT = `E2E test feedback with a real attachment ${RUN_ID}`;
 
-let clientId: string;
+let clientCode: string;
 let slug: string;
 
 test.describe.serial('Global Feedback + Assets admin pages', () => {
   test.beforeAll(async () => {
     const client = await createTestClient(`e2e-fb-${RUN_ID}`, CLIENT_NAME);
-    clientId = client.id;
-    const site = await createTestSite(clientId, SITE_NAME);
+    clientCode = client.id;
+    const site = await createTestSite(clientCode, SITE_NAME);
     slug = site.slug;
     // Real end-to-end: signature -> direct Cloudinary upload -> feedback submission with that public_id.
     await submitFeedbackWithRealAttachment(slug, FEEDBACK_TEXT);
   });
 
   test.afterAll(async () => {
-    await deleteTestClient(clientId); // will deactivate instead of hard-delete since feedback history now exists
+    await deleteTestClient(clientCode); // will deactivate instead of hard-delete since feedback history now exists
   });
 
   test('feedback appears on the global Feedback page with client/site/attachment', async ({ page }) => {
@@ -35,7 +35,7 @@ test.describe.serial('Global Feedback + Assets admin pages', () => {
   test('client/site filters on the Feedback page narrow the list correctly', async ({ page }) => {
     await page.goto('/feedback');
     await page.getByLabel('Client').selectOption({ label: CLIENT_NAME });
-    await expect(page).toHaveURL(new RegExp(`clientId=${clientId}`));
+    await expect(page).toHaveURL(new RegExp(`clientCode=${clientCode}`));
     await expect(page.locator('tr', { hasText: FEEDBACK_TEXT })).toBeVisible();
 
     await page.getByLabel('Site').selectOption({ label: SITE_NAME });
@@ -44,14 +44,14 @@ test.describe.serial('Global Feedback + Assets admin pages', () => {
   });
 
   test('per-site Feedback page shows the same submission with a working back link', async ({ page }) => {
-    await page.goto(`/clients/${clientId}`);
+    await page.goto(`/clients/${clientCode}`);
     const siteRow = page.locator('tr', { hasText: SITE_NAME });
     await siteRow.getByRole('link', { name: 'Feedback' }).click();
 
     await expect(page.getByText(FEEDBACK_TEXT)).toBeVisible();
     await expect(page.getByText(SITE_NAME, { exact: true })).toBeVisible();
     await page.getByRole('link', { name: `← ${CLIENT_NAME}` }).click();
-    await expect(page).toHaveURL(new RegExp(`/clients/${clientId}$`));
+    await expect(page).toHaveURL(new RegExp(`/clients/${clientCode}$`));
   });
 
   test('the real attachment appears on the Assets page and can be reviewed and deleted', async ({ page }) => {

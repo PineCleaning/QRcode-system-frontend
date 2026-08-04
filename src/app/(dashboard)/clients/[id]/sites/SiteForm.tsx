@@ -36,13 +36,13 @@ export function SiteForm({
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label htmlFor="siteName" className="mb-1 block text-sm font-bold text-ink">
-          Site name <span className="text-coral">*</span>
+        <label htmlFor="businessName" className="mb-1 block text-sm font-bold text-ink">
+          Business Name <span className="text-coral">*</span>
         </label>
         <input
-          id="siteName"
-          name="siteName"
-          defaultValue={site?.siteName}
+          id="businessName"
+          name="businessName"
+          defaultValue={site?.businessName}
           required
           className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />

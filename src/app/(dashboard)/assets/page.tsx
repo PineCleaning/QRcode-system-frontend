@@ -22,18 +22,18 @@ function formatDate(iso: string) {
 export default async function AssetsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string; siteId?: string; error?: string }>;
+  searchParams: Promise<{ clientCode?: string; siteId?: string; error?: string }>;
 }) {
-  const { clientId, siteId, error } = await searchParams;
+  const { clientCode, siteId, error } = await searchParams;
 
   const query = new URLSearchParams();
-  if (clientId) query.set('clientId', clientId);
+  if (clientCode) query.set('clientCode', clientCode);
   if (siteId) query.set('siteId', siteId);
   const queryString = query.toString() ? `?${query.toString()}` : '';
 
   const [clients, sites, media] = await Promise.all([
     apiFetch<Client[]>('/clients'),
-    clientId ? apiFetch<Site[]>(`/clients/${clientId}/sites`) : Promise.resolve<Site[]>([]),
+    clientCode ? apiFetch<Site[]>(`/clients/${clientCode}/sites`) : Promise.resolve<Site[]>([]),
     apiFetch<AdminMediaItem[]>(`/admin/media${queryString}`),
   ]);
 
@@ -48,7 +48,7 @@ export default async function AssetsPage({
       </div>
 
       <FilterPendingProvider>
-        <FeedbackFilters basePath="/assets" clients={clients} sites={sites} clientId={clientId} siteId={siteId} />
+        <FeedbackFilters basePath="/assets" clients={clients} sites={sites} clientCode={clientCode} siteId={siteId} />
 
         {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
@@ -70,7 +70,7 @@ export default async function AssetsPage({
                 url: item.url,
                 label: item.originalFilename || (item.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
                 resourceType: item.resourceType,
-                caption: `${item.feedback.site.client.name} · ${item.feedback.site.siteName}`,
+                caption: `${item.feedback.site.client.name} · ${item.feedback.site.businessName}`,
               }))}
             >
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -113,7 +113,7 @@ export default async function AssetsPage({
                         href={`/clients/${item.feedback.site.client.id}/sites/${item.feedback.site.id}/feedback`}
                         className="hover:underline"
                       >
-                        {item.feedback.site.siteName}
+                        {item.feedback.site.businessName}
                       </Link>
                     </p>
                     <p className="mt-0.5 text-[11px] text-ink-muted/70">{formatDate(item.createdAt)}</p>

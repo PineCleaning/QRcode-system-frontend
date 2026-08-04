@@ -6,7 +6,7 @@ import { ApiError, apiFetch } from '@/lib/api/server-fetch';
 import type { Client } from '@/lib/api/types';
 
 async function createClient(formData: FormData): Promise<string | null> {
-  const clientCode = (formData.get('clientCode') as string)?.trim();
+  const clientId = (formData.get('clientId') as string)?.trim();
   const name = (formData.get('name') as string)?.trim();
   const contactEmail = (formData.get('contactEmail') as string)?.trim() || undefined;
   const contactPhone = (formData.get('contactPhone') as string)?.trim() || undefined;
@@ -14,7 +14,7 @@ async function createClient(formData: FormData): Promise<string | null> {
   try {
     await apiFetch<Client>('/clients', {
       method: 'POST',
-      body: JSON.stringify({ clientCode, name, contactEmail, contactPhone }),
+      body: JSON.stringify({ clientId, name, contactEmail, contactPhone }),
     });
   } catch (err) {
     return err instanceof ApiError ? err.message : 'Failed to create client';

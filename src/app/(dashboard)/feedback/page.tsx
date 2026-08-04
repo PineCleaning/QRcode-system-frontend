@@ -35,27 +35,27 @@ const PAGE_SIZE = 50;
 export default async function FeedbackPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string; siteId?: string; error?: string; page?: string }>;
+  searchParams: Promise<{ clientCode?: string; siteId?: string; error?: string; page?: string }>;
 }) {
-  const { clientId, siteId, error, page: pageParam } = await searchParams;
+  const { clientCode, siteId, error, page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
   const query = new URLSearchParams();
-  if (clientId) query.set('clientId', clientId);
+  if (clientCode) query.set('clientCode', clientCode);
   if (siteId) query.set('siteId', siteId);
   query.set('page', String(page));
   query.set('pageSize', String(PAGE_SIZE));
 
   const [clients, sitesResult, { data: feedback, total }] = await Promise.all([
     apiFetch<Client[]>('/clients'),
-    clientId ? apiFetch<PaginatedSites>(`/clients/${clientId}/sites?pageSize=200`) : Promise.resolve<PaginatedSites>({ data: [], total: 0, page: 1, pageSize: 0 }),
+    clientCode ? apiFetch<PaginatedSites>(`/clients/${clientCode}/sites?pageSize=200`) : Promise.resolve<PaginatedSites>({ data: [], total: 0, page: 1, pageSize: 0 }),
     apiFetch<PaginatedFeedback>(`/admin/feedback?${query.toString()}`),
   ]);
   const sites = sitesResult.data;
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const filterQuery = new URLSearchParams();
-  if (clientId) filterQuery.set('clientId', clientId);
+  if (clientCode) filterQuery.set('clientCode', clientCode);
   if (siteId) filterQuery.set('siteId', siteId);
 
   // Every verified attachment across every row on this page, flattened
@@ -71,7 +71,7 @@ export default async function FeedbackPage({
       url: m.url!,
       label: m.originalFilename || (m.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
       resourceType: m.resourceType,
-      caption: `${parentFeedback.site.client.name} · ${parentFeedback.site.siteName}`,
+      caption: `${parentFeedback.site.client.name} · ${parentFeedback.site.businessName}`,
     };
   });
 
@@ -86,7 +86,7 @@ export default async function FeedbackPage({
       </div>
 
       <FilterPendingProvider>
-        <FeedbackFilters basePath="/feedback" clients={clients} sites={sites} clientId={clientId} siteId={siteId} />
+        <FeedbackFilters basePath="/feedback" clients={clients} sites={sites} clientCode={clientCode} siteId={siteId} />
 
         {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
@@ -136,7 +136,7 @@ export default async function FeedbackPage({
                           href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
                           className="text-ink-muted hover:text-ink hover:underline"
                         >
-                          {item.site.siteName}
+                          {item.site.businessName}
                         </Link>
                       </td>
                       <td className="max-w-md px-5.5 py-3.5">

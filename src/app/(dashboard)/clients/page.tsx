@@ -125,7 +125,7 @@ export default async function ClientsPage({
                 <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
                   <tr>
                     <th className="whitespace-nowrap px-5.5 py-4">Name</th>
-                    <th className="whitespace-nowrap px-5.5 py-4">Client code</th>
+                    <th className="whitespace-nowrap px-5.5 py-4">Client ID</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Sites</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Status</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Actions</th>
@@ -139,7 +139,7 @@ export default async function ClientsPage({
                       className="border-b border-line last:border-0 hover:bg-ink/[0.03]"
                     >
                       <td className="max-w-[220px] px-5.5 py-3.5 font-bold">{client.name}</td>
-                      <td className="px-5.5 py-3.5 font-mono text-[12.5px] text-ink-muted">{client.clientCode}</td>
+                      <td className="px-5.5 py-3.5 font-mono text-[12.5px] text-ink-muted">{client.clientId}</td>
                       <td className="px-5.5 py-3.5 text-ink-muted">{client._count.sites}</td>
                       <td className="px-5.5 py-3.5">
                         <span

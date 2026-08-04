@@ -35,16 +35,16 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
   });
 }
 
-export async function createTestClient(clientCode: string, name: string) {
-  const res = await apiFetch('/clients', { method: 'POST', body: JSON.stringify({ clientCode, name }) });
+export async function createTestClient(clientId: string, name: string) {
+  const res = await apiFetch('/clients', { method: 'POST', body: JSON.stringify({ clientId, name }) });
   if (!res.ok) throw new Error(`Failed to create test client: ${res.status} ${await res.text()}`);
   return res.json();
 }
 
-export async function createTestSite(clientId: string, siteName: string) {
-  const res = await apiFetch(`/clients/${clientId}/sites`, {
+export async function createTestSite(clientCode: string, businessName: string) {
+  const res = await apiFetch(`/clients/${clientCode}/sites`, {
     method: 'POST',
-    body: JSON.stringify({ siteName, address: '123 Test St' }),
+    body: JSON.stringify({ businessName, address: '123 Test St' }),
   });
   if (!res.ok) throw new Error(`Failed to create test site: ${res.status} ${await res.text()}`);
   return res.json();
@@ -112,11 +112,11 @@ export async function submitFeedbackWithRealAttachment(slug: string, feedbackTex
 }
 
 /** Hard-deletes if possible; falls back to deactivating if it has feedback history (ON DELETE RESTRICT). */
-export async function deleteTestClient(clientId: string) {
-  const res = await apiFetch(`/clients/${clientId}`, { method: 'DELETE' });
+export async function deleteTestClient(clientCode: string) {
+  const res = await apiFetch(`/clients/${clientCode}`, { method: 'DELETE' });
   if (res.status === 409) {
-    await apiFetch(`/clients/${clientId}`, { method: 'PUT', body: JSON.stringify({ status: 'INACTIVE' }) });
+    await apiFetch(`/clients/${clientCode}`, { method: 'PUT', body: JSON.stringify({ status: 'INACTIVE' }) });
   } else if (!res.ok && res.status !== 404) {
-    throw new Error(`Failed to clean up test client ${clientId}: ${res.status} ${await res.text()}`);
+    throw new Error(`Failed to clean up test client ${clientCode}: ${res.status} ${await res.text()}`);
   }
 }

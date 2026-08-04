@@ -8,19 +8,19 @@ const RUN_ID = Date.now();
 const GOOD_CODE = `e2e-csv-good-${RUN_ID}`;
 const BAD_CODE = `e2e-csv-bad-${RUN_ID}`;
 
-let goodClientId: string | null = null;
-let badClientId: string | null = null;
+let goodClientCode: string | null = null;
+let badClientCode: string | null = null;
 
 test.describe('CSV bulk import', () => {
   test.afterAll(async () => {
-    if (goodClientId) await deleteTestClient(goodClientId);
-    if (badClientId) await deleteTestClient(badClientId);
+    if (goodClientCode) await deleteTestClient(goodClientCode);
+    if (badClientCode) await deleteTestClient(badClientCode);
   });
 
   test('valid row succeeds, invalid-phone row fails, both reported per-row', async ({ page }) => {
     const csvPath = path.join(os.tmpdir(), `e2e-import-${RUN_ID}.csv`);
     const csv = [
-      'Client Name,Client Code,Contact Email,Contact Phone,Site Name,Address',
+      'Client Name,Client Code,Contact Email,Contact Phone,Business Name,Address',
       `E2E CSV Good ${RUN_ID},${GOOD_CODE},good@example.com,+61-2-9111222,Main Branch,1 Good St`,
       `E2E CSV Bad ${RUN_ID},${BAD_CODE},bad@example.com,not-a-phone,Main Branch,1 Bad St`,
     ].join('\n');
@@ -45,11 +45,11 @@ test.describe('CSV bulk import', () => {
 
     const res = await apiFetch('/clients');
     const clients = await res.json();
-    const good = clients.find((c: { clientCode: string }) => c.clientCode === GOOD_CODE);
-    const bad = clients.find((c: { clientCode: string }) => c.clientCode === BAD_CODE);
+    const good = clients.find((c: { clientId: string }) => c.clientId === GOOD_CODE);
+    const bad = clients.find((c: { clientId: string }) => c.clientId === BAD_CODE);
     expect(good, 'valid row should have created a real client').toBeTruthy();
     expect(bad, 'invalid-phone row should NOT have created a client').toBeFalsy();
-    goodClientId = good?.id ?? null;
+    goodClientCode = good?.id ?? null;
   });
 
   test('template download link is present and points at the real template file', async ({ page }) => {

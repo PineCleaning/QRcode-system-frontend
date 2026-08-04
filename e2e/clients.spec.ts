@@ -6,11 +6,11 @@ const CLIENT_CODE = `e2e-client-${RUN_ID}`;
 const CLIENT_NAME = `E2E Test Client ${RUN_ID}`;
 const CLIENT_NAME_EDITED = `E2E Test Client ${RUN_ID} Edited`;
 
-let createdClientId: string | null = null;
+let createdClientCode: string | null = null;
 
 test.describe.serial('Client CRUD + deactivate', () => {
   test.afterAll(async () => {
-    if (createdClientId) await deleteTestClient(createdClientId);
+    if (createdClientCode) await deleteTestClient(createdClientCode);
   });
 
   test('create a client via the form, verify it appears in the list', async ({ page }) => {
@@ -44,7 +44,7 @@ test.describe.serial('Client CRUD + deactivate', () => {
     await expect(page).toHaveURL(/\/clients\/[a-f0-9-]+$/);
     await expect(page.getByRole('heading', { name: CLIENT_NAME })).toBeVisible();
 
-    createdClientId = page.url().split('/clients/')[1];
+    createdClientCode = page.url().split('/clients/')[1];
     await expect(page.getByText(/no sites yet/i)).toBeVisible();
   });
 
@@ -77,7 +77,7 @@ test.describe.serial('Client CRUD + deactivate', () => {
     await page.getByText(/nothing is deleted/i).locator('..').getByRole('button', { name: 'Deactivate' }).click();
     await expect(row.getByText('INACTIVE', { exact: true })).toBeVisible({ timeout: 10_000 });
 
-    const res = await apiFetch(`/clients/${createdClientId}`);
+    const res = await apiFetch(`/clients/${createdClientCode}`);
     const body = await res.json();
     expect(body.status).toBe('INACTIVE');
     expect(body.name).toBe(CLIENT_NAME_EDITED); // proves the partial update didn't clobber other fields

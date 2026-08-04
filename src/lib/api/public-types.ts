@@ -1,6 +1,6 @@
 export interface ResolvedSlug {
   slug: string;
-  siteName: string;
+  businessName: string;
   clientName: string;
 }
 

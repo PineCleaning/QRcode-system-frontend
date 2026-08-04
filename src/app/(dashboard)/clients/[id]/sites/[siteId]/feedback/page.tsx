@@ -48,7 +48,7 @@ export default async function SiteFeedbackPage({
     url: m.url!,
     label: m.originalFilename || (m.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
     resourceType: m.resourceType,
-    caption: site.siteName,
+    caption: site.businessName,
   }));
 
   return (
@@ -69,7 +69,7 @@ export default async function SiteFeedbackPage({
             <h1 className="text-2xl font-extrabold tracking-tight">Feedback</h1>
             <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{feedback.length}</span>
           </div>
-          <p className="mt-1 text-[13.5px] text-ink-muted">{site.siteName}</p>
+          <p className="mt-1 text-[13.5px] text-ink-muted">{site.businessName}</p>
           <p className="mt-1 text-xs text-ink-muted/70">{site.slug}</p>
         </div>
       </div>
