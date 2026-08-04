@@ -12,6 +12,16 @@ import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types'
 import { retryFeedbackAction } from './actions';
 import { FeedbackFilters } from './FeedbackFilters';
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleString('en-AU', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 const STATUS_STYLES: Record<string, string> = {
   DELIVERED: 'bg-green/15 text-green',
   SUBMITTED: 'bg-ink-muted/15 text-ink-muted',
@@ -104,6 +114,7 @@ export default async function FeedbackPage({
                     <th className="px-5.5 py-4">Feedback</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Mobile</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Attachments</th>
+                    <th className="whitespace-nowrap px-5.5 py-4">Date</th>
                     <th className="whitespace-nowrap px-5.5 py-4 text-center">Status</th>
                   </tr>
                 </thead>
@@ -137,6 +148,7 @@ export default async function FeedbackPage({
                       <td className="px-5.5 py-3.5">
                         <AttachmentsCell media={item.media} pathToRevalidate="/feedback" mediaIndexMap={mediaIndexMap} />
                       </td>
+                      <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">{formatDate(item.submittedAt)}</td>
                       <td className="px-5.5 py-3.5">
                         <div className="flex items-center justify-center gap-1.5">
                           <span
