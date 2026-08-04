@@ -42,7 +42,17 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 px-4 py-8 sm:items-center">
+    // React re-fires bubbled events through the *component* tree, not the
+    // DOM tree - even though this is portaled to document.body, a click
+    // anywhere in here still bubbles up to whatever React ancestor
+    // rendered <Modal> (e.g. ClickableRow's <tr onClick>), unless stopped
+    // here. Real bug: clicking any non-button/link area of an Edit modal
+    // opened from a ClickableRow (Clients list) triggered the row's
+    // navigation underneath it.
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 px-4 py-8 sm:items-center"
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className="w-full max-w-md rounded-[26px] bg-surface p-6 text-left shadow-lg">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-extrabold">{title}</h2>
