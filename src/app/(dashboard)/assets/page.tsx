@@ -4,8 +4,9 @@ import { FilterPendingProvider } from '@/components/FilterPending';
 import { MediaLightboxProvider, MediaReviewButton } from '@/components/MediaLightbox';
 import { ResultsContainer } from '@/components/ResultsContainer';
 import { CardGridSkeleton } from '@/components/skeletons/CardGridSkeleton';
+import { StorageStatusBar } from '@/components/StorageStatusBar';
 import { apiFetch } from '@/lib/api/server-fetch';
-import type { AdminMediaItem, Client, Site } from '@/lib/api/types';
+import type { AdminMediaItem, Client, CloudinaryUsage, Site } from '@/lib/api/types';
 import { deleteMediaAction } from './actions';
 import { FeedbackFilters } from '../feedback/FeedbackFilters';
 
@@ -31,20 +32,24 @@ export default async function AssetsPage({
   if (siteId) query.set('siteId', siteId);
   const queryString = query.toString() ? `?${query.toString()}` : '';
 
-  const [clients, sites, media] = await Promise.all([
+  const [clients, sites, media, storageUsage] = await Promise.all([
     apiFetch<Client[]>('/clients'),
     clientCode ? apiFetch<Site[]>(`/clients/${clientCode}/sites`) : Promise.resolve<Site[]>([]),
     apiFetch<AdminMediaItem[]>(`/admin/media${queryString}`),
+    apiFetch<CloudinaryUsage>('/admin/media/storage-usage'),
   ]);
 
   return (
     <div>
-      <div className="mb-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-extrabold tracking-tight text-balance">Assets</h1>
-          <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{media.length}</span>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-extrabold tracking-tight text-balance">Assets</h1>
+            <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{media.length}</span>
+          </div>
+          <p className="mt-1 text-[13.5px] text-ink-muted">All feedback attachments across every client and site.</p>
         </div>
-        <p className="mt-1 text-[13.5px] text-ink-muted">All feedback attachments across every client and site.</p>
+        <StorageStatusBar usage={storageUsage} />
       </div>
 
       <FilterPendingProvider>
@@ -70,7 +75,7 @@ export default async function AssetsPage({
                 url: item.url,
                 label: item.originalFilename || (item.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
                 resourceType: item.resourceType,
-                caption: `${item.feedback.site.client.name} · ${item.feedback.site.businessName}`,
+                caption: `${item.feedback.site.client.clientName} · ${item.feedback.site.businessName}`,
               }))}
             >
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -105,7 +110,7 @@ export default async function AssetsPage({
                     <p className="mt-2 truncate text-sm font-bold">{label}</p>
                     <p className="truncate text-xs text-ink-muted">
                       <Link prefetch={false} href={`/clients/${item.feedback.site.client.id}`} className="hover:underline">
-                        {item.feedback.site.client.name}
+                        {item.feedback.site.client.clientName}
                       </Link>
                       {' · '}
                       <Link
