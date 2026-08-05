@@ -1,6 +1,7 @@
 export interface ResolvedSlug {
   slug: string;
   businessName: string;
+  address: string | null;
   clientName: string;
 }
 

@@ -62,7 +62,7 @@ interface SubmitResponse {
   media?: SubmitResponseMedia[];
 }
 
-export function FeedbackForm({ slug, businessName, clientName }: { slug: string; businessName: string; clientName: string }) {
+export function FeedbackForm({ slug, businessName, address }: { slug: string; businessName: string; address: string | null }) {
   // Generated once per form load - reused on every retry, so a retry
   // after a network error is a safe idempotent replay, not a
   // duplicate submission.
@@ -245,17 +245,6 @@ export function FeedbackForm({ slug, businessName, clientName }: { slug: string;
         <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-6 space-y-4">
           <div>
-            <label htmlFor="clientName" className="mb-2 block text-base font-bold text-[#2d3660]">
-              Client
-            </label>
-            <input
-              id="clientName"
-              value={clientName}
-              disabled
-              className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
-            />
-          </div>
-          <div>
             <label htmlFor="businessName" className="mb-2 block text-base font-bold text-[#2d3660]">
               Business Name
             </label>
@@ -266,6 +255,19 @@ export function FeedbackForm({ slug, businessName, clientName }: { slug: string;
               className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
             />
           </div>
+          {address && (
+            <div>
+              <label htmlFor="address" className="mb-2 block text-base font-bold text-[#2d3660]">
+                Address
+              </label>
+              <input
+                id="address"
+                value={address}
+                disabled
+                className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
+              />
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

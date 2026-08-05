@@ -11,5 +11,5 @@ export default async function PublicFeedbackPage({ params }: { params: Promise<{
     return <InactiveFallback />;
   }
 
-  return <FeedbackForm slug={body.slug} businessName={body.businessName} clientName={body.clientName} />;
+  return <FeedbackForm slug={body.slug} businessName={body.businessName} address={body.address} />;
 }
