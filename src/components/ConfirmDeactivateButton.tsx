@@ -50,7 +50,12 @@ export function ConfirmDeactivateButton({
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        // Not portaled - this overlay is still a real DOM descendant of
+        // wherever the trigger button lives (e.g. a ClickableRow's <tr>).
+        // Stop propagation so clicking non-button areas (title,
+        // description, backdrop padding) can't bubble up and trigger a
+        // row's own click-to-navigate handler underneath it.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={(e) => e.stopPropagation()}>
           <div className="w-full max-w-sm rounded-[26px] bg-surface p-6 shadow-lg">
             <h2 className="text-base font-extrabold">
               {verb} {itemLabel}?

@@ -6,15 +6,15 @@ import { ApiError, apiFetch } from '@/lib/api/server-fetch';
 import type { Client } from '@/lib/api/types';
 
 async function createClient(formData: FormData): Promise<string | null> {
-  const clientCode = (formData.get('clientCode') as string)?.trim();
-  const name = (formData.get('name') as string)?.trim();
+  const clientId = (formData.get('clientId') as string)?.trim();
+  const clientName = (formData.get('clientName') as string)?.trim();
   const contactEmail = (formData.get('contactEmail') as string)?.trim() || undefined;
   const contactPhone = (formData.get('contactPhone') as string)?.trim() || undefined;
 
   try {
     await apiFetch<Client>('/clients', {
       method: 'POST',
-      body: JSON.stringify({ clientCode, name, contactEmail, contactPhone }),
+      body: JSON.stringify({ clientId, clientName, contactEmail, contactPhone }),
     });
   } catch (err) {
     return err instanceof ApiError ? err.message : 'Failed to create client';
@@ -30,7 +30,7 @@ export async function createClientModalAction(_prevState: string | null, formDat
 }
 
 async function updateClient(id: string, formData: FormData): Promise<string | null> {
-  const name = (formData.get('name') as string)?.trim();
+  const clientName = (formData.get('clientName') as string)?.trim();
   const contactEmail = (formData.get('contactEmail') as string)?.trim() || undefined;
   const contactPhone = (formData.get('contactPhone') as string)?.trim() || undefined;
   const status = formData.get('status') as string;
@@ -38,7 +38,7 @@ async function updateClient(id: string, formData: FormData): Promise<string | nu
   try {
     await apiFetch<Client>(`/clients/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ name, contactEmail, contactPhone, status }),
+      body: JSON.stringify({ clientName, contactEmail, contactPhone, status }),
     });
   } catch (err) {
     return err instanceof ApiError ? err.message : 'Failed to update client';

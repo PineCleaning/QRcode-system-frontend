@@ -5,13 +5,13 @@ import { CopyLinkButton } from './CopyLinkButton';
 
 export function SiteQrModal({
   siteId,
-  siteName,
+  businessName,
   slug,
   status,
   feedbackUrl,
 }: {
   siteId: string;
-  siteName: string;
+  businessName: string;
   slug: string;
   status: 'ACTIVE' | 'INACTIVE';
   /** Server-computed from BASE_DOMAIN (same value baked into the QR image) - never guessed from window.location, which would be wrong if the admin portal and public form aren't on the same host. */
@@ -31,7 +31,7 @@ export function SiteQrModal({
           <div className="w-full max-w-sm rounded-[26px] bg-surface p-6 shadow-lg">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-base font-extrabold">{siteName}</h2>
+                <h2 className="text-base font-extrabold">{businessName}</h2>
                 <div className="flex items-center gap-1.5">
                   <p className="text-xs text-ink-muted">{slug}</p>
                   <CopyLinkButton url={feedbackUrl} />
@@ -57,7 +57,7 @@ export function SiteQrModal({
               {status}
             </span>
 
-            <img src={qrSrc} alt={`QR code for ${siteName}`} width={200} height={200} className="mt-4 h-auto w-full" />
+            <img src={qrSrc} alt={`QR code for ${businessName}`} width={200} height={200} className="mt-4 h-auto w-full" />
 
             <div className="mt-4 flex justify-center gap-3 text-sm">
               <a href={qrSrc} download className="text-sky hover:underline">

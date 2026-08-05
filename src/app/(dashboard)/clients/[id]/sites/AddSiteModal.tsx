@@ -7,10 +7,10 @@ import { SiteForm } from './SiteForm';
 
 /** "+ Add site" opens this instead of navigating to a full page. */
 export function AddSiteModal({
-  clientId,
+  clientCode,
   triggerClassName = 'inline-flex items-center rounded-xl bg-primary px-4 py-2 text-center text-[13.5px] font-bold text-page transition hover:-translate-y-px',
 }: {
-  clientId: string;
+  clientCode: string;
   triggerClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -24,7 +24,7 @@ export function AddSiteModal({
       {open && (
         <Modal title="Add site" onClose={() => setOpen(false)}>
           <SiteForm
-            action={createSiteModalAction.bind(null, clientId)}
+            action={createSiteModalAction.bind(null, clientCode)}
             onCancel={() => setOpen(false)}
             onSuccess={() => setOpen(false)}
           />

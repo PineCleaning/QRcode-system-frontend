@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
+import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { FilterPendingProvider } from '@/components/FilterPending';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { Pagination } from '@/components/Pagination';
@@ -9,8 +10,18 @@ import { TableRowsSkeleton } from '@/components/skeletons/TableRowsSkeleton';
 import { TruncatedFeedback } from '@/components/TruncatedFeedback';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types';
-import { retryFeedbackAction } from './actions';
+import { deleteFeedbackAction, retryFeedbackAction } from './actions';
 import { FeedbackFilters } from './FeedbackFilters';
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleString('en-AU', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 const STATUS_STYLES: Record<string, string> = {
   DELIVERED: 'bg-green/15 text-green',
@@ -25,27 +36,27 @@ const PAGE_SIZE = 50;
 export default async function FeedbackPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string; siteId?: string; error?: string; page?: string }>;
+  searchParams: Promise<{ clientCode?: string; siteId?: string; error?: string; page?: string }>;
 }) {
-  const { clientId, siteId, error, page: pageParam } = await searchParams;
+  const { clientCode, siteId, error, page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
   const query = new URLSearchParams();
-  if (clientId) query.set('clientId', clientId);
+  if (clientCode) query.set('clientCode', clientCode);
   if (siteId) query.set('siteId', siteId);
   query.set('page', String(page));
   query.set('pageSize', String(PAGE_SIZE));
 
   const [clients, sitesResult, { data: feedback, total }] = await Promise.all([
     apiFetch<Client[]>('/clients'),
-    clientId ? apiFetch<PaginatedSites>(`/clients/${clientId}/sites?pageSize=200`) : Promise.resolve<PaginatedSites>({ data: [], total: 0, page: 1, pageSize: 0 }),
+    clientCode ? apiFetch<PaginatedSites>(`/clients/${clientCode}/sites?pageSize=200`) : Promise.resolve<PaginatedSites>({ data: [], total: 0, page: 1, pageSize: 0 }),
     apiFetch<PaginatedFeedback>(`/admin/feedback?${query.toString()}`),
   ]);
   const sites = sitesResult.data;
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const filterQuery = new URLSearchParams();
-  if (clientId) filterQuery.set('clientId', clientId);
+  if (clientCode) filterQuery.set('clientCode', clientCode);
   if (siteId) filterQuery.set('siteId', siteId);
 
   // Every verified attachment across every row on this page, flattened
@@ -61,7 +72,7 @@ export default async function FeedbackPage({
       url: m.url!,
       label: m.originalFilename || (m.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
       resourceType: m.resourceType,
-      caption: `${parentFeedback.site.client.name} · ${parentFeedback.site.siteName}`,
+      caption: `${parentFeedback.site.client.clientName} · ${parentFeedback.site.businessName}`,
     };
   });
 
@@ -76,7 +87,7 @@ export default async function FeedbackPage({
       </div>
 
       <FilterPendingProvider>
-        <FeedbackFilters basePath="/feedback" clients={clients} sites={sites} clientId={clientId} siteId={siteId} />
+        <FeedbackFilters basePath="/feedback" clients={clients} sites={sites} clientCode={clientCode} siteId={siteId} />
 
         {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
@@ -104,7 +115,9 @@ export default async function FeedbackPage({
                     <th className="px-5.5 py-4">Feedback</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Mobile</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Attachments</th>
+                    <th className="whitespace-nowrap px-5.5 py-4">Date</th>
                     <th className="whitespace-nowrap px-5.5 py-4 text-center">Status</th>
+                    <th className="whitespace-nowrap px-5.5 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -116,7 +129,7 @@ export default async function FeedbackPage({
                           href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
                           className="font-bold hover:underline"
                         >
-                          {item.site.client.name}
+                          {item.site.client.clientName}
                         </Link>
                       </td>
                       <td className="max-w-[160px] px-5.5 py-3.5">
@@ -125,7 +138,7 @@ export default async function FeedbackPage({
                           href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
                           className="text-ink-muted hover:text-ink hover:underline"
                         >
-                          {item.site.siteName}
+                          {item.site.businessName}
                         </Link>
                       </td>
                       <td className="max-w-md px-5.5 py-3.5">
@@ -137,6 +150,7 @@ export default async function FeedbackPage({
                       <td className="px-5.5 py-3.5">
                         <AttachmentsCell media={item.media} pathToRevalidate="/feedback" mediaIndexMap={mediaIndexMap} />
                       </td>
+                      <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">{formatDate(item.submittedAt)}</td>
                       <td className="px-5.5 py-3.5">
                         <div className="flex items-center justify-center gap-1.5">
                           <span
@@ -150,6 +164,18 @@ export default async function FeedbackPage({
                             <RetryButton action={retryFeedbackAction.bind(null, item.id, '/feedback')} />
                           )}
                         </div>
+                      </td>
+                      <td className="px-5.5 py-3.5 text-center">
+                        <ConfirmDeleteButton
+                          action={deleteFeedbackAction.bind(null, item.id, '/feedback')}
+                          itemLabel="this feedback submission"
+                          warning={
+                            item.clickupTaskId
+                              ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
+                              : 'This also deletes every attachment - none of it can be recovered.'
+                          }
+                          triggerClassName="rounded-lg border border-coral/30 px-2.5 py-1 text-[11.5px] font-bold text-coral hover:bg-coral/10"
+                        />
                       </td>
                     </tr>
                   ))}

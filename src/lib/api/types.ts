@@ -2,8 +2,8 @@ export type ClientSiteStatus = 'ACTIVE' | 'INACTIVE';
 
 export interface Client {
   id: string;
-  clientCode: string;
-  name: string;
+  clientId: string;
+  clientName: string;
   contactEmail: string | null;
   contactPhone: string | null;
   status: ClientSiteStatus;
@@ -27,10 +27,10 @@ export interface PaginatedClients {
 
 export interface Site {
   id: string;
-  clientId: string;
+  clientCode: string;
   siteCode: string;
   slug: string;
-  siteName: string;
+  businessName: string;
   address: string | null;
   status: ClientSiteStatus;
   clickupEntityId: string | null;
@@ -72,7 +72,7 @@ export interface FeedbackSubmission {
 
 /** Global feedback list (admin "Feedbacks" page) - each row also carries its site + client. */
 export interface AdminFeedbackSubmission extends FeedbackSubmission {
-  site: Pick<Site, 'id' | 'siteName' | 'slug'> & { client: Pick<Client, 'id' | 'name' | 'clientCode'> };
+  site: Pick<Site, 'id' | 'businessName' | 'slug'> & { client: Pick<Client, 'id' | 'clientName' | 'clientId'> };
 }
 
 /** Shape returned by GET /admin/feedback?page=&pageSize= - the unpaginated array shape stays for callers that never send those params. */
@@ -94,7 +94,24 @@ export interface PaginatedSites {
 /** Global media library (admin "Assets" page) - VERIFIED-only, so url is never null here. */
 export interface AdminMediaItem extends Omit<FeedbackMedia, 'url'> {
   url: string;
-  feedback: { id: string; site: Pick<Site, 'id' | 'siteName' | 'slug'> & { client: Pick<Client, 'id' | 'name' | 'clientCode'> } };
+  feedback: { id: string; site: Pick<Site, 'id' | 'businessName' | 'slug'> & { client: Pick<Client, 'id' | 'clientName' | 'clientId'> } };
+}
+
+/** GET /admin/media/storage-usage - Cloudinary account usage, for the Assets page's storage widget. */
+export interface CloudinaryUsage {
+  plan: string;
+  storageUsedBytes: number;
+  storageLimitBytes: number;
+  creditsUsedPercent: number;
+  breakdown: {
+    storageCredits: number;
+    bandwidthCredits: number;
+    bandwidthBytes: number;
+    transformationsCredits: number;
+    transformationsCount: number;
+  };
+  totalCreditsUsed: number;
+  totalCreditsLimit: number;
 }
 
 export type CsvBatchStatus = 'PROCESSING' | 'COMPLETED' | 'FAILED';
@@ -114,7 +131,7 @@ export interface CsvImportRow {
   id: string;
   batchId: string;
   rowNumber: number;
-  clientId: string | null;
+  clientCode: string | null;
   siteId: string | null;
   status: CsvRowStatus;
   errorMessage: string | null;

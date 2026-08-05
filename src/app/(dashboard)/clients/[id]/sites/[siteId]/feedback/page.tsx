@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
+import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { RetryButton } from '@/components/RetryButton';
 import { TruncatedFeedback } from '@/components/TruncatedFeedback';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, FeedbackSubmission, Site } from '@/lib/api/types';
-import { retryFeedbackAction } from '@/app/(dashboard)/feedback/actions';
+import { deleteFeedbackAction, retryFeedbackAction } from '@/app/(dashboard)/feedback/actions';
 
 const STATUS_STYLES: Record<string, string> = {
   DELIVERED: 'bg-green/15 text-green',
@@ -48,7 +49,7 @@ export default async function SiteFeedbackPage({
     url: m.url!,
     label: m.originalFilename || (m.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
     resourceType: m.resourceType,
-    caption: site.siteName,
+    caption: site.businessName,
   }));
 
   return (
@@ -57,7 +58,7 @@ export default async function SiteFeedbackPage({
         <Link
           prefetch={false}
           href={`/clients/${id}`}
-          aria-label={`Back to ${client.name}`}
+          aria-label={`Back to ${client.clientName}`}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink transition hover:-translate-y-px"
         >
           <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -69,7 +70,7 @@ export default async function SiteFeedbackPage({
             <h1 className="text-2xl font-extrabold tracking-tight">Feedback</h1>
             <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{feedback.length}</span>
           </div>
-          <p className="mt-1 text-[13.5px] text-ink-muted">{site.siteName}</p>
+          <p className="mt-1 text-[13.5px] text-ink-muted">{site.businessName}</p>
           <p className="mt-1 text-xs text-ink-muted/70">{site.slug}</p>
         </div>
       </div>
@@ -98,6 +99,7 @@ export default async function SiteFeedbackPage({
                 <th className="whitespace-nowrap px-5.5 py-4">Mobile</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Attachments</th>
                 <th className="whitespace-nowrap px-5.5 py-4 text-center">Status</th>
+                <th className="whitespace-nowrap px-5.5 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -132,6 +134,18 @@ export default async function SiteFeedbackPage({
                         />
                       )}
                     </div>
+                  </td>
+                  <td className="px-5.5 py-3.5 text-center">
+                    <ConfirmDeleteButton
+                      action={deleteFeedbackAction.bind(null, item.id, `/clients/${id}/sites/${siteId}/feedback`)}
+                      itemLabel="this feedback submission"
+                      warning={
+                        item.clickupTaskId
+                          ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
+                          : 'This also deletes every attachment - none of it can be recovered.'
+                      }
+                      triggerClassName="rounded-lg border border-coral/30 px-2.5 py-1 text-[11.5px] font-bold text-coral hover:bg-coral/10"
+                    />
                   </td>
                 </tr>
               ))}

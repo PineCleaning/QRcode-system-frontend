@@ -9,13 +9,13 @@ export function FeedbackFilters({
   basePath,
   clients,
   sites,
-  clientId,
+  clientCode,
   siteId,
 }: {
   basePath: string;
   clients: Client[];
   sites: Site[];
-  clientId?: string;
+  clientCode?: string;
   siteId?: string;
 }) {
   const router = useRouter();
@@ -23,13 +23,13 @@ export function FeedbackFilters({
 
   function handleClientChange(value: string) {
     startTransition(() => {
-      router.push(value ? `${basePath}?clientId=${value}` : basePath);
+      router.push(value ? `${basePath}?clientCode=${value}` : basePath);
     });
   }
 
   function handleSiteChange(value: string) {
     startTransition(() => {
-      router.push(value ? `${basePath}?clientId=${clientId}&siteId=${value}` : `${basePath}?clientId=${clientId}`);
+      router.push(value ? `${basePath}?clientCode=${clientCode}&siteId=${value}` : `${basePath}?clientCode=${clientCode}`);
     });
   }
 
@@ -41,11 +41,11 @@ export function FeedbackFilters({
         </label>
         <Select
           id="clientFilter"
-          value={clientId ?? ''}
+          value={clientCode ?? ''}
           onChange={handleClientChange}
           disabled={isPending}
           placeholder="All clients"
-          options={[{ value: '', label: 'All clients' }, ...clients.map((c) => ({ value: c.id, label: c.name }))]}
+          options={[{ value: '', label: 'All clients' }, ...clients.map((c) => ({ value: c.id, label: c.clientName }))]}
         />
       </div>
 
@@ -57,11 +57,11 @@ export function FeedbackFilters({
           id="siteFilter"
           value={siteId ?? ''}
           onChange={handleSiteChange}
-          disabled={!clientId || isPending}
-          placeholder={clientId ? 'All sites' : 'Select a client first'}
+          disabled={!clientCode || isPending}
+          placeholder={clientCode ? 'All sites' : 'Select a client first'}
           options={[
-            { value: '', label: clientId ? 'All sites' : 'Select a client first' },
-            ...sites.map((s) => ({ value: s.id, label: s.siteName })),
+            { value: '', label: clientCode ? 'All sites' : 'Select a client first' },
+            ...sites.map((s) => ({ value: s.id, label: s.businessName })),
           ]}
         />
       </div>

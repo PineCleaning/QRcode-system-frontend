@@ -62,7 +62,7 @@ interface SubmitResponse {
   media?: SubmitResponseMedia[];
 }
 
-export function FeedbackForm({ slug, siteName, clientName }: { slug: string; siteName: string; clientName: string }) {
+export function FeedbackForm({ slug, businessName, address }: { slug: string; businessName: string; address: string | null }) {
   // Generated once per form load - reused on every retry, so a retry
   // after a network error is a safe idempotent replay, not a
   // duplicate submission.
@@ -245,46 +245,32 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
         <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-6 space-y-4">
           <div>
-            <label htmlFor="clientName" className="mb-2 block text-base font-bold text-[#2d3660]">
-              Client
+            <label htmlFor="businessName" className="mb-2 block text-base font-bold text-[#2d3660]">
+              Business Name
             </label>
             <input
-              id="clientName"
-              value={clientName}
+              id="businessName"
+              value={businessName}
               disabled
               className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
             />
           </div>
-          <div>
-            <label htmlFor="siteName" className="mb-2 block text-base font-bold text-[#2d3660]">
-              Site
-            </label>
-            <input
-              id="siteName"
-              value={siteName}
-              disabled
-              className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
-            />
-          </div>
+          {address && (
+            <div>
+              <label htmlFor="address" className="mb-2 block text-base font-bold text-[#2d3660]">
+                Address
+              </label>
+              <input
+                id="address"
+                value={address}
+                disabled
+                className="w-full rounded border border-gray-300 bg-gray-100 px-3 py-3 text-base text-gray-500"
+              />
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="feedback" className="mb-2 block text-base font-bold text-[#2d3660]">
-              Feedback: <span className="text-red-600">*</span>
-            </label>
-            <textarea
-              id="feedback"
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              required
-              maxLength={5000}
-              rows={6}
-              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
-            />
-            <p className="mt-1 text-xs text-gray-500">{feedback.length} / 5000 characters</p>
-          </div>
-
           <div>
             <label htmlFor="mobileNumber" className="mb-2 block text-base font-bold text-[#2d3660]">
               Mobile Number <span className="font-normal text-gray-500">(optional)</span>
@@ -296,9 +282,24 @@ export function FeedbackForm({ slug, siteName, clientName }: { slug: string; sit
               value={mobileNumber}
               onChange={(e) => setMobileNumber(e.target.value.replace(/[^0-9+\-\s()]/g, ''))}
               maxLength={32}
+              placeholder="Max 32 characters"
               className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
             />
-            <p className="mt-1 text-xs text-gray-500">Max 32 characters</p>
+            <p className="mt-1 text-xs text-gray-500">THIS LETS US SENDS YOU A TEXT UPDATE</p>
+          </div>
+
+          <div>
+            <label htmlFor="feedback" className="mb-2 block text-base font-bold text-[#2d3660]">
+              Feedback: <span className="text-red-600">*</span>
+            </label>
+            <textarea
+              id="feedback"
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              required
+              rows={6}
+              className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
+            />
           </div>
 
           <div>

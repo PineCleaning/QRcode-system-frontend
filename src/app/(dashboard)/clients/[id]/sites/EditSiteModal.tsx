@@ -9,11 +9,11 @@ import { SiteForm } from './SiteForm';
 /** "Edit" opens this instead of navigating to a full page. */
 export function EditSiteModal({
   site,
-  clientId,
+  clientCode,
   triggerClassName = 'text-ink-muted hover:text-ink',
 }: {
   site: Site;
-  clientId: string;
+  clientCode: string;
   triggerClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -28,7 +28,7 @@ export function EditSiteModal({
         <Modal title="Edit site" onClose={() => setOpen(false)}>
           <SiteForm
             site={site}
-            action={updateSiteModalAction.bind(null, site.id, clientId)}
+            action={updateSiteModalAction.bind(null, site.id, clientCode)}
             onCancel={() => setOpen(false)}
             onSuccess={() => setOpen(false)}
           />

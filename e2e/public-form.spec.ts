@@ -5,7 +5,7 @@ import os from 'node:os';
 import { createTestClient, createTestSite, deleteTestClient, apiFetch } from './backend-client';
 
 const RUN_ID = Date.now();
-let clientId: string;
+let clientCode: string;
 let activeSlug: string;
 let inactiveSlug: string;
 
@@ -15,22 +15,21 @@ test.use({ storageState: { cookies: [], origins: [] } });
 test.describe('Public feedback form (anonymous, no login)', () => {
   test.beforeAll(async () => {
     const client = await createTestClient(`e2e-public-${RUN_ID}`, `E2E Public Form Client ${RUN_ID}`);
-    clientId = client.id;
-    const activeSite = await createTestSite(clientId, 'Active Site');
+    clientCode = client.id;
+    const activeSite = await createTestSite(clientCode, 'Active Site');
     activeSlug = activeSite.slug;
-    const inactiveSite = await createTestSite(clientId, 'Inactive Site');
+    const inactiveSite = await createTestSite(clientCode, 'Inactive Site');
     inactiveSlug = inactiveSite.slug;
     await apiFetch(`/sites/${inactiveSite.id}`, { method: 'PUT', body: JSON.stringify({ status: 'INACTIVE' }) });
   });
 
   test.afterAll(async () => {
-    await deleteTestClient(clientId);
+    await deleteTestClient(clientCode);
   });
 
-  test('active slug pre-fills client/site name and submits successfully with no attachment', async ({ page }) => {
+  test('active slug pre-fills business name and submits successfully with no attachment', async ({ page }) => {
     await page.goto(`/qrfeedback/${activeSlug}`);
-    await expect(page.getByLabel('Client')).toHaveValue(/E2E Public Form Client/);
-    await expect(page.getByLabel('Site')).toHaveValue('Active Site');
+    await expect(page.getByLabel('Business Name')).toHaveValue('Active Site');
 
     await page.getByLabel(/^Feedback/).fill('E2E test: great service, very clean facility.');
     await page.getByRole('button', { name: 'Submit' }).click();
@@ -43,12 +42,6 @@ test.describe('Public feedback form (anonymous, no login)', () => {
     const mobileInput = page.getByLabel(/mobile number/i);
     await mobileInput.fill('abc0412-345 678xyz');
     await expect(mobileInput).toHaveValue('0412-345 678');
-  });
-
-  test('character counter updates as feedback is typed', async ({ page }) => {
-    await page.goto(`/qrfeedback/${activeSlug}`);
-    await page.getByLabel(/^Feedback/).fill('Hello');
-    await expect(page.getByText('5 / 5000 characters')).toBeVisible();
   });
 
   test('submitting with a real uploaded image attaches it and is reported VERIFIED', async ({ page }) => {
