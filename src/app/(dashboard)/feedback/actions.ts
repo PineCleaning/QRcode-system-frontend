@@ -39,3 +39,25 @@ export async function deleteAttachmentAction(mediaId: string, pathToRevalidate: 
   revalidatePath(pathToRevalidate);
   revalidatePath('/assets');
 }
+
+/**
+ * Deletes a feedback submission entirely - its ClickUp ticket (if any),
+ * its attachments (Cloudinary + DB), and the submission row itself, via
+ * DELETE /admin/feedback/:id. This is the Dashboard -> ClickUp direction
+ * of the two-way sync; the reverse (someone deletes the ticket directly
+ * in ClickUp) is caught by a background reconciliation check on the
+ * backend, not anything triggered from here. Always revalidates /assets
+ * too, since the deleted attachments must also disappear from there.
+ */
+export async function deleteFeedbackAction(feedbackId: string, pathToRevalidate: string) {
+  try {
+    await apiFetch(`/admin/feedback/${feedbackId}`, { method: 'DELETE' });
+  } catch (err) {
+    const message = err instanceof ApiError ? err.message : 'Failed to delete feedback';
+    revalidatePath(pathToRevalidate);
+    revalidatePath('/assets');
+    redirect(`${pathToRevalidate}?error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath(pathToRevalidate);
+  revalidatePath('/assets');
+}

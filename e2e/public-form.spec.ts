@@ -27,10 +27,9 @@ test.describe('Public feedback form (anonymous, no login)', () => {
     await deleteTestClient(clientCode);
   });
 
-  test('active slug pre-fills client/site name and submits successfully with no attachment', async ({ page }) => {
+  test('active slug pre-fills business name and submits successfully with no attachment', async ({ page }) => {
     await page.goto(`/qrfeedback/${activeSlug}`);
-    await expect(page.getByLabel('Client')).toHaveValue(/E2E Public Form Client/);
-    await expect(page.getByLabel('Site')).toHaveValue('Active Site');
+    await expect(page.getByLabel('Business Name')).toHaveValue('Active Site');
 
     await page.getByLabel(/^Feedback/).fill('E2E test: great service, very clean facility.');
     await page.getByRole('button', { name: 'Submit' }).click();

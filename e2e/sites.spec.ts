@@ -19,13 +19,19 @@ test.describe.serial('Site CRUD, QR modal, deactivate', () => {
 
   test('add a site from the client detail page', async ({ page }) => {
     await page.goto(`/clients/${clientCode}`);
-    await page.getByRole('link', { name: '+ Add site' }).click();
-    await expect(page).toHaveURL(/\/sites\/new/);
+    // Two "+ Add site" triggers render when the client has zero sites (the
+    // toolbar button plus the empty-state prompt) - both open the same
+    // modal, so .first() is enough.
+    await page.getByRole('button', { name: '+ Add site' }).first().click();
+    await expect(page.getByRole('heading', { name: 'Add site' })).toBeVisible();
 
     await page.getByLabel('Business Name').fill(SITE_NAME);
     await page.getByLabel('Address').fill('1 E2E Test St');
-    await page.getByRole('button', { name: 'Add site' }).click();
+    // exact: true - the trigger button "+ Add site" is still present behind
+    // the modal and would otherwise also match this substring.
+    await page.getByRole('button', { name: 'Add site', exact: true }).click();
 
+    await expect(page.getByRole('heading', { name: 'Add site' })).not.toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/clients/${clientCode}$`));
     const row = page.locator('tr', { hasText: SITE_NAME });
     await expect(row).toBeVisible();
@@ -50,16 +56,16 @@ test.describe.serial('Site CRUD, QR modal, deactivate', () => {
     await expect(page.getByRole('heading', { name: SITE_NAME })).not.toBeVisible();
   });
 
-  test('edit the site and confirm redirect back to the client page', async ({ page }) => {
+  test('edit the site via the Edit modal', async ({ page }) => {
     await page.goto(`/clients/${clientCode}`);
     const row = page.locator('tr', { hasText: SITE_NAME });
-    await row.getByRole('link', { name: 'Edit' }).click();
-    await expect(page).toHaveURL(/\/edit$/);
+    await row.getByRole('button', { name: 'Edit' }).click();
+    await expect(page.getByRole('heading', { name: 'Edit site' })).toBeVisible();
 
     await page.getByLabel('Business Name').fill(SITE_NAME_EDITED);
     await page.getByRole('button', { name: 'Save changes' }).click();
 
-    await expect(page).toHaveURL(new RegExp(`/clients/${clientCode}$`));
+    await expect(page.getByRole('heading', { name: 'Edit site' })).not.toBeVisible();
     await expect(page.locator('tr', { hasText: SITE_NAME_EDITED })).toBeVisible();
   });
 

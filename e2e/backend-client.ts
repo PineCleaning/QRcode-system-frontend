@@ -35,8 +35,8 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
   });
 }
 
-export async function createTestClient(clientId: string, name: string) {
-  const res = await apiFetch('/clients', { method: 'POST', body: JSON.stringify({ clientId, name }) });
+export async function createTestClient(clientId: string, clientName: string) {
+  const res = await apiFetch('/clients', { method: 'POST', body: JSON.stringify({ clientId, clientName }) });
   if (!res.ok) throw new Error(`Failed to create test client: ${res.status} ${await res.text()}`);
   return res.json();
 }

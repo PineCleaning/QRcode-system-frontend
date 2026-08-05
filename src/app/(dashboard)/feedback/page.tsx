@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
+import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { FilterPendingProvider } from '@/components/FilterPending';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { Pagination } from '@/components/Pagination';
@@ -9,7 +10,7 @@ import { TableRowsSkeleton } from '@/components/skeletons/TableRowsSkeleton';
 import { TruncatedFeedback } from '@/components/TruncatedFeedback';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types';
-import { retryFeedbackAction } from './actions';
+import { deleteFeedbackAction, retryFeedbackAction } from './actions';
 import { FeedbackFilters } from './FeedbackFilters';
 
 function formatDate(iso: string) {
@@ -71,7 +72,7 @@ export default async function FeedbackPage({
       url: m.url!,
       label: m.originalFilename || (m.resourceType === 'IMAGE' ? 'Photo' : 'Video'),
       resourceType: m.resourceType,
-      caption: `${parentFeedback.site.client.name} · ${parentFeedback.site.businessName}`,
+      caption: `${parentFeedback.site.client.clientName} · ${parentFeedback.site.businessName}`,
     };
   });
 
@@ -116,6 +117,7 @@ export default async function FeedbackPage({
                     <th className="whitespace-nowrap px-5.5 py-4">Attachments</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Date</th>
                     <th className="whitespace-nowrap px-5.5 py-4 text-center">Status</th>
+                    <th className="whitespace-nowrap px-5.5 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -127,7 +129,7 @@ export default async function FeedbackPage({
                           href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
                           className="font-bold hover:underline"
                         >
-                          {item.site.client.name}
+                          {item.site.client.clientName}
                         </Link>
                       </td>
                       <td className="max-w-[160px] px-5.5 py-3.5">
@@ -162,6 +164,18 @@ export default async function FeedbackPage({
                             <RetryButton action={retryFeedbackAction.bind(null, item.id, '/feedback')} />
                           )}
                         </div>
+                      </td>
+                      <td className="px-5.5 py-3.5 text-center">
+                        <ConfirmDeleteButton
+                          action={deleteFeedbackAction.bind(null, item.id, '/feedback')}
+                          itemLabel="this feedback submission"
+                          warning={
+                            item.clickupTaskId
+                              ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
+                              : 'This also deletes every attachment - none of it can be recovered.'
+                          }
+                          triggerClassName="rounded-lg border border-coral/30 px-2.5 py-1 text-[11.5px] font-bold text-coral hover:bg-coral/10"
+                        />
                       </td>
                     </tr>
                   ))}

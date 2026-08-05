@@ -20,7 +20,15 @@ test.describe.serial('Global Feedback + Assets admin pages', () => {
   });
 
   test.afterAll(async () => {
-    await deleteTestClient(clientCode); // will deactivate instead of hard-delete since feedback history now exists
+    // ClickUp is now connected (see below), so this run's submission created
+    // a REAL ticket in the live workspace. deleteTestClient only deactivates
+    // (feedback history blocks the hard delete) and has no way to reach
+    // ClickUp - it does not delete the ticket or the feedback row itself.
+    // Until there's a dedicated cleanup path, treat this test as leaving
+    // real data behind: after running it, manually delete the resulting
+    // ClickUp task (see feedback's clickupTaskId via GET /admin/feedback)
+    // and the leftover INACTIVE test client/feedback rows.
+    await deleteTestClient(clientCode);
   });
 
   test('feedback appears on the global Feedback page with client/site/attachment', async ({ page }) => {
@@ -29,16 +37,23 @@ test.describe.serial('Global Feedback + Assets admin pages', () => {
     await expect(row).toBeVisible({ timeout: 10_000 });
     await expect(row.getByText(CLIENT_NAME)).toBeVisible();
     await expect(row.getByText(SITE_NAME)).toBeVisible();
-    await expect(row.getByText(/DELIVERY PENDING|DELIVERY FAILED/)).toBeVisible(); // ClickUp not connected in this environment
+    // ClickUp is connected via CLICKUP_API_TOKEN as of the Personal API
+    // Token pivot - delivery happens synchronously during submission, so by
+    // the time this page loads the real ticket has already been created.
+    await expect(row.getByText(/DELIVERED|DELIVERY PENDING|DELIVERY FAILED/)).toBeVisible();
   });
 
   test('client/site filters on the Feedback page narrow the list correctly', async ({ page }) => {
     await page.goto('/feedback');
-    await page.getByLabel('Client').selectOption({ label: CLIENT_NAME });
+    // Custom listbox Select, not a native <select> - open the trigger, then
+    // click the matching role="option".
+    await page.getByLabel('Client').click();
+    await page.getByRole('option', { name: CLIENT_NAME }).click();
     await expect(page).toHaveURL(new RegExp(`clientCode=${clientCode}`));
     await expect(page.locator('tr', { hasText: FEEDBACK_TEXT })).toBeVisible();
 
-    await page.getByLabel('Site').selectOption({ label: SITE_NAME });
+    await page.getByLabel('Site').click();
+    await page.getByRole('option', { name: SITE_NAME }).click();
     await expect(page).toHaveURL(/siteId=/);
     await expect(page.locator('tr', { hasText: FEEDBACK_TEXT })).toBeVisible();
   });
@@ -50,7 +65,9 @@ test.describe.serial('Global Feedback + Assets admin pages', () => {
 
     await expect(page.getByText(FEEDBACK_TEXT)).toBeVisible();
     await expect(page.getByText(SITE_NAME, { exact: true })).toBeVisible();
-    await page.getByRole('link', { name: `← ${CLIENT_NAME}` }).click();
+    // Icon-only back link - accessible name comes from aria-label, not
+    // visible text (no "←" glyph actually renders, it's an SVG chevron).
+    await page.getByRole('link', { name: `Back to ${CLIENT_NAME}` }).click();
     await expect(page).toHaveURL(new RegExp(`/clients/${clientCode}$`));
   });
 
@@ -60,18 +77,26 @@ test.describe.serial('Global Feedback + Assets admin pages', () => {
     const card = page.getByTestId('asset-card').filter({ hasText: 'e2e-test.png' }).filter({ hasText: CLIENT_NAME });
     await expect(card).toBeVisible({ timeout: 10_000 });
 
-    await expect(card.getByRole('link', { name: 'Review' })).toHaveAttribute('href', /res\.cloudinary\.com|cloudinary/);
+    // Review now opens a shared full-screen lightbox (MediaLightboxProvider)
+    // instead of the old <a href target="_blank"> straight to Cloudinary.
+    await card.getByRole('button', { name: 'Review' }).click();
+    const lightbox = page.getByRole('dialog');
+    await expect(lightbox).toBeVisible();
+    await expect(lightbox.getByRole('img', { name: 'e2e-test.png' })).toHaveAttribute('src', /cloudinary/);
+    await lightbox.getByRole('button', { name: 'Close' }).click();
+    await expect(lightbox).not.toBeVisible();
 
     // Delete it - this also exercises the real Cloudinary destroy() call, so it doubles as cleanup for the asset itself.
     // (ConfirmDeleteButton is a React-rendered modal, not a native confirm() dialog - no page.on('dialog') needed.)
     await card.getByRole('button', { name: 'Delete' }).click();
-    await expect(page.getByRole('heading', { name: 'Delete e2e-test.png?' })).toBeVisible();
-    // The confirm modal is NOT a portal - it renders inline inside this same card's
-    // subtree (ConfirmDeleteButton renders it as a sibling of its own trigger). Assets
-    // are listed newest-first, so our card is likely first in the grid - a page-wide
-    // "last Delete button" would click some OTHER card's trigger instead of our
-    // modal's confirm button. Scoping to `card` avoids that entirely.
-    await card.getByRole('button', { name: 'Delete' }).last().click();
+    const confirmHeading = page.getByRole('heading', { name: 'Delete e2e-test.png?' });
+    await expect(confirmHeading).toBeVisible();
+    // ConfirmDeleteButton's confirm modal IS portaled to document.body, so
+    // it's outside `card`'s own DOM subtree - scoping to the modal's own
+    // container (found via its heading) targets the real confirm button,
+    // not the (still-present-but-covered) card's trigger button underneath.
+    const confirmModal = confirmHeading.locator('..');
+    await confirmModal.getByRole('button', { name: 'Delete' }).click();
     await expect(card).not.toBeVisible({ timeout: 10_000 });
     // Confirm via the API too - this is the real proof the Cloudinary destroy() call and DB row deletion both happened.
     const remaining = await (await apiFetch('/admin/media')).json();
