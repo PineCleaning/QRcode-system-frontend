@@ -45,7 +45,7 @@ export function FeedbackFilters({
           onChange={handleClientChange}
           disabled={isPending}
           placeholder="All clients"
-          options={[{ value: '', label: 'All clients' }, ...clients.map((c) => ({ value: c.id, label: c.name }))]}
+          options={[{ value: '', label: 'All clients' }, ...clients.map((c) => ({ value: c.id, label: c.clientName }))]}
         />
       </div>
 

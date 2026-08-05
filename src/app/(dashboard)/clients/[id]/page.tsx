@@ -49,7 +49,7 @@ export default async function ClientDetailPage({
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
           </svg>
         </Link>
-        <h1 className="text-2xl font-extrabold tracking-tight break-words">{client.name}</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight break-words">{client.clientName}</h1>
       </div>
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
@@ -101,7 +101,7 @@ export default async function ClientDetailPage({
                   </td>
                   <td className="px-5.5 py-3.5">
                     <span
-                      title={clientInactive ? `This site's own status is ${site.status}, but its QR code is blocked because ${client.name} is deactivated.` : undefined}
+                      title={clientInactive ? `This site's own status is ${site.status}, but its QR code is blocked because ${client.clientName} is deactivated.` : undefined}
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold before:h-1.5 before:w-1.5 before:rounded-full before:bg-current ${
                         clientInactive
                           ? 'bg-coral/15 text-coral'

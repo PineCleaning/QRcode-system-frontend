@@ -52,7 +52,7 @@ export function ClientForm({
   const isEdit = Boolean(client);
 
   const [clientId, setClientId] = useState(client?.clientId ?? '');
-  const [nameValue, setNameValue] = useState(client?.name ?? '');
+  const [nameValue, setNameValue] = useState(client?.clientName ?? '');
   // Once the admin types directly into Client ID, stop overwriting it
   // from Name changes - same "auto-slug until manually touched" pattern
   // used by most CMS permalink fields.
@@ -124,12 +124,12 @@ export function ClientForm({
       </div>
 
       <div>
-        <label htmlFor="name" className="mb-1 block text-sm font-bold text-ink">
-          Name <span className="text-coral">*</span>
+        <label htmlFor="clientName" className="mb-1 block text-sm font-bold text-ink">
+          Client Name <span className="text-coral">*</span>
         </label>
         <input
-          id="name"
-          name="name"
+          id="clientName"
+          name="clientName"
           value={nameValue}
           onChange={(e) => {
             setNameValue(e.target.value);
@@ -142,6 +142,10 @@ export function ClientForm({
         />
       </div>
 
+      {/* Contact email/phone - commented out, not needed for now (2026-08-05).
+      Uncomment to bring back; the DB columns (clients.contact_email,
+      clients.contact_phone) and backend DTO fields are untouched, so this
+      is fully reversible with no data loss.
       <div>
         <label htmlFor="contactEmail" className="mb-1 block text-sm font-bold text-ink">
           Contact email
@@ -169,6 +173,7 @@ export function ClientForm({
           className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
         />
       </div>
+      */}
 
       {isEdit && (
         <div>
