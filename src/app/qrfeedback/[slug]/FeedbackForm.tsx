@@ -143,6 +143,13 @@ export function FeedbackForm({ slug, businessName, address }: { slug: string; bu
     setError(null);
     setStatus('uploading');
 
+    // Populated per-file below when an upload fails - never thrown, so a
+    // Cloudinary-side problem (storage full, network error, etc.) can
+    // never take the whole submission down with it. Merged with the
+    // backend's own REJECTED notes after submission so the customer sees
+    // one consistent "not everything made it" message either way.
+    const uploadFailureNotes: string[] = [];
+
     try {
       const media: FeedbackMediaInput[] = [];
 
@@ -157,20 +164,39 @@ export function FeedbackForm({ slug, businessName, address }: { slug: string; bu
           // so nesting it deeper here needs no changes anywhere else.
           body: JSON.stringify({ folder: `feedback/${slug}/${new Date().toISOString().slice(0, 10)}` }),
         });
-        if (!sigRes.ok) throw new Error('Could not prepare file upload. Please try again.');
-        const sig: SignedUploadParams = await sigRes.json();
 
-        for (const file of files) {
-          const result = await uploadToCloudinary(file, sig, (percent) => {
-            setProgress((prev) => ({ ...prev, [file.name]: percent }));
-          });
-          media.push({
-            cloudinaryPublicId: result.public_id,
-            resourceType: result.resource_type.toUpperCase() as 'IMAGE' | 'VIDEO',
-            originalFilename: file.name,
-            mimeType: file.type,
-            sizeBytes: file.size,
-          });
+        // A failed signature request blocks every upload, not just one -
+        // still not fatal to the submission itself, so fall through to
+        // submitting the feedback text with zero attachments rather than
+        // throwing (same reasoning as a single failed upload below).
+        let sig: SignedUploadParams | null = null;
+        if (!sigRes.ok) {
+          uploadFailureNotes.push('Your attachments could not be uploaded.');
+        } else {
+          sig = await sigRes.json();
+        }
+
+        if (sig) {
+          for (const file of files) {
+            try {
+              const result = await uploadToCloudinary(file, sig, (percent) => {
+                setProgress((prev) => ({ ...prev, [file.name]: percent }));
+              });
+              media.push({
+                cloudinaryPublicId: result.public_id,
+                resourceType: result.resource_type.toUpperCase() as 'IMAGE' | 'VIDEO',
+                originalFilename: file.name,
+                mimeType: file.type,
+                sizeBytes: file.size,
+              });
+            } catch {
+              // Individual upload failures (Cloudinary storage full, a
+              // network drop mid-upload, etc.) never fail the whole
+              // submission - the feedback text is what matters most, and
+              // the customer is told exactly which file didn't make it.
+              uploadFailureNotes.push(`"${file.name}" could not be uploaded.`);
+            }
+          }
         }
       }
 
@@ -197,12 +223,17 @@ export function FeedbackForm({ slug, businessName, address }: { slug: string; bu
       // Individual bad attachments never fail the whole submission (the
       // feedback itself is already saved) - but a customer standing at a
       // job site deserves to know if a photo didn't make it through,
-      // rather than assuming it did.
+      // rather than assuming it did. Combines two different failure
+      // sources into one list: files that never reached Cloudinary at all
+      // (uploadFailureNotes, caught above) and files that reached
+      // Cloudinary but the backend rejected on verification (REJECTED,
+      // e.g. a spoofed public_id) - same customer-facing message either
+      // way, just a different reason underneath.
       const body = feedbackBody as SubmitResponse;
       const rejected = (body?.media ?? [])
         .filter((m) => m.status === 'REJECTED')
         .map((m) => m.rejectionReason ?? 'One attachment could not be included.');
-      setRejectedNotes(rejected);
+      setRejectedNotes([...uploadFailureNotes, ...rejected]);
 
       setStatus('success');
     } catch (err) {
