@@ -21,14 +21,24 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   const search = request.nextUrl.search;
+  const ifNoneMatch = request.headers.get('if-none-match');
   const res = await fetch(`${API_BASE_URL}/sites/${siteId}/qr${search}`, {
-    headers: { Authorization: `Bearer ${session.access_token}` },
-    // QR images are generated fresh per request - without this, Next's
-    // fetch() defaults to caching GET requests, which can silently keep
-    // serving a stale (or, worse, a previously-failed) response after
-    // the underlying data or backend code changes.
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      ...(ifNoneMatch ? { 'If-None-Match': ifNoneMatch } : {}),
+    },
+    // This no-store is about Next's own server-side fetch Data Cache
+    // (which would otherwise risk one admin's request serving a
+    // different admin's cached response body) - unrelated to, and safe
+    // alongside, the browser-facing Cache-Control/ETag forwarded below.
+    // The backend's own in-memory QrService cache is what actually
+    // avoids redoing the sharp/pdfkit render on every hit.
     cache: 'no-store',
   });
+
+  if (res.status === 304) {
+    return new NextResponse(null, { status: 304, headers: { ETag: res.headers.get('ETag') ?? '' } });
+  }
 
   if (!res.ok) {
     const body = await res.text();
@@ -40,7 +50,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     headers: {
       'Content-Type': res.headers.get('Content-Type') ?? 'application/octet-stream',
       'Content-Disposition': res.headers.get('Content-Disposition') ?? 'inline',
-      'Cache-Control': 'no-store',
+      'Cache-Control': res.headers.get('Cache-Control') ?? 'no-store',
+      ...(res.headers.get('ETag') ? { ETag: res.headers.get('ETag')! } : {}),
     },
   });
 }
