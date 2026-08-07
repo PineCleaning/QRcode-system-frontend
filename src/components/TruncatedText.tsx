@@ -9,25 +9,32 @@ const VIEWPORT_MARGIN = 8;
 /** Delay before closing on mouseleave, so moving from the clamped text down into the panel (to scroll it) doesn't close it first. */
 const CLOSE_DELAY_MS = 120;
 
+const LINE_CLAMP_CLASS = { 1: 'line-clamp-1', 2: 'line-clamp-2' } as const;
+
 /**
- * 2-line-clamped feedback text; hovering (or focusing via keyboard,
+ * Line-clamped text (1 or 2 lines); hovering (or focusing via keyboard,
  * for accessibility) reveals the full text in a scrollable panel.
  * Portaled into document.body at a fixed position computed from the
  * trigger - same technique as AttachmentsCell/Select in this codebase.
- * The Feedback table has an overflow-x-auto wrapper that would clip a
+ * Tables using this have an overflow-x-auto wrapper that would clip a
  * plain absolutely-positioned popover otherwise.
+ *
+ * `children`, when given, renders as the clamped trigger content instead
+ * of `text` (e.g. a clickable client-name Link) - `text` is always what
+ * the hover panel shows, since a Link's own text is what needs surfacing
+ * in full, clamped or not.
  *
  * Hover/focus handlers are only attached when the text is genuinely
  * clamped (scrollHeight > clientHeight) - without this, short text
- * (e.g. "Test") still renders inside a block-level <p> that spans the
- * full column width, so hovering the empty space to its right would
+ * (e.g. "Test") still renders inside a block-level element that spans
+ * the full column width, so hovering the empty space to its right would
  * otherwise wrongly open a popover with nothing extra to show.
  */
-export function TruncatedFeedback({ text }: { text: string }) {
+export function TruncatedText({ text, lines = 2, children }: { text: string; lines?: 1 | 2; children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const [isTruncated, setIsTruncated] = useState(false);
-  const triggerRef = useRef<HTMLParagraphElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -35,13 +42,13 @@ export function TruncatedFeedback({ text }: { text: string }) {
     function checkTruncation() {
       const el = triggerRef.current;
       if (!el) return;
-      // +1 guards against subpixel rounding falsely reporting truncation on exactly-2-line text.
+      // +1 guards against subpixel rounding falsely reporting truncation on exactly-clamped text.
       setIsTruncated(el.scrollHeight > el.clientHeight + 1);
     }
     checkTruncation();
     window.addEventListener('resize', checkTruncation);
     return () => window.removeEventListener('resize', checkTruncation);
-  }, [text]);
+  }, [text, lines]);
 
   function show() {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -91,17 +98,17 @@ export function TruncatedFeedback({ text }: { text: string }) {
 
   return (
     <>
-      <p
+      <div
         ref={triggerRef}
         tabIndex={isTruncated ? 0 : undefined}
         onMouseEnter={isTruncated ? show : undefined}
         onMouseLeave={isTruncated ? scheduleHide : undefined}
         onFocus={isTruncated ? show : undefined}
         onBlur={isTruncated ? scheduleHide : undefined}
-        className={`line-clamp-2 whitespace-pre-wrap ${isTruncated ? 'cursor-default' : ''}`}
+        className={`${LINE_CLAMP_CLASS[lines]} whitespace-pre-wrap ${isTruncated ? 'cursor-default' : ''}`}
       >
-        {text}
-      </p>
+        {children ?? text}
+      </div>
 
       {open &&
         isTruncated &&

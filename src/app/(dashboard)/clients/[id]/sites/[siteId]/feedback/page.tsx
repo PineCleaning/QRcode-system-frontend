@@ -3,9 +3,10 @@ import { AttachmentsCell } from '@/components/AttachmentsCell';
 import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { RetryButton } from '@/components/RetryButton';
-import { TruncatedFeedback } from '@/components/TruncatedFeedback';
+import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, FeedbackSubmission, Site } from '@/lib/api/types';
+import { formatDate } from '@/lib/format-date';
 import { deleteFeedbackAction, retryFeedbackAction } from '@/app/(dashboard)/feedback/actions';
 
 const STATUS_STYLES: Record<string, string> = {
@@ -15,16 +16,6 @@ const STATUS_STYLES: Record<string, string> = {
   DELIVERY_FAILED: 'bg-coral/15 text-coral',
   DRAFT: 'bg-ink-muted/15 text-ink-muted',
 };
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('en-AU', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
 
 export default async function SiteFeedbackPage({
   params,
@@ -105,11 +96,11 @@ export default async function SiteFeedbackPage({
             <tbody>
               {feedback.map((item) => (
                 <tr key={item.id} className="border-b border-line align-top last:border-0 hover:bg-ink/[0.03]">
-                  <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">{formatDate(item.submittedAt)}</td>
-                  <td className="max-w-md px-5.5 py-3.5">
-                    <TruncatedFeedback text={item.feedback} />
+                  <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold tabular-nums text-ink/80">{formatDate(item.submittedAt)}</td>
+                  <td className="max-w-md px-5.5 py-3.5 font-semibold text-ink/80">
+                    <TruncatedText text={item.feedback} lines={2} />
                   </td>
-                  <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">
+                  <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold tabular-nums text-ink/80">
                     {item.mobileNumber ?? <span className="text-xs italic text-ink-muted/70">Not provided</span>}
                   </td>
                   <td className="px-5.5 py-3.5">

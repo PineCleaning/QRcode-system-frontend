@@ -7,21 +7,12 @@ import { Pagination } from '@/components/Pagination';
 import { RetryButton } from '@/components/RetryButton';
 import { ResultsContainer } from '@/components/ResultsContainer';
 import { TableRowsSkeleton } from '@/components/skeletons/TableRowsSkeleton';
-import { TruncatedFeedback } from '@/components/TruncatedFeedback';
+import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types';
+import { formatDate } from '@/lib/format-date';
 import { deleteFeedbackAction, retryFeedbackAction } from './actions';
 import { FeedbackFilters } from './FeedbackFilters';
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('en-AU', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
 
 const STATUS_STYLES: Record<string, string> = {
   DELIVERED: 'bg-green/15 text-green',
@@ -107,51 +98,76 @@ export default async function FeedbackPage({
             <MediaLightboxProvider items={lightboxItems}>
             <div className="overflow-hidden rounded-[26px] border border-line bg-surface shadow-sm">
               <div className="overflow-x-auto">
-              <table className="w-full min-w-[880px] text-left text-[13.5px]">
+              <table className="w-full min-w-[1020px] table-fixed text-left text-[13.5px]">
+                <colgroup>
+                  <col className="w-[10%]" />
+                  <col className="w-[11%]" />
+                  <col className="w-[11%]" />
+                  <col className="w-[18%]" />
+                  <col className="w-[9%]" />
+                  <col className="w-[10%]" />
+                  <col className="w-[13%]" />
+                  <col className="w-[11%]" />
+                  <col className="w-[7%]" />
+                </colgroup>
                 <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
                   <tr>
-                    <th className="whitespace-nowrap px-5.5 py-4">Client</th>
-                    <th className="whitespace-nowrap px-5.5 py-4">Site</th>
-                    <th className="px-5.5 py-4">Feedback</th>
-                    <th className="whitespace-nowrap px-5.5 py-4">Mobile</th>
-                    <th className="whitespace-nowrap px-5.5 py-4">Attachments</th>
-                    <th className="whitespace-nowrap px-5.5 py-4">Date</th>
-                    <th className="whitespace-nowrap px-5.5 py-4 text-center">Status</th>
-                    <th className="whitespace-nowrap px-5.5 py-4 text-center">Actions</th>
+                    <th className="whitespace-nowrap px-4 py-4">Client</th>
+                    <th className="whitespace-nowrap px-4 py-4">Site</th>
+                    <th className="whitespace-nowrap px-4 py-4">Address</th>
+                    <th className="px-4 py-4">Feedback</th>
+                    <th className="whitespace-nowrap px-4 py-4">Mobile</th>
+                    <th className="whitespace-nowrap px-4 py-4">Attachments</th>
+                    <th className="whitespace-nowrap px-4 py-4">Date</th>
+                    <th className="whitespace-nowrap px-4 py-4 text-center">Status</th>
+                    <th className="whitespace-nowrap px-4 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {feedback.map((item) => (
                     <tr key={item.id} className="border-b border-line align-top last:border-0 hover:bg-ink/[0.03]">
-                      <td className="max-w-[180px] px-5.5 py-3.5">
-                        <Link
-                          prefetch={false}
-                          href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
-                          className="font-bold hover:underline"
-                        >
-                          {item.site.client.clientName}
-                        </Link>
+                      <td className="px-4 py-3.5">
+                        <TruncatedText text={item.site.client.clientName} lines={1}>
+                          <Link
+                            prefetch={false}
+                            href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
+                            className="font-bold hover:underline"
+                          >
+                            {item.site.client.clientName}
+                          </Link>
+                        </TruncatedText>
                       </td>
-                      <td className="max-w-[160px] px-5.5 py-3.5">
-                        <Link
-                          prefetch={false}
-                          href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
-                          className="text-ink-muted hover:text-ink hover:underline"
-                        >
-                          {item.site.businessName}
-                        </Link>
+                      <td className="px-4 py-3.5">
+                        <TruncatedText text={item.site.businessName} lines={1}>
+                          <Link
+                            prefetch={false}
+                            href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
+                            className="font-semibold text-ink/80 hover:text-ink hover:underline"
+                          >
+                            {item.site.businessName}
+                          </Link>
+                        </TruncatedText>
                       </td>
-                      <td className="max-w-md px-5.5 py-3.5">
-                        <TruncatedFeedback text={item.feedback} />
+                      <td className="px-4 py-3.5 font-semibold text-ink/80">
+                        {item.site.address ? (
+                          <TruncatedText text={item.site.address} lines={1} />
+                        ) : (
+                          <span className="text-xs italic text-ink-muted/70">Not provided</span>
+                        )}
                       </td>
-                      <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">
+                      <td className="px-4 py-3.5 font-semibold text-ink/80">
+                        <TruncatedText text={item.feedback} lines={2} />
+                      </td>
+                      <td className="truncate px-4 py-3.5 font-semibold tabular-nums text-ink/80">
                         {item.mobileNumber ?? <span className="text-xs italic text-ink-muted/70">Not provided</span>}
                       </td>
-                      <td className="px-5.5 py-3.5">
+                      <td className="px-4 py-3.5">
                         <AttachmentsCell media={item.media} pathToRevalidate="/feedback" mediaIndexMap={mediaIndexMap} />
                       </td>
-                      <td className="whitespace-nowrap px-5.5 py-3.5 text-ink-muted">{formatDate(item.submittedAt)}</td>
-                      <td className="px-5.5 py-3.5">
+                      <td className="px-4 py-3.5 font-semibold tabular-nums text-ink/80">
+                        <TruncatedText text={formatDate(item.submittedAt)} lines={1} />
+                      </td>
+                      <td className="px-4 py-3.5">
                         <div className="flex items-center justify-center gap-1.5">
                           <span
                             className={`inline-block whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-extrabold ${
@@ -165,7 +181,7 @@ export default async function FeedbackPage({
                           )}
                         </div>
                       </td>
-                      <td className="px-5.5 py-3.5 text-center">
+                      <td className="px-4 py-3.5 text-center">
                         <ConfirmDeleteButton
                           action={deleteFeedbackAction.bind(null, item.id, '/feedback')}
                           itemLabel="this feedback submission"

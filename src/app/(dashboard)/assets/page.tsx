@@ -7,18 +7,9 @@ import { CardGridSkeleton } from '@/components/skeletons/CardGridSkeleton';
 import { StorageStatusBar } from '@/components/StorageStatusBar';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { AdminMediaItem, Client, CloudinaryUsage, Site } from '@/lib/api/types';
+import { formatDate } from '@/lib/format-date';
 import { deleteMediaAction } from './actions';
 import { FeedbackFilters } from '../feedback/FeedbackFilters';
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('en-AU', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
 
 export default async function AssetsPage({
   searchParams,

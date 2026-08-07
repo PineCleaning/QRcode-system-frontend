@@ -68,9 +68,8 @@ export function BulkImportClient() {
           <div>
             <h2 className="text-sm font-extrabold">1. Download the template</h2>
             <p className="mt-1 text-sm text-ink-muted">
-              Columns: Client Name, Client Code (optional), Contact Email, Contact Phone, Business Name, Address.
+              Columns: Client Name, Client Code (optional), Business Name, Address.
             </p>
-            <p className="mt-1 text-xs text-ink-muted">Contact Phone: digits only, optionally with + or - (no spaces, letters, or brackets).</p>
           </div>
           <a
             href="/client-import-template.csv"

@@ -142,39 +142,6 @@ export function ClientForm({
         />
       </div>
 
-      {/* Contact email/phone - commented out, not needed for now (2026-08-05).
-      Uncomment to bring back; the DB columns (clients.contact_email,
-      clients.contact_phone) and backend DTO fields are untouched, so this
-      is fully reversible with no data loss.
-      <div>
-        <label htmlFor="contactEmail" className="mb-1 block text-sm font-bold text-ink">
-          Contact email
-        </label>
-        <input
-          id="contactEmail"
-          name="contactEmail"
-          type="email"
-          defaultValue={client?.contactEmail ?? ''}
-          className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="contactPhone" className="mb-1 block text-sm font-bold text-ink">
-          Contact phone
-        </label>
-        <input
-          id="contactPhone"
-          name="contactPhone"
-          type="tel"
-          defaultValue={client?.contactPhone ?? ''}
-          pattern="[0-9+-]+"
-          title="Only digits, + and - are allowed (e.g. +61-2-1111-1111)"
-          className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
-        />
-      </div>
-      */}
-
       {isEdit && (
         <div>
           <label htmlFor="status" className="mb-1 block text-sm font-bold text-ink">

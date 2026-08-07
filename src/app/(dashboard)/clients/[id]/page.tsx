@@ -92,10 +92,10 @@ export default async function ClientDetailPage({
               {sites.map((site) => (
                 <tr key={site.id} className="border-b border-line last:border-0 hover:bg-ink/[0.03]">
                   <td className="max-w-[180px] px-5.5 py-3.5 font-bold">{site.businessName}</td>
-                  <td className="max-w-[200px] px-5.5 py-3.5 text-ink-muted">{site.address || <span className="text-ink-muted/40">—</span>}</td>
+                  <td className="max-w-[200px] px-5.5 py-3.5 font-semibold text-ink/80">{site.address || <span className="text-ink-muted/40">—</span>}</td>
                   <td className="px-5.5 py-3.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-[12.5px] text-ink-muted">{site.slug}</span>
+                      <span className="font-mono text-[14.5px] font-semibold tracking-wide text-ink/75">{site.slug}</span>
                       <CopyLinkButton url={site.feedbackUrl} />
                     </div>
                   </td>

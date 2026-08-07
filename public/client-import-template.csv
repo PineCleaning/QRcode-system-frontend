@@ -1,3 +1,3 @@
-Client Name,Client Code,Contact Email,Contact Phone,Business Name,Address
-Acme Gym,acme-gym,contact@acmegym.com,0400111222,Main Branch,123 Main St
-Acme Gym,acme-gym,,,North Branch,456 North Rd
+Client Name,Client Code,Business Name,Address
+Acme Gym,acme-gym,Main Branch,123 Main St
+Acme Gym,acme-gym,North Branch,456 North Rd
