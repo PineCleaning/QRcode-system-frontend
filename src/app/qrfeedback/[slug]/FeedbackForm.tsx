@@ -250,8 +250,8 @@ export function FeedbackForm({ slug, businessName, address }: { slug: string; bu
         <div className="mx-auto w-full max-w-lg rounded-3xl bg-[#eaf3e7] p-4 shadow-lg sm:p-6">
           <BrandHeader />
           <div className="rounded-2xl bg-white p-6 text-center shadow-sm sm:p-8">
-            <h1 className="text-xl font-bold text-[#2d3660]">Thank you!</h1>
-            <p className="mt-2 text-sm text-gray-600">Your feedback has been received.</p>
+            <h1 className="text-xl font-bold text-[#2d3660]">Thanks!</h1>
+            <p className="mt-2 text-sm text-gray-600">Your submission will now be reviewed.</p>
             {rejectedNotes.length > 0 && (
               <div className="mt-4 rounded-md bg-yellow-50 p-3 text-left text-xs text-yellow-800">
                 <p className="font-semibold">Your feedback was submitted, but not every attachment could be included:</p>
@@ -311,12 +311,11 @@ export function FeedbackForm({ slug, businessName, address }: { slug: string; bu
               type="tel"
               inputMode="tel"
               value={mobileNumber}
-              onChange={(e) => setMobileNumber(e.target.value.replace(/[^0-9+\-\s()]/g, ''))}
-              maxLength={32}
-              placeholder="Max 32 characters"
+              onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ''))}
+              maxLength={12}
               className="w-full rounded border border-gray-300 px-3 py-3 text-base text-gray-900 focus:border-[#3a6b47] focus:outline-none"
             />
-            <p className="mt-1 text-xs text-gray-500">THIS LETS US SENDS YOU A TEXT UPDATE</p>
+            <p className="mt-1 text-xs text-gray-500">THIS LETS US SEND YOU A TEXT UPDATE</p>
           </div>
 
           <div>
