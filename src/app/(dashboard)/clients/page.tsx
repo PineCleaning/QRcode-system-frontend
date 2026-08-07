@@ -139,8 +139,8 @@ export default async function ClientsPage({
                       className="border-b border-line last:border-0 hover:bg-ink/[0.03]"
                     >
                       <td className="max-w-[220px] px-5.5 py-3.5 font-bold">{client.clientName}</td>
-                      <td className="px-5.5 py-3.5 font-mono text-[12.5px] text-ink-muted">{client.clientId}</td>
-                      <td className="px-5.5 py-3.5 text-ink-muted">{client._count.sites}</td>
+                      <td className="px-5.5 py-3.5 font-mono text-[14.5px] font-semibold tracking-wide text-ink/75">{client.clientId.toUpperCase()}</td>
+                      <td className="px-5.5 py-3.5 text-[14.5px] font-semibold tabular-nums text-ink/80">{client._count.sites}</td>
                       <td className="px-5.5 py-3.5">
                         <span
                           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold before:h-1.5 before:w-1.5 before:rounded-full before:bg-current ${
