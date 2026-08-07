@@ -4,8 +4,6 @@ export interface Client {
   id: string;
   clientId: string;
   clientName: string;
-  contactEmail: string | null;
-  contactPhone: string | null;
   status: ClientSiteStatus;
   clickupEntityId: string | null;
   createdAt: string;
@@ -72,7 +70,7 @@ export interface FeedbackSubmission {
 
 /** Global feedback list (admin "Feedbacks" page) - each row also carries its site + client. */
 export interface AdminFeedbackSubmission extends FeedbackSubmission {
-  site: Pick<Site, 'id' | 'businessName' | 'slug'> & { client: Pick<Client, 'id' | 'clientName' | 'clientId'> };
+  site: Pick<Site, 'id' | 'businessName' | 'address' | 'slug'> & { client: Pick<Client, 'id' | 'clientName' | 'clientId'> };
 }
 
 /** Shape returned by GET /admin/feedback?page=&pageSize= - the unpaginated array shape stays for callers that never send those params. */
