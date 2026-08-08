@@ -135,7 +135,7 @@ export default async function SiteFeedbackPage({
                           ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
                           : 'This also deletes every attachment - none of it can be recovered.'
                       }
-                      triggerClassName="rounded-lg border border-coral/30 px-2.5 py-1 text-[11.5px] font-bold text-coral hover:bg-coral/10"
+                      triggerClassName="font-bold text-red-500 hover:text-red-700"
                     />
                   </td>
                 </tr>
