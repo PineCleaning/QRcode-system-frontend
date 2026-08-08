@@ -54,6 +54,24 @@ export async function updateClientModalAction(
   return updateClient(id, formData);
 }
 
+/**
+ * Permanently deletes the client, every site under it, and every
+ * feedback submission (with attachments) on those sites - a real
+ * cascading hard delete, not the reversible Deactivate/Activate above.
+ */
+export async function deleteClientAction(id: string) {
+  try {
+    await apiFetch(`/clients/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    const message = err instanceof ApiError ? err.message : 'Failed to delete client';
+    revalidatePath('/clients');
+    redirect(`/clients?error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath('/clients');
+  revalidatePath('/feedback');
+  revalidatePath('/assets');
+}
+
 export async function setClientStatusAction(id: string, status: 'ACTIVE' | 'INACTIVE') {
   try {
     await apiFetch<Client>(`/clients/${id}`, {

@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { ClickableRow } from '@/components/ClickableRow';
 import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
+import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { Pagination } from '@/components/Pagination';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { PaginatedClients } from '@/lib/api/types';
 import { AddClientModal } from './AddClientModal';
 import { EditClientModal } from './EditClientModal';
-import { setClientStatusAction } from './actions';
+import { deleteClientAction, setClientStatusAction } from './actions';
 
 const PAGE_SIZE = 50;
 
@@ -166,6 +167,16 @@ export default async function ClientsPage({
                               ? "Its QR codes will start accepting new feedback submissions again, but only for sites that are also Active; reactivate any inactive sites individually from the site page."
                               : 'Its QR codes will start accepting new feedback submissions again.'
                           }
+                        />
+                        <ConfirmDeleteButton
+                          action={deleteClientAction.bind(null, client.id)}
+                          itemLabel={client.clientName}
+                          warning={
+                            client._count.sites > 0
+                              ? `This permanently deletes ${client.clientName}, all ${client._count.sites} of its site(s), and every feedback submission (including photos/videos and ClickUp tickets). If you just want to stop new feedback, use Deactivate instead.`
+                              : `This permanently deletes ${client.clientName}. If you just want to stop new feedback, use Deactivate instead.`
+                          }
+                          triggerClassName="ml-3.5 font-bold text-red-500 hover:text-red-700"
                         />
                       </td>
                     </ClickableRow>
