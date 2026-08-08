@@ -114,7 +114,7 @@ export default async function ClientDetailPage({
                     </span>
                   </td>
                   <td className="px-5.5 py-3.5 font-bold">
-                    <div className="flex gap-3 text-[12.5px]">
+                    <div className="flex gap-3 text-[13.5px]">
                       <SiteQrModal
                         siteId={site.id}
                         businessName={site.businessName}

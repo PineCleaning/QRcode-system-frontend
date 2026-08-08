@@ -44,7 +44,7 @@ export function ConfirmDeactivateButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={isActivating ? 'text-green' : 'text-coral'}
+        className={isActivating ? 'font-bold text-green/90 hover:text-green' : 'font-bold text-coral/90 hover:text-coral'}
       >
         {verb}
       </button>
