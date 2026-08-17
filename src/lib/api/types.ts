@@ -140,3 +140,17 @@ export interface CsvImportResult {
   batch: CsvImportBatch;
   rows: CsvImportRow[];
 }
+
+export type ClickupConnectionStatus = 'CONNECTED' | 'DISCONNECTED' | 'RECONNECT_REQUIRED';
+
+export interface ClickupStatus {
+  connected: boolean;
+  /** True when a previously-CONNECTED connection got an auth-class failure (token revoked/regenerated in ClickUp) and needs an admin to paste a fresh one. */
+  needsReconnect: boolean;
+  workspaceId?: string;
+  workspaceName?: string | null;
+  status?: ClickupConnectionStatus;
+  lastErrorMessage?: string | null;
+  disconnectedAt?: string | null;
+  configured?: boolean;
+}

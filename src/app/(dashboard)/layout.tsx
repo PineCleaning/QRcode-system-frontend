@@ -1,3 +1,4 @@
+import { ClickupStatusBanner } from '@/components/ClickupStatusBanner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { DashboardNav } from './DashboardNav';
 
@@ -6,6 +7,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-page text-ink md:flex">
       <DashboardNav />
       <div className="flex flex-1 flex-col">
+        <ClickupStatusBanner />
         {/* Desktop-only top strip - on mobile the toggle already lives in
             DashboardNav's own top bar next to the hamburger, so this
             would just duplicate it. */}
