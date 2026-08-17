@@ -152,5 +152,7 @@ export interface ClickupStatus {
   status?: ClickupConnectionStatus;
   lastErrorMessage?: string | null;
   disconnectedAt?: string | null;
+  /** Whether RAILWAY_API_TOKEN/PROJECT_ID/ENVIRONMENT_ID/SERVICE_ID are all set backend-side - if false, reconnecting here still fixes ClickUp instantly but won't also update Railway's copy of the token. */
+  railwaySyncConfigured?: boolean;
   configured?: boolean;
 }

@@ -47,6 +47,12 @@ export default async function ClickupSettingsPage() {
           </ol>
 
           <ClickupTokenForm />
+
+          <p className="mt-3 text-[12px] text-ink-muted">
+            {status.railwaySyncConfigured
+              ? 'This will also update your Railway deployment automatically — no other steps needed.'
+              : "This fixes ClickUp immediately. It won't touch Railway (auto-sync isn't set up) - that's fine, nothing else needs to change."}
+          </p>
         </div>
       ) : status.connected ? (
         <div className="mt-6 rounded-[20px] border border-green/30 bg-green/10 p-5">
@@ -57,6 +63,15 @@ export default async function ClickupSettingsPage() {
             Connected to {status.workspaceName ?? status.workspaceId}
           </p>
           <p className="mt-1 text-[13px] text-ink-muted">{status.configured ? 'Fully configured.' : 'Connected, but list/field setup is incomplete.'}</p>
+          <p className="mt-3 border-t border-green/20 pt-3 text-[13px] text-ink-muted">
+            {status.railwaySyncConfigured ? (
+              <>
+                <span className="text-green">✓</span> Railway auto-sync is on — reconnecting here also updates your Railway deployment automatically.
+              </>
+            ) : (
+              <>Railway auto-sync isn&apos;t set up — reconnecting here still fixes ClickUp instantly, it just won&apos;t also update Railway&apos;s backup copy.</>
+            )}
+          </p>
         </div>
       ) : (
         <div className="mt-6 rounded-[20px] border border-line bg-surface p-5">
