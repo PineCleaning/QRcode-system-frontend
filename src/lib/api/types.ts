@@ -140,3 +140,19 @@ export interface CsvImportResult {
   batch: CsvImportBatch;
   rows: CsvImportRow[];
 }
+
+export type ClickupConnectionStatus = 'CONNECTED' | 'DISCONNECTED' | 'RECONNECT_REQUIRED';
+
+export interface ClickupStatus {
+  connected: boolean;
+  /** True when a previously-CONNECTED connection got an auth-class failure (token revoked/regenerated in ClickUp) and needs an admin to paste a fresh one. */
+  needsReconnect: boolean;
+  workspaceId?: string;
+  workspaceName?: string | null;
+  status?: ClickupConnectionStatus;
+  lastErrorMessage?: string | null;
+  disconnectedAt?: string | null;
+  /** Whether RAILWAY_API_TOKEN/PROJECT_ID/ENVIRONMENT_ID/SERVICE_ID are all set backend-side - if false, reconnecting here still fixes ClickUp instantly but won't also update Railway's copy of the token. */
+  railwaySyncConfigured?: boolean;
+  configured?: boolean;
+}
