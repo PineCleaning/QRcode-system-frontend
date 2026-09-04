@@ -174,3 +174,35 @@ export interface AdminUserRecord {
 export interface CreatedAdminUser extends AdminUserRecord {
   temporaryPassword: string;
 }
+
+export type InventoryStatus = 'IN_STOCK' | 'LOW_STOCK' | 'URGENT_LOW_STOCK' | 'OUT_OF_STOCK' | 'GOOD' | 'NEEDS_REPAIR' | 'OUT_OF_SERVICE';
+export type InventoryCategory =
+  | 'CHEMICAL'
+  | 'PPE'
+  | 'CONSUMABLES'
+  | 'CLEANING_TOOLS_MANUAL'
+  | 'POWERED_EQUIPMENT_MACHINERY'
+  | 'SPARE_PARTS'
+  | 'OTHER';
+
+export interface InventoryItem {
+  id: string;
+  siteId: string;
+  item: string;
+  category: InventoryCategory;
+  status: InventoryStatus;
+  quantity: number;
+  lastSupplyDate: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InventoryHistoryEntry {
+  id: string;
+  inventoryItemId: string;
+  previousQuantity: number;
+  previousStatus: InventoryStatus;
+  previousNotes: string | null;
+  changedAt: string;
+}

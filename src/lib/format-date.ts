@@ -16,3 +16,22 @@ export function formatDate(iso: string) {
     minute: '2-digit',
   });
 }
+
+/**
+ * For genuinely date-only values (e.g. Inventory's Last Supply Date, picked
+ * via <input type="date"> - no time is ever collected). These are stored as
+ * midnight UTC on the picked calendar date (a JS date-parsing quirk: a bare
+ * "YYYY-MM-DD" string parses as UTC, not local time). Reading the UTC date
+ * parts directly - not converting through Australia/Sydney like formatDate()
+ * does - recovers exactly the date that was picked. Converting a date-only
+ * value through a timezone would attach a fabricated, meaningless time
+ * (confirmed bug 2026-09-03: midnight UTC rendered as "10:00 am" in Sydney).
+ */
+export function formatDateOnly(iso: string) {
+  return new Date(iso).toLocaleDateString('en-AU', {
+    timeZone: 'UTC',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}

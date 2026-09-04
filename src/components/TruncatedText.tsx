@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 const PANEL_MAX_WIDTH = 420;
@@ -30,7 +30,18 @@ const LINE_CLAMP_CLASS = { 1: 'line-clamp-1', 2: 'line-clamp-2' } as const;
  * the full column width, so hovering the empty space to its right would
  * otherwise wrongly open a popover with nothing extra to show.
  */
-export function TruncatedText({ text, lines = 2, children }: { text: string; lines?: 1 | 2; children?: React.ReactNode }) {
+export function TruncatedText({
+  text,
+  lines = 2,
+  children,
+  className = '',
+}: {
+  text: string;
+  lines?: 1 | 2;
+  children?: React.ReactNode;
+  /** Extra classes applied to BOTH the clamped trigger and the hover popup panel - e.g. "break-all" for free text that can contain long unbroken tokens (no spaces). Without it on the panel too, such text overflows the popup's fixed width sideways instead of wrapping and being vertically scrollable, since the popup only has overflow-y-auto (confirmed bug 2026-09-04). */
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -55,10 +66,35 @@ export function TruncatedText({ text, lines = 2, children }: { text: string; lin
     const rect = triggerRef.current?.getBoundingClientRect();
     if (!rect) return;
     const width = Math.min(PANEL_MAX_WIDTH, window.innerWidth - VIEWPORT_MARGIN * 2);
-    const left = Math.min(rect.left, window.innerWidth - width - VIEWPORT_MARGIN);
-    setPosition({ top: rect.bottom + 6, left: Math.max(VIEWPORT_MARGIN, left), width });
+    // Anchored to the trigger's own left edge here - the panel is
+    // width: fit-content (maxWidth caps it, see the render below), so its
+    // real rendered width isn't known until after it paints. The
+    // layout effect below corrects `left` post-render if this guess
+    // would overflow off the right edge - reserving the full max width
+    // pre-emptively here (as this used to) shifts short popups (a date,
+    // a short category label) far away from their trigger for no reason,
+    // landing them over unrelated content (confirmed bug 2026-09-04).
+    const left = Math.max(VIEWPORT_MARGIN, Math.min(rect.left, window.innerWidth - VIEWPORT_MARGIN));
+    setPosition({ top: rect.bottom + 6, left, width });
     setOpen(true);
   }
+
+  // Corrects `left` after the panel has actually painted, in case its
+  // real fit-content width pushes it past the right edge of the
+  // viewport - the initial guess in show() can't know this in advance.
+  useLayoutEffect(() => {
+    if (!open || !position) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+    const rect = panel.getBoundingClientRect();
+    const overflow = rect.right - (window.innerWidth - VIEWPORT_MARGIN);
+    if (overflow > 0) {
+      setPosition((prev) => (prev ? { ...prev, left: Math.max(VIEWPORT_MARGIN, prev.left - overflow) } : prev));
+    }
+    // Only re-run when the panel opens/repositions, not on every render -
+    // re-measuring after our own correction would either no-op or loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, position?.top, position?.left]);
 
   function scheduleHide() {
     closeTimer.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS);
@@ -105,7 +141,7 @@ export function TruncatedText({ text, lines = 2, children }: { text: string; lin
         onMouseLeave={isTruncated ? scheduleHide : undefined}
         onFocus={isTruncated ? show : undefined}
         onBlur={isTruncated ? scheduleHide : undefined}
-        className={`${LINE_CLAMP_CLASS[lines]} whitespace-pre-wrap ${isTruncated ? 'cursor-default' : ''}`}
+        className={`${LINE_CLAMP_CLASS[lines]} whitespace-pre-wrap ${isTruncated ? 'cursor-default' : ''} ${className}`}
       >
         {children ?? text}
       </div>
@@ -119,8 +155,8 @@ export function TruncatedText({ text, lines = 2, children }: { text: string; lin
             ref={panelRef}
             onMouseEnter={show}
             onMouseLeave={scheduleHide}
-            style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, maxHeight: PANEL_MAX_HEIGHT, zIndex: 100 }}
-            className="overflow-y-auto whitespace-pre-wrap rounded-xl border border-line bg-surface p-3.5 text-[13px] leading-relaxed text-ink shadow-lg [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            style={{ position: 'fixed', top: position.top, left: position.left, width: 'fit-content', maxWidth: position.width, maxHeight: PANEL_MAX_HEIGHT, zIndex: 100 }}
+            className={`overflow-y-auto whitespace-pre-wrap rounded-xl border border-line bg-surface p-3.5 text-[13px] leading-relaxed text-ink shadow-lg [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
           >
             {text}
           </div>,
