@@ -6,12 +6,13 @@ import { ResultsContainer } from '@/components/ResultsContainer';
 import { CardGridSkeleton } from '@/components/skeletons/CardGridSkeleton';
 import { StorageStatusBar } from '@/components/StorageStatusBar';
 import { apiFetch } from '@/lib/api/server-fetch';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { AdminMediaItem, Client, CloudinaryUsage, Site } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
 import { deleteMediaAction } from './actions';
 import { FeedbackFilters } from '../feedback/FeedbackFilters';
 
-export default async function AssetsPage({
+export default async function MediaPage({
   searchParams,
 }: {
   searchParams: Promise<{ clientCode?: string; siteId?: string; error?: string }>;
@@ -23,19 +24,22 @@ export default async function AssetsPage({
   if (siteId) query.set('siteId', siteId);
   const queryString = query.toString() ? `?${query.toString()}` : '';
 
-  const [clients, sites, media, storageUsage] = await Promise.all([
+  const [clients, sites, media, storageUsage, currentAdmin] = await Promise.all([
     apiFetch<Client[]>('/clients'),
     clientCode ? apiFetch<Site[]>(`/clients/${clientCode}/sites`) : Promise.resolve<Site[]>([]),
     apiFetch<AdminMediaItem[]>(`/admin/media${queryString}`),
     apiFetch<CloudinaryUsage>('/admin/media/storage-usage'),
+    getCurrentAdmin(),
   ]);
+  // Deleting media is Admin-only.
+  const isAdmin = currentAdmin?.role === 'ADMIN';
 
   return (
     <div>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-extrabold tracking-tight text-balance">Assets</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight text-balance">Media</h1>
             <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{media.length}</span>
           </div>
           <p className="mt-1 text-[13.5px] text-ink-muted">All feedback attachments across every client and site.</p>
@@ -44,7 +48,7 @@ export default async function AssetsPage({
       </div>
 
       <FilterPendingProvider>
-        <FeedbackFilters basePath="/assets" clients={clients} sites={sites} clientCode={clientCode} siteId={siteId} />
+        <FeedbackFilters basePath="/media" clients={clients} sites={sites} clientCode={clientCode} siteId={siteId} />
 
         {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
@@ -58,7 +62,7 @@ export default async function AssetsPage({
                   d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M18 12.75V6.75A2.25 2.25 0 0 0 15.75 4.5H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5A2.25 2.25 0 0 0 6.75 19.5h10.5A2.25 2.25 0 0 0 19.5 17.25V15M9 9h.008v.008H9V9Z"
                 />
               </svg>
-              <p className="text-sm text-ink-muted">No assets yet.</p>
+              <p className="text-sm text-ink-muted">No media yet.</p>
             </div>
           ) : (
             <MediaLightboxProvider
@@ -77,7 +81,7 @@ export default async function AssetsPage({
                 return (
                   <div
                     key={item.id}
-                    data-testid="asset-card"
+                    data-testid="media-card"
                     className="rounded-[22px] border border-line bg-surface p-3 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
                   >
                     {item.resourceType === 'IMAGE' ? (
@@ -116,12 +120,14 @@ export default async function AssetsPage({
 
                     <div className="mt-3 flex items-center gap-2 text-xs">
                       <MediaReviewButton index={index} />
-                      <ConfirmDeleteButton
-                        action={deleteMediaAction.bind(null, item.id)}
-                        itemLabel={itemLabel}
-                        warning="This permanently deletes the file from Cloudinary storage, not just from this list."
-                        triggerClassName="flex-1 rounded-xl border border-coral/40 py-1.5 text-center font-bold text-coral hover:bg-coral/10"
-                      />
+                      {isAdmin && (
+                        <ConfirmDeleteButton
+                          action={deleteMediaAction.bind(null, item.id)}
+                          itemLabel={itemLabel}
+                          warning="This permanently deletes the file from Cloudinary storage, not just from this list."
+                          triggerClassName="flex-1 rounded-xl border border-coral/40 py-1.5 text-center font-bold text-coral hover:bg-coral/10"
+                        />
+                      )}
                     </div>
                   </div>
                 );

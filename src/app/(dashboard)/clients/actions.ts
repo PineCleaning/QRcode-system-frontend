@@ -69,7 +69,7 @@ export async function deleteClientAction(id: string) {
   }
   revalidatePath('/clients');
   revalidatePath('/feedback');
-  revalidatePath('/assets');
+  revalidatePath('/media');
 }
 
 export async function setClientStatusAction(id: string, status: 'ACTIVE' | 'INACTIVE') {

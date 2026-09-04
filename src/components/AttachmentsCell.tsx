@@ -96,13 +96,13 @@ function AttachmentLink({
   );
 }
 
-/** Delete icon + confirmation, reused for both the single-attachment and dropdown-row cases. Permanently removes the file from Cloudinary, the feedback record, and the Assets page. */
+/** Delete icon + confirmation, reused for both the single-attachment and dropdown-row cases. Permanently removes the file from Cloudinary, the feedback record, and the Media page. */
 function DeleteAttachmentButton({ item, pathToRevalidate }: { item: MediaItem; pathToRevalidate: string }) {
   return (
     <ConfirmDeleteButton
       action={deleteAttachmentAction.bind(null, item.id, pathToRevalidate)}
       itemLabel={mediaLabel(item)}
-      warning="This permanently removes the file from Cloudinary storage, and it will also disappear from the Assets page - not just from this list."
+      warning="This permanently removes the file from Cloudinary storage, and it will also disappear from the Media page - not just from this list."
       triggerLabel={<TrashIcon />}
       triggerAriaLabel={`Delete ${mediaLabel(item)}`}
       triggerClassName="shrink-0 rounded p-1 text-ink-muted/50 hover:bg-coral/10 hover:text-coral"

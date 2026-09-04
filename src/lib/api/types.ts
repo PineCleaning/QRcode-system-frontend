@@ -81,7 +81,7 @@ export interface PaginatedFeedback {
   pageSize: number;
 }
 
-/** Shape returned by GET /clients/:id/sites?page=&pageSize= - the unpaginated Site[] shape stays for the Feedback/Assets filter dropdowns. */
+/** Shape returned by GET /clients/:id/sites?page=&pageSize= - the unpaginated Site[] shape stays for the Feedback/Media filter dropdowns. */
 export interface PaginatedSites {
   data: Site[];
   total: number;
@@ -89,13 +89,13 @@ export interface PaginatedSites {
   pageSize: number;
 }
 
-/** Global media library (admin "Assets" page) - VERIFIED-only, so url is never null here. */
+/** Global media library (admin "Media" page) - VERIFIED-only, so url is never null here. */
 export interface AdminMediaItem extends Omit<FeedbackMedia, 'url'> {
   url: string;
   feedback: { id: string; site: Pick<Site, 'id' | 'businessName' | 'slug'> & { client: Pick<Client, 'id' | 'clientName' | 'clientId'> } };
 }
 
-/** GET /admin/media/storage-usage - Cloudinary account usage, for the Assets page's storage widget. */
+/** GET /admin/media/storage-usage - Cloudinary account usage, for the Media page's storage widget. */
 export interface CloudinaryUsage {
   plan: string;
   storageUsedBytes: number;
