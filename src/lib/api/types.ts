@@ -156,3 +156,21 @@ export interface ClickupStatus {
   railwaySyncConfigured?: boolean;
   configured?: boolean;
 }
+
+export type AdminRole = 'ADMIN' | 'SUPERVISOR';
+export type AdminStatus = 'ACTIVE' | 'INACTIVE';
+
+export interface AdminUserRecord {
+  id: string;
+  email: string;
+  fullName: string | null;
+  role: AdminRole;
+  status: AdminStatus;
+  createdAt: string;
+  lastLoginAt: string | null;
+}
+
+/** Only returned once, from POST /admin-users - the system-generated password, never retrievable again after this response. */
+export interface CreatedAdminUser extends AdminUserRecord {
+  temporaryPassword: string;
+}

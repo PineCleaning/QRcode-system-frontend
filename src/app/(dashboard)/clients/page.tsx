@@ -4,6 +4,7 @@ import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
 import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { Pagination } from '@/components/Pagination';
 import { apiFetch } from '@/lib/api/server-fetch';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { PaginatedClients } from '@/lib/api/types';
 import { AddClientModal } from './AddClientModal';
 import { EditClientModal } from './EditClientModal';
@@ -61,9 +62,16 @@ export default async function ClientsPage({
   const { error, page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
-  const { data: clients, total, activeCount, inactiveCount, totalSites, multiSiteCount } = await apiFetch<PaginatedClients>(
-    `/clients?page=${page}&pageSize=${PAGE_SIZE}`,
-  );
+  const [{ data: clients, total, activeCount, inactiveCount, totalSites, multiSiteCount }, currentAdmin] = await Promise.all([
+    apiFetch<PaginatedClients>(`/clients?page=${page}&pageSize=${PAGE_SIZE}`),
+    getCurrentAdmin(),
+  ]);
+  // Add/edit/delete clients (and the CSV bulk-import path, which does the
+  // same thing in bulk) are Admin-only - Supervisors can view everything
+  // here but every mutating control is hidden, matching what the backend's
+  // RolesGuard already enforces server-side (this is UX only, not the real
+  // security boundary).
+  const isAdmin = currentAdmin?.role === 'ADMIN';
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -74,16 +82,18 @@ export default async function ClientsPage({
           <h1 className="text-2xl font-extrabold tracking-tight text-balance">Clients</h1>
           <p className="mt-1 text-[13.5px] text-ink-muted">Every client and site on the QR feedback network.</p>
         </div>
-        <div className="flex gap-2.5">
-          <Link
-            prefetch={false}
-            href="/clients/import"
-            className="inline-flex items-center rounded-xl border border-line bg-surface px-4.5 py-2.5 text-[13.5px] font-bold text-ink transition hover:-translate-y-px"
-          >
-            Bulk Import
-          </Link>
-          <AddClientModal />
-        </div>
+        {isAdmin && (
+          <div className="flex gap-2.5">
+            <Link
+              prefetch={false}
+              href="/clients/import"
+              className="inline-flex items-center rounded-xl border border-line bg-surface px-4.5 py-2.5 text-[13.5px] font-bold text-ink transition hover:-translate-y-px"
+            >
+              Bulk Import
+            </Link>
+            <AddClientModal />
+          </div>
+        )}
       </div>
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
@@ -98,10 +108,12 @@ export default async function ClientsPage({
             />
           </svg>
           <p className="text-sm text-ink-muted">No clients yet.</p>
-          <AddClientModal
-            triggerLabel="Add your first client"
-            triggerClassName="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page transition hover:-translate-y-px"
-          />
+          {isAdmin && (
+            <AddClientModal
+              triggerLabel="Add your first client"
+              triggerClassName="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page transition hover:-translate-y-px"
+            />
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
@@ -152,32 +164,38 @@ export default async function ClientsPage({
                         </span>
                       </td>
                       <td className="px-5.5 py-3.5 font-bold">
-                        <EditClientModal client={client} />
-                        <ConfirmDeactivateButton
-                          currentStatus={client.status}
-                          action={setClientStatusAction.bind(null, client.id)}
-                          itemLabel={client.clientName}
-                          deactivateDescription={
-                            client._count.sites > 0
-                              ? `This will also stop every one of its ${client._count.sites} site(s) from accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime using the Activate button.`
-                              : 'Its QR codes will stop accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime using the Activate button.'
-                          }
-                          activateDescription={
-                            client._count.sites > 0
-                              ? "Its QR codes will start accepting new feedback submissions again, but only for sites that are also Active; reactivate any inactive sites individually from the site page."
-                              : 'Its QR codes will start accepting new feedback submissions again.'
-                          }
-                        />
-                        <ConfirmDeleteButton
-                          action={deleteClientAction.bind(null, client.id)}
-                          itemLabel={client.clientName}
-                          warning={
-                            client._count.sites > 0
-                              ? `This permanently deletes ${client.clientName}, all ${client._count.sites} of its site(s), and every feedback submission (including photos/videos and ClickUp tickets). If you just want to stop new feedback, use Deactivate instead.`
-                              : `This permanently deletes ${client.clientName}. If you just want to stop new feedback, use Deactivate instead.`
-                          }
-                          triggerClassName="ml-3.5 font-bold text-red-500 hover:text-red-700"
-                        />
+                        {isAdmin ? (
+                          <>
+                            <EditClientModal client={client} />
+                            <ConfirmDeactivateButton
+                              currentStatus={client.status}
+                              action={setClientStatusAction.bind(null, client.id)}
+                              itemLabel={client.clientName}
+                              deactivateDescription={
+                                client._count.sites > 0
+                                  ? `This will also stop every one of its ${client._count.sites} site(s) from accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime using the Activate button.`
+                                  : 'Its QR codes will stop accepting new feedback submissions. Nothing is deleted, and you can reactivate anytime using the Activate button.'
+                              }
+                              activateDescription={
+                                client._count.sites > 0
+                                  ? "Its QR codes will start accepting new feedback submissions again, but only for sites that are also Active; reactivate any inactive sites individually from the site page."
+                                  : 'Its QR codes will start accepting new feedback submissions again.'
+                              }
+                            />
+                            <ConfirmDeleteButton
+                              action={deleteClientAction.bind(null, client.id)}
+                              itemLabel={client.clientName}
+                              warning={
+                                client._count.sites > 0
+                                  ? `This permanently deletes ${client.clientName}, all ${client._count.sites} of its site(s), and every feedback submission (including photos/videos and ClickUp tickets). If you just want to stop new feedback, use Deactivate instead.`
+                                  : `This permanently deletes ${client.clientName}. If you just want to stop new feedback, use Deactivate instead.`
+                              }
+                              triggerClassName="ml-3.5 font-bold text-red-500 hover:text-red-700"
+                            />
+                          </>
+                        ) : (
+                          <span className="text-ink-muted/50">—</span>
+                        )}
                       </td>
                     </ClickableRow>
                   ))}
