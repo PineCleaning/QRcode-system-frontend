@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { apiFetch } from '@/lib/api/server-fetch';
 import { createClient } from '@/lib/supabase/server';
 
 const NETWORK_ERROR_MESSAGE = "Couldn't reach the server. Please check your connection and try again.";
@@ -24,6 +25,10 @@ export async function login(_prevState: string | null, formData: FormData): Prom
   if (error) {
     return error.message === 'fetch failed' ? NETWORK_ERROR_MESSAGE : error.message;
   }
+
+  // Best-effort - powers User Management's "Last Login" column. Never
+  // block a successful login on this failing (e.g. backend briefly down).
+  await apiFetch('/auth/record-login', { method: 'POST' }).catch(() => {});
 
   redirect('/clients');
 }

@@ -4,7 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { ProfileButton } from '@/components/ProfileButton';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import type { AdminRole, AdminUserRecord } from '@/lib/api/types';
 import { logout } from '../login/actions';
 
 function Logo({ className }: { className: string }) {
@@ -86,13 +88,34 @@ const NAV_ITEMS = [
   },
 ];
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+/**
+ * Admin-only, kept separate from NAV_ITEMS rather than adding an
+ * `adminOnly` flag to every entry - this is the only restricted item
+ * today, and appended last so it doesn't reflow the order of the
+ * existing links depending on role.
+ */
+const USER_MANAGEMENT_ITEM = {
+  href: '/admin-users',
+  label: 'User Management',
+  icon: (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+      />
+    </svg>
+  ),
+};
+
+function NavLinks({ role, onNavigate }: { role?: AdminRole; onNavigate?: () => void }) {
   const pathname = usePathname();
+  const items = role === 'ADMIN' ? [...NAV_ITEMS, USER_MANAGEMENT_ITEM] : NAV_ITEMS;
 
   return (
     <div className="flex h-full flex-col">
       <nav className="flex-1 space-y-1">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const active = pathname.startsWith(item.href);
           return (
             <Link
@@ -131,7 +154,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function DashboardNav() {
+export function DashboardNav({ role, admin }: { role?: AdminRole; admin?: AdminUserRecord | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -141,6 +164,7 @@ export function DashboardNav() {
         <Logo className="w-28" />
         <div className="flex items-center gap-1">
           <ThemeToggle />
+          {admin && <ProfileButton admin={admin} />}
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
@@ -173,7 +197,7 @@ export function DashboardNav() {
               </button>
             </div>
             <div className="flex-1">
-              <NavLinks onNavigate={() => setMobileOpen(false)} />
+              <NavLinks role={role} onNavigate={() => setMobileOpen(false)} />
             </div>
           </aside>
         </div>
@@ -185,7 +209,7 @@ export function DashboardNav() {
           <Logo className="w-40" />
         </div>
         <div className="flex-1">
-          <NavLinks />
+          <NavLinks role={role} />
         </div>
       </aside>
     </>

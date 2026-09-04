@@ -9,6 +9,7 @@ import { ResultsContainer } from '@/components/ResultsContainer';
 import { TableRowsSkeleton } from '@/components/skeletons/TableRowsSkeleton';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
 import { deleteFeedbackAction, retryFeedbackAction } from './actions';
@@ -38,12 +39,15 @@ export default async function FeedbackPage({
   query.set('page', String(page));
   query.set('pageSize', String(PAGE_SIZE));
 
-  const [clients, sitesResult, { data: feedback, total }] = await Promise.all([
+  const [clients, sitesResult, { data: feedback, total }, currentAdmin] = await Promise.all([
     apiFetch<Client[]>('/clients'),
     clientCode ? apiFetch<PaginatedSites>(`/clients/${clientCode}/sites?pageSize=200`) : Promise.resolve<PaginatedSites>({ data: [], total: 0, page: 1, pageSize: 0 }),
     apiFetch<PaginatedFeedback>(`/admin/feedback?${query.toString()}`),
+    getCurrentAdmin(),
   ]);
   const sites = sitesResult.data;
+  // Deleting feedback is Admin-only; retrying delivery stays open to both roles.
+  const isAdmin = currentAdmin?.role === 'ADMIN';
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const filterQuery = new URLSearchParams();
@@ -182,16 +186,20 @@ export default async function FeedbackPage({
                         </div>
                       </td>
                       <td className="px-4 py-3.5 text-center">
-                        <ConfirmDeleteButton
-                          action={deleteFeedbackAction.bind(null, item.id, '/feedback')}
-                          itemLabel="this feedback submission"
-                          warning={
-                            item.clickupTaskId
-                              ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
-                              : 'This also deletes every attachment - none of it can be recovered.'
-                          }
-                          triggerClassName="font-bold text-red-500 hover:text-red-700"
-                        />
+                        {isAdmin ? (
+                          <ConfirmDeleteButton
+                            action={deleteFeedbackAction.bind(null, item.id, '/feedback')}
+                            itemLabel="this feedback submission"
+                            warning={
+                              item.clickupTaskId
+                                ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
+                                : 'This also deletes every attachment - none of it can be recovered.'
+                            }
+                            triggerClassName="font-bold text-red-500 hover:text-red-700"
+                          />
+                        ) : (
+                          <span className="text-ink-muted/50">—</span>
+                        )}
                       </td>
                     </tr>
                   ))}
