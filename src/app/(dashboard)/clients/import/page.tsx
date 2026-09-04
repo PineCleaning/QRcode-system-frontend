@@ -1,7 +1,11 @@
 import Link from 'next/link';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import { BulkImportClient } from './BulkImportClient';
 
-export default function BulkImportPage() {
+export default async function BulkImportPage() {
+  const currentAdmin = await getCurrentAdmin();
+  const isAdmin = currentAdmin?.role === 'ADMIN';
+
   return (
     <div>
       <div className="mb-6 flex items-center gap-3">
@@ -18,7 +22,13 @@ export default function BulkImportPage() {
         <h1 className="text-2xl font-extrabold tracking-tight">Bulk Import Clients</h1>
       </div>
 
-      <BulkImportClient />
+      {isAdmin ? (
+        <BulkImportClient />
+      ) : (
+        <div className="rounded-[26px] border border-line bg-surface p-12 text-center">
+          <p className="text-sm text-ink-muted">Only Admins can bulk-import clients.</p>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { CopyLinkButton } from '@/components/CopyLinkButton';
 import { Pagination } from '@/components/Pagination';
 import { SiteQrModal } from '@/components/SiteQrModal';
 import { apiFetch } from '@/lib/api/server-fetch';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, PaginatedSites } from '@/lib/api/types';
 import { AddSiteModal } from './sites/AddSiteModal';
 import { EditSiteModal } from './sites/EditSiteModal';
@@ -22,10 +23,14 @@ export default async function ClientDetailPage({
   const { error, page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
-  const [client, { data: sites, total }] = await Promise.all([
+  const [client, { data: sites, total }, currentAdmin] = await Promise.all([
     apiFetch<Client>(`/clients/${id}`),
     apiFetch<PaginatedSites>(`/clients/${id}/sites?page=${page}&pageSize=${PAGE_SIZE}`),
+    getCurrentAdmin(),
   ]);
+  // Site create/edit is Admin-only, same category as client management -
+  // see clients/page.tsx for the same gate.
+  const isAdmin = currentAdmin?.role === 'ADMIN';
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   // Deactivating a client never touches its sites' own status rows (see
   // setSiteStatusAction) - a site's real ACTIVE/INACTIVE value is
@@ -56,7 +61,7 @@ export default async function ClientDetailPage({
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-bold">Sites</h2>
-        <AddSiteModal clientCode={id} />
+        {isAdmin && <AddSiteModal clientCode={id} />}
       </div>
 
       {total === 0 ? (
@@ -70,10 +75,12 @@ export default async function ClientDetailPage({
             />
           </svg>
           <p className="text-sm text-ink-muted">No sites yet.</p>
-          <AddSiteModal
-            clientCode={id}
-            triggerClassName="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page transition hover:-translate-y-px"
-          />
+          {isAdmin && (
+            <AddSiteModal
+              clientCode={id}
+              triggerClassName="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-page transition hover:-translate-y-px"
+            />
+          )}
         </div>
       ) : (
         <div className="overflow-hidden rounded-[26px] border border-line bg-surface shadow-sm">
@@ -129,7 +136,7 @@ export default async function ClientDetailPage({
                       >
                         Feedback
                       </Link>
-                      {!clientInactive && (
+                      {isAdmin && !clientInactive && (
                         <>
                           <EditSiteModal site={site} clientCode={id} />
                           <ConfirmDeactivateButton
