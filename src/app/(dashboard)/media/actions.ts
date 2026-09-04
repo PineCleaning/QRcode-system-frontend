@@ -8,9 +8,9 @@ export async function deleteMediaAction(mediaId: string) {
   try {
     await apiFetch(`/admin/media/${mediaId}`, { method: 'DELETE' });
   } catch (err) {
-    const message = err instanceof ApiError ? err.message : 'Failed to delete asset';
-    revalidatePath('/assets');
-    redirect(`/assets?error=${encodeURIComponent(message)}`);
+    const message = err instanceof ApiError ? err.message : 'Failed to delete media';
+    revalidatePath('/media');
+    redirect(`/media?error=${encodeURIComponent(message)}`);
   }
-  revalidatePath('/assets');
+  revalidatePath('/media');
 }

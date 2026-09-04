@@ -21,7 +21,7 @@ export function ConfirmDeleteButton({
   action: () => Promise<void>;
   itemLabel: string;
   warning?: string;
-  /** Defaults to the plain text-link style used in tables; pass a pill/button style for card layouts (e.g. the Assets grid). */
+  /** Defaults to the plain text-link style used in tables; pass a pill/button style for card layouts (e.g. the Media grid). */
   triggerClassName?: string;
   /** Defaults to the literal "Delete" text; pass an icon (e.g. a trash SVG) for icon-only triggers. */
   triggerLabel?: React.ReactNode;

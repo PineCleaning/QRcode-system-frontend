@@ -19,7 +19,7 @@ test.describe('Auth & navigation', () => {
 });
 
 test.describe('Authenticated navigation', () => {
-  test('sidebar links move between Clients, Feedbacks, Assets', async ({ page }) => {
+  test('sidebar links move between Clients, Feedbacks, Media', async ({ page }) => {
     await page.goto('/clients');
     await expect(page.getByRole('heading', { name: 'Clients' })).toBeVisible();
 
@@ -27,9 +27,9 @@ test.describe('Authenticated navigation', () => {
     await expect(page).toHaveURL(/\/feedback/);
     await expect(page.getByRole('heading', { name: 'Feedback' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Assets' }).click();
-    await expect(page).toHaveURL(/\/assets/);
-    await expect(page.getByRole('heading', { name: 'Assets' })).toBeVisible();
+    await page.getByRole('link', { name: 'Media' }).click();
+    await expect(page).toHaveURL(/\/media/);
+    await expect(page.getByRole('heading', { name: 'Media' })).toBeVisible();
 
     await page.getByRole('link', { name: 'Clients' }).click();
     await expect(page).toHaveURL(/\/clients$/);

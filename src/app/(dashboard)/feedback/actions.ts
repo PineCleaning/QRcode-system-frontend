@@ -22,9 +22,9 @@ export async function retryFeedbackAction(feedbackId: string, pathToRevalidate: 
 
 /**
  * Deletes a single attachment (from Cloudinary and the DB, via the same
- * DELETE /admin/media/:id the Assets page already uses) from wherever
+ * DELETE /admin/media/:id the Media page already uses) from wherever
  * it's shown - the Feedback page's attachments dropdown, in this case.
- * Always revalidates /assets too, since the deleted file must also
+ * Always revalidates /media too, since the deleted file must also
  * disappear from there, not just from the page this was called on.
  */
 export async function deleteAttachmentAction(mediaId: string, pathToRevalidate: string) {
@@ -33,11 +33,11 @@ export async function deleteAttachmentAction(mediaId: string, pathToRevalidate: 
   } catch (err) {
     const message = err instanceof ApiError ? err.message : 'Failed to delete attachment';
     revalidatePath(pathToRevalidate);
-    revalidatePath('/assets');
+    revalidatePath('/media');
     redirect(`${pathToRevalidate}?error=${encodeURIComponent(message)}`);
   }
   revalidatePath(pathToRevalidate);
-  revalidatePath('/assets');
+  revalidatePath('/media');
 }
 
 /**
@@ -46,7 +46,7 @@ export async function deleteAttachmentAction(mediaId: string, pathToRevalidate: 
  * DELETE /admin/feedback/:id. This is the Dashboard -> ClickUp direction
  * of the two-way sync; the reverse (someone deletes the ticket directly
  * in ClickUp) is caught by a background reconciliation check on the
- * backend, not anything triggered from here. Always revalidates /assets
+ * backend, not anything triggered from here. Always revalidates /media
  * too, since the deleted attachments must also disappear from there.
  */
 export async function deleteFeedbackAction(feedbackId: string, pathToRevalidate: string) {
@@ -55,9 +55,9 @@ export async function deleteFeedbackAction(feedbackId: string, pathToRevalidate:
   } catch (err) {
     const message = err instanceof ApiError ? err.message : 'Failed to delete feedback';
     revalidatePath(pathToRevalidate);
-    revalidatePath('/assets');
+    revalidatePath('/media');
     redirect(`${pathToRevalidate}?error=${encodeURIComponent(message)}`);
   }
   revalidatePath(pathToRevalidate);
-  revalidatePath('/assets');
+  revalidatePath('/media');
 }

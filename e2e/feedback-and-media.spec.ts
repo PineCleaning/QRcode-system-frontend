@@ -9,7 +9,7 @@ const FEEDBACK_TEXT = `E2E test feedback with a real attachment ${RUN_ID}`;
 let clientCode: string;
 let slug: string;
 
-test.describe.serial('Global Feedback + Assets admin pages', () => {
+test.describe.serial('Global Feedback + Media admin pages', () => {
   test.beforeAll(async () => {
     const client = await createTestClient(`e2e-fb-${RUN_ID}`, CLIENT_NAME);
     clientCode = client.id;
@@ -71,10 +71,10 @@ test.describe.serial('Global Feedback + Assets admin pages', () => {
     await expect(page).toHaveURL(new RegExp(`/clients/${clientCode}$`));
   });
 
-  test('the real attachment appears on the Assets page and can be reviewed and deleted', async ({ page }) => {
-    await page.goto('/assets');
-    // Scope to our specific card, not .first() - other real assets may already be in the grid.
-    const card = page.getByTestId('asset-card').filter({ hasText: 'e2e-test.png' }).filter({ hasText: CLIENT_NAME });
+  test('the real attachment appears on the Media page and can be reviewed and deleted', async ({ page }) => {
+    await page.goto('/media');
+    // Scope to our specific card, not .first() - other real media may already be in the grid.
+    const card = page.getByTestId('media-card').filter({ hasText: 'e2e-test.png' }).filter({ hasText: CLIENT_NAME });
     await expect(card).toBeVisible({ timeout: 10_000 });
 
     // Review now opens a shared full-screen lightbox (MediaLightboxProvider)
