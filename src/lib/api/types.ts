@@ -206,3 +206,47 @@ export interface InventoryHistoryEntry {
   previousNotes: string | null;
   changedAt: string;
 }
+
+export type InspectionRating = 'EXCELLENT' | 'ABOVE_AVERAGE' | 'AVERAGE' | 'BELOW_AVERAGE' | 'VERY_POOR';
+
+export type InspectionSessionStatus = 'OPEN' | 'COMPLETED';
+
+export interface InspectionItemMedia {
+  id: string;
+  inspectionItemId: string;
+  cloudinaryPublicId: string;
+  resourceType: 'IMAGE' | 'VIDEO';
+  originalFilename: string | null;
+  mimeType: string;
+  sizeBytes: number;
+  status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  uploadedAt: string;
+  /** Derived server-side at read time, never stored - null when status isn't VERIFIED. */
+  url: string | null;
+  /** Only populated in the response immediately after this file was submitted - not persisted. */
+  rejectionReason: string | null;
+}
+
+export interface InspectionItem {
+  id: string;
+  inspectionId: string;
+  spaceName: string;
+  isNotApplicable: boolean;
+  rating: InspectionRating | null;
+  percentage: number | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  media: InspectionItemMedia[];
+}
+
+export interface SiteInspection {
+  id: string;
+  siteId: string;
+  status: InspectionSessionStatus;
+  averageScore: number | null;
+  meetsStandard: boolean | null;
+  startedAt: string;
+  completedAt: string | null;
+  items: InspectionItem[];
+}

@@ -6,6 +6,8 @@ import { deleteAttachmentAction } from '@/app/(dashboard)/feedback/actions';
 import { ConfirmDeleteButton } from './ConfirmDeleteButton';
 import { useOpenLightbox } from './MediaLightbox';
 
+type DeleteAction = (mediaId: string, pathToRevalidate: string) => Promise<void>;
+
 interface MediaItem {
   id: string;
   originalFilename: string | null;
@@ -96,13 +98,23 @@ function AttachmentLink({
   );
 }
 
-/** Delete icon + confirmation, reused for both the single-attachment and dropdown-row cases. Permanently removes the file from Cloudinary, the feedback record, and the Media page. */
-function DeleteAttachmentButton({ item, pathToRevalidate }: { item: MediaItem; pathToRevalidate: string }) {
+/** Delete icon + confirmation, reused for both the single-attachment and dropdown-row cases. Permanently removes the file from Cloudinary and wherever else it's tracked (see `warning` below). */
+function DeleteAttachmentButton({
+  item,
+  pathToRevalidate,
+  deleteAction,
+  warning,
+}: {
+  item: MediaItem;
+  pathToRevalidate: string;
+  deleteAction: DeleteAction;
+  warning: string;
+}) {
   return (
     <ConfirmDeleteButton
-      action={deleteAttachmentAction.bind(null, item.id, pathToRevalidate)}
+      action={deleteAction.bind(null, item.id, pathToRevalidate)}
       itemLabel={mediaLabel(item)}
-      warning="This permanently removes the file from Cloudinary storage, and it will also disappear from the Media page - not just from this list."
+      warning={warning}
       triggerLabel={<TrashIcon />}
       triggerAriaLabel={`Delete ${mediaLabel(item)}`}
       triggerClassName="shrink-0 rounded p-1 text-ink-muted/50 hover:bg-coral/10 hover:text-coral"
@@ -134,11 +146,17 @@ export function AttachmentsCell({
   media,
   pathToRevalidate,
   mediaIndexMap,
+  deleteAction = deleteAttachmentAction,
+  deleteWarning = 'This permanently removes the file from Cloudinary storage, and it will also disappear from the Media page - not just from this list.',
 }: {
   media: MediaItem[];
   pathToRevalidate: string;
   /** Maps each media id to its index in the page's shared MediaLightboxProvider items list - lets any attachment on the page open the lightbox at the right item and Prev/Next through every other one. */
   mediaIndexMap: Map<string, number>;
+  /** Defaults to the Feedback page's admin/media delete - pass a different one (e.g. inspections) for a media table this cell isn't the canonical owner of. */
+  deleteAction?: DeleteAction;
+  /** Confirmation copy shown before deleting - defaults to the Feedback/Media page's wording. */
+  deleteWarning?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
@@ -195,7 +213,7 @@ export function AttachmentsCell({
     return (
       <div className="flex max-w-[200px] items-center gap-1 text-xs">
         <AttachmentLink item={media[0]} lightboxIndex={mediaIndexMap.get(media[0].id)} />
-        <DeleteAttachmentButton item={media[0]} pathToRevalidate={pathToRevalidate} />
+        <DeleteAttachmentButton item={media[0]} pathToRevalidate={pathToRevalidate} deleteAction={deleteAction} warning={deleteWarning} />
       </div>
     );
   }
@@ -243,7 +261,7 @@ export function AttachmentsCell({
                     underlineOnHover={false}
                     onSelect={() => setOpen(false)}
                   />
-                  <DeleteAttachmentButton item={item} pathToRevalidate={pathToRevalidate} />
+                  <DeleteAttachmentButton item={item} pathToRevalidate={pathToRevalidate} deleteAction={deleteAction} warning={deleteWarning} />
                 </div>
               ))}
             </div>

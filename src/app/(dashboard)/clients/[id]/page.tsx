@@ -143,6 +143,13 @@ export default async function ClientDetailPage({
                       >
                         Inventory
                       </Link>
+                      <Link
+                        prefetch={false}
+                        href={`/clients/${id}/sites/${site.id}/inspections`}
+                        className="text-ink-muted hover:text-ink"
+                      >
+                        Inspections
+                      </Link>
                       {isAdmin && !clientInactive && (
                         <>
                           <EditSiteModal site={site} clientCode={id} />
