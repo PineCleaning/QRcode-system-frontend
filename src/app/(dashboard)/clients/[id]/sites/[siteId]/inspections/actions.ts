@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { ApiError, apiFetch } from '@/lib/api/server-fetch';
-import type { SiteInspection } from '@/lib/api/types';
+import type { CompletedInspectionSummary, SiteInspection } from '@/lib/api/types';
 
 export interface InspectionItemMediaInput {
   cloudinaryPublicId: string;
@@ -93,6 +93,43 @@ export async function updateInspectionItemModalAction(
 
 export async function openOrResumeInspectionAction(siteId: string): Promise<SiteInspection> {
   return apiFetch<SiteInspection>(`/sites/${siteId}/inspections`, { method: 'POST' });
+}
+
+/** The last 10 completed sessions for a site (Week 3 Wed "Past Inspections" list). */
+export async function findCompletedInspectionsAction(siteId: string): Promise<CompletedInspectionSummary[]> {
+  return apiFetch<CompletedInspectionSummary[]>(`/sites/${siteId}/inspections/completed`);
+}
+
+export interface FinishInspectionState {
+  error: string | null;
+  averageScore?: number;
+  meetsStandard?: boolean;
+}
+
+/**
+ * Deliberately NOT dispatched through <form action>/useActionState, and
+ * deliberately does NOT call revalidatePath() itself - unlike every
+ * other mutation in this file. The page unconditionally calls
+ * openOrResumeInspectionAction on every load, which auto-creates a
+ * fresh OPEN session the instant this one is no longer OPEN - if this
+ * action revalidated the page as part of the same transition (the
+ * combined round trip the other actions above deliberately use), the
+ * whole page tree gets replaced by that fresh empty session WHILE the
+ * result modal is still trying to show the just-finished score, wiping
+ * the modal's local state before the admin ever sees it (confirmed
+ * live: the finish itself worked and scored correctly, but the result
+ * modal never rendered - only a blank new session did). Instead, the
+ * caller shows the result first and only refreshes the page afterward,
+ * once the admin dismisses it - see FinishInspectionButton's "Done"
+ * handler.
+ */
+export async function finishInspectionAction(inspectionId: string): Promise<FinishInspectionState> {
+  try {
+    const result = await apiFetch<SiteInspection>(`/inspections/${inspectionId}/finish`, { method: 'POST' });
+    return { error: null, averageScore: result.averageScore ?? undefined, meetsStandard: result.meetsStandard ?? undefined };
+  } catch (err) {
+    return { error: err instanceof ApiError ? err.message : 'Failed to finish inspection' };
+  }
 }
 
 /**

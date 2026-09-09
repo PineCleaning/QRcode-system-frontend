@@ -250,3 +250,15 @@ export interface SiteInspection {
   completedAt: string | null;
   items: InspectionItem[];
 }
+
+/** Shape returned by GET /sites/:siteId/inspections/completed - a lightweight summary (no items/media) for the "Past Inspections" list. */
+export interface CompletedInspectionSummary {
+  id: string;
+  siteId: string;
+  status: InspectionSessionStatus;
+  averageScore: number | null;
+  meetsStandard: boolean | null;
+  startedAt: string;
+  completedAt: string | null;
+  itemCount: number;
+}

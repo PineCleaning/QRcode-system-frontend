@@ -46,7 +46,16 @@ export function ConfirmDeleteButton({
       {open &&
         typeof document !== 'undefined' &&
         createPortal(
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          // data-confirm-delete-overlay lets an ancestor's own
+          // outside-click handler (e.g. AttachmentsCell's dropdown
+          // popover) recognize this portal as "still inside" rather than
+          // treating a click on it as outside and closing/unmounting
+          // itself mid-delete - see AttachmentsCell.tsx for the bug this
+          // fixes (confirmed live: clicking Delete inside a
+          // ConfirmDeleteButton nested in that dropdown closed the
+          // dropdown, unmounting the in-flight delete before it
+          // completed, so the file never actually got deleted).
+          <div data-confirm-delete-overlay className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
             <div className="w-full max-w-sm rounded-[26px] bg-surface p-6 shadow-lg">
               <h2 className="text-base font-extrabold">Delete {itemLabel}?</h2>
               <p className="mt-2 text-sm text-ink-muted">This can&apos;t be undone.{warning ? ` ${warning}` : ''}</p>

@@ -181,6 +181,14 @@ export function AttachmentsCell({
     function handlePointerDown(e: MouseEvent) {
       const target = e.target as Node;
       if (triggerRef.current?.contains(target) || panelRef.current?.contains(target)) return;
+      // A delete icon inside this dropdown opens its own nested
+      // ConfirmDeleteButton portal (a separate top-level DOM node, not a
+      // child of panelRef) - without this check, clicking "Delete"
+      // inside that confirmation registers as an outside click here,
+      // closing (unmounting) this dropdown and killing the in-flight
+      // delete before it completes. Real bug, reproduced live: the file
+      // never actually got deleted from Cloudinary or the DB.
+      if (target instanceof Element && target.closest('[data-confirm-delete-overlay]')) return;
       setOpen(false);
     }
     function handleKeyDown(e: KeyboardEvent) {
