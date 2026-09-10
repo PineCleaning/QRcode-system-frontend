@@ -157,7 +157,9 @@ export interface ClickupStatus {
   configured?: boolean;
 }
 
-export type AdminRole = 'ADMIN' | 'SUPERVISOR';
+export type AdminRole = 'ADMIN' | 'SUPERVISOR' | 'MANAGER' | 'ADMIN_SUPPORT';
+/** Selectable when creating/editing a user - 'ADMIN' is deliberately excluded, there is exactly one, permanently (see backend's CreateAdminUserDto). */
+export type SelectableAdminRole = Exclude<AdminRole, 'ADMIN'>;
 export type AdminStatus = 'ACTIVE' | 'INACTIVE';
 
 export interface AdminUserRecord {
