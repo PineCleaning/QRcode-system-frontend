@@ -128,17 +128,29 @@ export function EditAdminUserModal({ user }: { user: AdminUserRecord }) {
               <label htmlFor="role" className="mb-1 block text-sm font-bold text-ink">
                 Role
               </label>
-              <input type="hidden" name="role" value={role} />
-              <Select
-                id="role"
-                value={role}
-                onChange={setRole}
-                options={[
-                  { value: 'SUPERVISOR', label: 'Supervisor' },
-                  { value: 'ADMIN', label: 'Admin' },
-                ]}
-                placeholder="Role"
-              />
+              {user.role === 'ADMIN' ? (
+                // There is exactly one Admin, permanently - its role can
+                // never change, so this isn't editable and (deliberately)
+                // no `role` field is submitted at all for this user, not
+                // even the unchanged value - see UpdateAdminUserDto's
+                // comment for why sending 'ADMIN' here would be rejected.
+                <div className="rounded-xl border border-line bg-line/40 px-3 py-2 text-sm font-semibold text-ink-muted">Admin</div>
+              ) : (
+                <>
+                  <input type="hidden" name="role" value={role} />
+                  <Select
+                    id="role"
+                    value={role}
+                    onChange={setRole}
+                    options={[
+                      { value: 'SUPERVISOR', label: 'Supervisor' },
+                      { value: 'MANAGER', label: 'Manager' },
+                      { value: 'ADMIN_SUPPORT', label: 'Admin Support' },
+                    ]}
+                    placeholder="Role"
+                  />
+                </>
+              )}
             </div>
 
             <div>

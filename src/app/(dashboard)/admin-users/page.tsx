@@ -1,11 +1,26 @@
 import { ApiError, apiFetch } from '@/lib/api/server-fetch';
 import { getCurrentAdmin } from '@/lib/api/current-admin';
 import { formatDate } from '@/lib/format-date';
-import type { AdminUserRecord } from '@/lib/api/types';
+import type { AdminRole, AdminUserRecord } from '@/lib/api/types';
 import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
+import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { AddAdminUserModal } from './AddAdminUserModal';
 import { EditAdminUserModal } from './EditAdminUserModal';
-import { setAdminUserStatusAction } from './actions';
+import { deleteAdminUserAction, setAdminUserStatusAction } from './actions';
+
+const ROLE_LABELS: Record<AdminRole, string> = {
+  ADMIN: 'Admin',
+  SUPERVISOR: 'Supervisor',
+  MANAGER: 'Manager',
+  ADMIN_SUPPORT: 'Admin Support',
+};
+
+const ROLE_BADGE_STYLES: Record<AdminRole, string> = {
+  ADMIN: 'bg-primary/15 text-primary',
+  SUPERVISOR: 'bg-sky/15 text-sky',
+  MANAGER: 'bg-purple-500/15 text-purple-600',
+  ADMIN_SUPPORT: 'bg-orange-500/15 text-orange-600',
+};
 
 export default async function AdminUsersPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
@@ -34,7 +49,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-balance">User Management</h1>
-          <p className="mt-1 text-[13.5px] text-ink-muted">Admins and Supervisors with access to this portal.</p>
+          <p className="mt-1 text-[13.5px] text-ink-muted">Everyone with access to this portal.</p>
         </div>
         <AddAdminUserModal />
       </div>
@@ -64,11 +79,9 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                   <td className="px-5.5 py-3.5 text-ink/80">{user.email}</td>
                   <td className="px-5.5 py-3.5">
                     <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase ${
-                        user.role === 'ADMIN' ? 'bg-primary/15 text-primary' : 'bg-sky/15 text-sky'
-                      }`}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase ${ROLE_BADGE_STYLES[user.role]}`}
                     >
-                      {user.role === 'ADMIN' ? 'Admin' : 'Supervisor'}
+                      {ROLE_LABELS[user.role]}
                     </span>
                   </td>
                   <td className="px-5.5 py-3.5">
@@ -92,6 +105,15 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                       deactivateDescription="They will no longer be able to sign in to the portal. Nothing is deleted, and you can reactivate anytime."
                       activateDescription="They will be able to sign in to the portal again."
                     />
+                    {/* The Admin account can never be deleted - there is exactly one, permanently - so no delete control is rendered for it at all. */}
+                    {user.role !== 'ADMIN' && (
+                      <ConfirmDeleteButton
+                        action={deleteAdminUserAction.bind(null, user.id)}
+                        itemLabel={user.fullName || user.email}
+                        warning="This permanently removes their access and account - it cannot be undone. Users inactive for 21+ days are also removed automatically."
+                        triggerClassName="ml-3.5 font-bold text-red-500 hover:text-red-700"
+                      />
+                    )}
                   </td>
                 </tr>
               ))}

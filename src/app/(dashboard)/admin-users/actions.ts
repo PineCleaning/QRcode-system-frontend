@@ -33,7 +33,13 @@ export async function createAdminUserModalAction(
 
 async function updateAdminUser(id: string, formData: FormData): Promise<string | null> {
   const fullName = (formData.get('fullName') as string)?.trim();
-  const role = formData.get('role') as string;
+  // FormData.get() returns null (not undefined) for a field that was
+  // never submitted - which is deliberate for the Admin row's own edit
+  // (see EditAdminUserModal.tsx, no `role` input rendered for it at
+  // all). JSON.stringify keeps a literal `null` but drops `undefined`
+  // keys entirely - only the latter actually means "don't touch this
+  // field" server-side (Prisma's update() only skips undefined keys).
+  const role = (formData.get('role') as string | null) || undefined;
 
   try {
     await apiFetch<AdminUserRecord>(`/admin-users/${id}`, {
@@ -71,6 +77,24 @@ export async function resetAdminUserPasswordAction(id: string): Promise<ResetPas
   } catch (err) {
     return { error: err instanceof ApiError ? err.message : 'Failed to reset password', temporaryPassword: null };
   }
+}
+
+/**
+ * Permanently deletes a user - their admin_users row and their real
+ * Supabase Auth login credential. The Admin account can never be
+ * targeted this way (backend rejects it with a 403 regardless of what
+ * this sends) - the UI also never renders a delete control for that
+ * row in the first place, see page.tsx.
+ */
+export async function deleteAdminUserAction(id: string) {
+  try {
+    await apiFetch(`/admin-users/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    const message = err instanceof ApiError ? err.message : 'Failed to delete user';
+    revalidatePath('/admin-users');
+    redirect(`/admin-users?error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath('/admin-users');
 }
 
 export async function setAdminUserStatusAction(id: string, status: 'ACTIVE' | 'INACTIVE') {

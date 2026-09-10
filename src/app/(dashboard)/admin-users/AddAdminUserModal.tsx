@@ -102,11 +102,12 @@ export function AddAdminUserModal() {
 
               <div>
                 <label htmlFor="fullName" className="mb-1 block text-sm font-bold text-ink">
-                  Full Name
+                  Full Name <span className="text-coral">*</span>
                 </label>
                 <input
                   id="fullName"
                   name="fullName"
+                  required
                   className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
                 />
               </div>
@@ -115,6 +116,7 @@ export function AddAdminUserModal() {
                 <label htmlFor="role" className="mb-1 block text-sm font-bold text-ink">
                   Role <span className="text-coral">*</span>
                 </label>
+                {/* 'Admin' is deliberately not an option - there is exactly one, permanently (test@example.com). */}
                 <input type="hidden" name="role" value={role} />
                 <Select
                   id="role"
@@ -123,7 +125,8 @@ export function AddAdminUserModal() {
                   placeholder="Supervisor"
                   options={[
                     { value: 'SUPERVISOR', label: 'Supervisor' },
-                    { value: 'ADMIN', label: 'Admin' },
+                    { value: 'MANAGER', label: 'Manager' },
+                    { value: 'ADMIN_SUPPORT', label: 'Admin Support' },
                   ]}
                 />
               </div>
