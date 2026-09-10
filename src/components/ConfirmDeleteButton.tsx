@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { createPortal } from 'react-dom';
 
 /**
@@ -30,10 +30,22 @@ export function ConfirmDeleteButton({
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  // `disabled={isPending}` below doesn't take effect until React commits
+  // the pending state, which leaves a brief window where a second click
+  // (a real fast double-click, or a duplicate synthetic event) can fire
+  // handleConfirm again before the button actually disables - this ref
+  // closes that window synchronously instead of relying on render timing.
+  const inFlightRef = useRef(false);
 
   function handleConfirm() {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     startTransition(async () => {
-      await action();
+      try {
+        await action();
+      } finally {
+        inFlightRef.current = false;
+      }
     });
   }
 
