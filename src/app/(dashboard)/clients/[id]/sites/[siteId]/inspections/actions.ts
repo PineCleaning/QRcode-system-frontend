@@ -133,6 +133,25 @@ export async function finishInspectionAction(inspectionId: string): Promise<Fini
 }
 
 /**
+ * Toggles an inspection item's flagged marker - open to both roles, and
+ * works regardless of the parent session's OPEN/COMPLETED status (see
+ * the backend's InspectionsService.setItemFlagged for why). Also
+ * revalidates /flagged so a newly-flagged item appears there (and a
+ * newly-unflagged one disappears) without a manual refresh.
+ */
+export async function setInspectionItemFlaggedAction(itemId: string, flagged: boolean, pathToRevalidate: string) {
+  try {
+    await apiFetch(`/inspections/items/${itemId}/flag`, { method: 'PATCH', body: JSON.stringify({ flagged }) });
+  } catch (err) {
+    const message = err instanceof ApiError ? err.message : 'Failed to update flag';
+    revalidatePath(pathToRevalidate);
+    redirect(`${pathToRevalidate}?error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath(pathToRevalidate);
+  revalidatePath('/flagged');
+}
+
+/**
  * Deletes a single inspection photo/video - from Cloudinary and the DB
  * - same pattern and same AttachmentsCell component as the Feedback
  * page's attachments. Admin-only server-side (RolesGuard); the UI

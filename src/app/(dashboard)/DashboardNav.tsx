@@ -60,6 +60,15 @@ const NAV_ITEMS = [
     ),
   },
   {
+    href: '/flagged',
+    label: 'Flagged',
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v18M3 4.5h13.5l-1.5 3 1.5 3H3" />
+      </svg>
+    ),
+  },
+  {
     href: '/media',
     label: 'Media',
     icon: (

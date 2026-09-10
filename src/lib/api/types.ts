@@ -63,6 +63,8 @@ export interface FeedbackSubmission {
   mobileNumber: string | null;
   status: FeedbackStatus;
   clickupTaskId: string | null;
+  /** Manually toggled by an admin/supervisor to mark this as needing urgent follow-up. */
+  flagged: boolean;
   submittedAt: string;
   deliveredAt: string | null;
   media: FeedbackMedia[];
@@ -235,9 +237,20 @@ export interface InspectionItem {
   rating: InspectionRating | null;
   percentage: number | null;
   notes: string | null;
+  /** Manually toggled by an admin/supervisor to mark this space as needing follow-up - independent of its rating. */
+  flagged: boolean;
   createdAt: string;
   updatedAt: string;
   media: InspectionItemMedia[];
+}
+
+/** Shape returned by GET /inspections/items/flagged - an item plus just enough site/client context to link back, for the Flagged tab. */
+export interface FlaggedInspectionItem extends InspectionItem {
+  inspection: {
+    id: string;
+    status: InspectionSessionStatus;
+    site: Pick<Site, 'id' | 'businessName' | 'address' | 'slug'> & { client: Pick<Client, 'id' | 'clientName' | 'clientId'> };
+  };
 }
 
 export interface SiteInspection {

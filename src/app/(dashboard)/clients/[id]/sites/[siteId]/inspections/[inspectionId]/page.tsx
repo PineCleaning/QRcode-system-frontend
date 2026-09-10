@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
+import { FlagButton } from '@/components/FlagButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, Site, SiteInspection } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
-import { deleteInspectionMediaAction } from '../actions';
+import { deleteInspectionMediaAction, setInspectionItemFlaggedAction } from '../actions';
 import { RATING_BADGE_STYLES, RATING_LABELS } from '../inspection-labels';
 
 const DELETE_MEDIA_WARNING = 'This permanently removes the file from Cloudinary storage - it cannot be recovered.';
@@ -15,7 +16,9 @@ const DELETE_MEDIA_WARNING = 'This permanently removes the file from Cloudinary 
  * status - used by the "Past Inspections" list to open a completed
  * session (open ones are reachable here too, but the main inspections
  * page is the normal way to work on one). No Add item, Edit, or Finish
- * controls - this page never mutates anything.
+ * controls - flagging is the one exception, since a flag is a
+ * follow-up marker, not inspection data, and stays toggleable even
+ * after the session is locked (e.g. noticed while reviewing the report).
  */
 export default async function InspectionDetailPage({
   params,
@@ -92,6 +95,7 @@ export default async function InspectionDetailPage({
                 <th className="whitespace-nowrap px-5.5 py-4">Rating</th>
                 <th className="px-5.5 py-4">Notes</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Photos</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Flag</th>
               </tr>
             </thead>
             <tbody>
@@ -127,6 +131,12 @@ export default async function InspectionDetailPage({
                       mediaIndexMap={mediaIndexMap}
                       deleteAction={deleteInspectionMediaAction}
                       deleteWarning={DELETE_MEDIA_WARNING}
+                    />
+                  </td>
+                  <td className="px-5.5 py-3.5">
+                    <FlagButton
+                      flagged={item.flagged}
+                      action={setInspectionItemFlaggedAction.bind(null, item.id, !item.flagged, path)}
                     />
                   </td>
                 </tr>

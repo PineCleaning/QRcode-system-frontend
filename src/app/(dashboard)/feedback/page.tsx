@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
 import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { FilterPendingProvider } from '@/components/FilterPending';
+import { FlagButton } from '@/components/FlagButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { Pagination } from '@/components/Pagination';
 import { RetryButton } from '@/components/RetryButton';
@@ -12,7 +13,7 @@ import { apiFetch } from '@/lib/api/server-fetch';
 import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
-import { deleteFeedbackAction, retryFeedbackAction } from './actions';
+import { deleteFeedbackAction, retryFeedbackAction, setFeedbackFlaggedAction } from './actions';
 import { FeedbackFilters } from './FeedbackFilters';
 
 const STATUS_STYLES: Record<string, string> = {
@@ -185,21 +186,25 @@ export default async function FeedbackPage({
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-center">
-                        {isAdmin ? (
-                          <ConfirmDeleteButton
-                            action={deleteFeedbackAction.bind(null, item.id, '/feedback')}
-                            itemLabel="this feedback submission"
-                            warning={
-                              item.clickupTaskId
-                                ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
-                                : 'This also deletes every attachment - none of it can be recovered.'
-                            }
-                            triggerClassName="font-bold text-red-500 hover:text-red-700"
+                      <td className="px-4 py-3.5">
+                        <div className="flex items-center justify-center gap-2">
+                          <FlagButton
+                            flagged={item.flagged}
+                            action={setFeedbackFlaggedAction.bind(null, item.id, !item.flagged, '/feedback')}
                           />
-                        ) : (
-                          <span className="text-ink-muted/50">—</span>
-                        )}
+                          {isAdmin ? (
+                            <ConfirmDeleteButton
+                              action={deleteFeedbackAction.bind(null, item.id, '/feedback')}
+                              itemLabel="this feedback submission"
+                              warning={
+                                item.clickupTaskId
+                                  ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
+                                  : 'This also deletes every attachment - none of it can be recovered.'
+                              }
+                              triggerClassName="font-bold text-red-500 hover:text-red-700"
+                            />
+                          ) : null}
+                        </div>
                       </td>
                     </tr>
                   ))}

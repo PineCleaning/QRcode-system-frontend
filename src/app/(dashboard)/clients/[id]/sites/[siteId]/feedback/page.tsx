@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
 import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
+import { FlagButton } from '@/components/FlagButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { RetryButton } from '@/components/RetryButton';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, FeedbackSubmission, Site } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
-import { deleteFeedbackAction, retryFeedbackAction } from '@/app/(dashboard)/feedback/actions';
+import { deleteFeedbackAction, retryFeedbackAction, setFeedbackFlaggedAction } from '@/app/(dashboard)/feedback/actions';
 
 const STATUS_STYLES: Record<string, string> = {
   DELIVERED: 'bg-green/15 text-green',
@@ -126,17 +127,23 @@ export default async function SiteFeedbackPage({
                       )}
                     </div>
                   </td>
-                  <td className="px-5.5 py-3.5 text-center">
-                    <ConfirmDeleteButton
-                      action={deleteFeedbackAction.bind(null, item.id, `/clients/${id}/sites/${siteId}/feedback`)}
-                      itemLabel="this feedback submission"
-                      warning={
-                        item.clickupTaskId
-                          ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
-                          : 'This also deletes every attachment - none of it can be recovered.'
-                      }
-                      triggerClassName="font-bold text-red-500 hover:text-red-700"
-                    />
+                  <td className="px-5.5 py-3.5">
+                    <div className="flex items-center justify-center gap-2">
+                      <FlagButton
+                        flagged={item.flagged}
+                        action={setFeedbackFlaggedAction.bind(null, item.id, !item.flagged, `/clients/${id}/sites/${siteId}/feedback`)}
+                      />
+                      <ConfirmDeleteButton
+                        action={deleteFeedbackAction.bind(null, item.id, `/clients/${id}/sites/${siteId}/feedback`)}
+                        itemLabel="this feedback submission"
+                        warning={
+                          item.clickupTaskId
+                            ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
+                            : 'This also deletes every attachment - none of it can be recovered.'
+                        }
+                        triggerClassName="font-bold text-red-500 hover:text-red-700"
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}

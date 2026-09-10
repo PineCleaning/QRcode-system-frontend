@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
+import { FlagButton } from '@/components/FlagButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import type { Client, Site } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
-import { deleteInspectionMediaAction, openOrResumeInspectionAction } from './actions';
+import { deleteInspectionMediaAction, openOrResumeInspectionAction, setInspectionItemFlaggedAction } from './actions';
 import { AddInspectionItemModal } from './AddInspectionItemModal';
 import { EditInspectionItemModal } from './EditInspectionItemModal';
 import { FinishInspectionButton } from './FinishInspectionButton';
@@ -153,7 +154,13 @@ export default async function SiteInspectionsPage({
                     />
                   </td>
                   <td className="whitespace-nowrap px-5.5 py-3.5 font-bold">
-                    {isOpen ? <EditInspectionItemModal item={item} path={path} /> : <span className="text-ink-muted/40">—</span>}
+                    <div className="flex items-center gap-2">
+                      <FlagButton
+                        flagged={item.flagged}
+                        action={setInspectionItemFlaggedAction.bind(null, item.id, !item.flagged, path)}
+                      />
+                      {isOpen ? <EditInspectionItemModal item={item} path={path} /> : null}
+                    </div>
                   </td>
                 </tr>
               ))}
