@@ -24,6 +24,13 @@ export function InventoryItemForm({
   const isEdit = Boolean(item);
   const [category, setCategory] = useState<string>(item?.category ?? '');
   const [status, setStatus] = useState<string>(item?.status ?? '');
+  // Type/Status are custom Selects backed by a hidden input, which HTML5
+  // constraint validation ignores entirely (hidden inputs are "barred from
+  // constraint validation" per spec, so `required` on them is a no-op) -
+  // unlike Item/Quantity's real required inputs, submitting with either
+  // left unselected would otherwise reach the server and come back as a
+  // raw, technical validation message instead of being caught here.
+  const [clientError, setClientError] = useState<string | null>(null);
 
   const submittedRef = useRef(false);
   useEffect(() => {
@@ -35,8 +42,17 @@ export function InventoryItemForm({
     }
   }, [isPending, error, onSuccess]);
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    if (!category || !status) {
+      e.preventDefault();
+      setClientError('Please select a Type and a Status.');
+      return;
+    }
+    setClientError(null);
+  }
+
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="item" className="mb-1 block text-sm font-bold text-ink">
           Item <span className="text-coral">*</span>
@@ -109,7 +125,7 @@ export function InventoryItemForm({
         />
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {(clientError || error) && <p className="text-sm text-red-600">{clientError || error}</p>}
 
       <div className="flex items-center gap-3">
         <button
