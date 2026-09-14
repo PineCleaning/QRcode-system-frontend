@@ -1,10 +1,11 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { apiFetch } from '@/lib/api/server-fetch';
+import { ApiError, apiFetch } from '@/lib/api/server-fetch';
 import { createClient } from '@/lib/supabase/server';
 
 const NETWORK_ERROR_MESSAGE = "Couldn't reach the server. Please check your connection and try again.";
+const DEACTIVATED_MESSAGE = 'Your account has been deactivated. Please contact your administrator.';
 
 export async function login(_prevState: string | null, formData: FormData): Promise<string | null> {
   const email = formData.get('email') as string;
@@ -26,9 +27,25 @@ export async function login(_prevState: string | null, formData: FormData): Prom
     return error.message === 'fetch failed' ? NETWORK_ERROR_MESSAGE : error.message;
   }
 
-  // Best-effort - powers User Management's "Last Login" column. Never
-  // block a successful login on this failing (e.g. backend briefly down).
-  await apiFetch('/auth/record-login', { method: 'POST' }).catch(() => {});
+  // Supabase Auth has no concept of our own admin_users.status - a
+  // deactivated admin's credentials are still accepted above. This is
+  // the first backend call after sign-in, and it's where that actually
+  // gets caught: SupabaseAuthGuard requires status === 'ACTIVE' and
+  // rejects with this exact message otherwise. If that's why it failed,
+  // sign the just-created session back out and stop here instead of
+  // redirecting into a dashboard that would immediately fail on every
+  // request. Any OTHER failure (e.g. the backend briefly down) still
+  // doesn't block login - this call's real purpose is best-effort "Last
+  // Login" tracking, not gatekeeping, and shouldn't turn away an active
+  // admin over a transient error.
+  try {
+    await apiFetch('/auth/record-login', { method: 'POST' });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401 && err.message === 'Not an active admin user') {
+      await supabase.auth.signOut({ scope: 'local' });
+      return DEACTIVATED_MESSAGE;
+    }
+  }
 
   redirect('/clients');
 }
