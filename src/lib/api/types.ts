@@ -200,6 +200,14 @@ export interface InventoryItem {
   updatedAt: string;
 }
 
+/** Shape returned by GET /sites/:siteId/inventory?page=&pageSize= - the unpaginated InventoryItem[] shape stays for callers that never send those params. */
+export interface PaginatedInventory {
+  data: InventoryItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface InventoryHistoryEntry {
   id: string;
   inventoryItemId: string;
