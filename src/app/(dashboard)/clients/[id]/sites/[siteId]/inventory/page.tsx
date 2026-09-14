@@ -1,34 +1,39 @@
 import Link from 'next/link';
 import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
+import { Pagination } from '@/components/Pagination';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import { getCurrentAdmin } from '@/lib/api/current-admin';
-import type { Client, InventoryItem, Site } from '@/lib/api/types';
+import type { Client, PaginatedInventory, Site } from '@/lib/api/types';
 import { formatDate, formatDateOnly } from '@/lib/format-date';
 import { AddInventoryItemModal } from './AddInventoryItemModal';
 import { deleteInventoryItemAction } from './actions';
 import { EditInventoryItemModal } from './EditInventoryItemModal';
 import { CATEGORY_LABELS, STATUS_BADGE_STYLES, STATUS_LABELS } from './inventory-labels';
 
+const PAGE_SIZE = 10;
+
 export default async function SiteInventoryPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string; siteId: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; page?: string }>;
 }) {
   const { id, siteId } = await params;
-  const { error } = await searchParams;
+  const { error, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
   const path = `/clients/${id}/sites/${siteId}/inventory`;
 
-  const [client, site, items, currentAdmin] = await Promise.all([
+  const [client, site, { data: items, total }, currentAdmin] = await Promise.all([
     apiFetch<Client>(`/clients/${id}`),
     apiFetch<Site>(`/sites/${siteId}`),
-    apiFetch<InventoryItem[]>(`/sites/${siteId}/inventory`),
+    apiFetch<PaginatedInventory>(`/sites/${siteId}/inventory?page=${page}&pageSize=${PAGE_SIZE}`),
     getCurrentAdmin(),
   ]);
   // Deleting an inventory item is Admin-only (backend RolesGuard) - mirrored here so Supervisors never see a button that would 403.
   const isAdmin = currentAdmin?.role === 'ADMIN';
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div>
@@ -48,7 +53,7 @@ export default async function SiteInventoryPage({
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-2xl font-extrabold tracking-tight">Inventory / Assets</h1>
-                <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{items.length}</span>
+                <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{total}</span>
               </div>
               <p className="mt-1 text-[13.5px] text-ink-muted">{site.businessName}</p>
             </div>
@@ -59,7 +64,7 @@ export default async function SiteInventoryPage({
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
-      {items.length === 0 ? (
+      {total === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-[26px] border border-line bg-surface p-12 text-center shadow-sm">
           <svg className="h-10 w-10 text-ink-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path
@@ -135,6 +140,15 @@ export default async function SiteInventoryPage({
             </tbody>
           </table>
           </div>
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            pageSize={PAGE_SIZE}
+            itemLabel="items"
+            buildHref={(p) => `${path}?page=${p}`}
+          />
         </div>
       )}
     </div>
