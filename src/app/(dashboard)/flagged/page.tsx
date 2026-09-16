@@ -9,6 +9,7 @@ import { formatDate } from '@/lib/format-date';
 import { setFeedbackFlaggedAction } from '../feedback/actions';
 import { deleteInspectionMediaAction, setInspectionItemFlaggedAction } from '../clients/[id]/sites/[siteId]/inspections/actions';
 import { RATING_BADGE_STYLES, RATING_LABELS } from '../clients/[id]/sites/[siteId]/inspections/inspection-labels';
+import { FlaggedTabs } from './FlaggedTabs';
 
 const PATH = '/flagged';
 
@@ -23,7 +24,12 @@ function EmptyState({ text }: { text: string }) {
   );
 }
 
-export default async function FlaggedPage() {
+export default async function FlaggedPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const [feedback, items] = await Promise.all([
     apiFetch<AdminFeedbackSubmission[]>('/admin/feedback?flagged=true'),
     apiFetch<FlaggedInspectionItem[]>('/inspections/items/flagged'),
@@ -53,19 +59,9 @@ export default async function FlaggedPage() {
     };
   });
 
-  return (
-    <div>
-      <div className="mb-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-extrabold tracking-tight text-balance">Flagged</h1>
-          <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{feedback.length + items.length}</span>
-        </div>
-        <p className="mt-1 text-[13.5px] text-ink-muted">Feedback and inspection items marked as needing attention.</p>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="mb-3 text-[13.5px] font-extrabold uppercase tracking-wide text-ink-muted">Flagged Feedback</h2>
-        {feedback.length === 0 ? (
+  const feedbackContent = (
+    <>
+      {feedback.length === 0 ? (
           <EmptyState text="No flagged feedback right now." />
         ) : (
           <MediaLightboxProvider items={feedbackLightboxItems}>
@@ -109,11 +105,12 @@ export default async function FlaggedPage() {
             </div>
           </MediaLightboxProvider>
         )}
-      </div>
+    </>
+  );
 
-      <div>
-        <h2 className="mb-3 text-[13.5px] font-extrabold uppercase tracking-wide text-ink-muted">Flagged Inspection Items</h2>
-        {items.length === 0 ? (
+  const itemsContent = (
+    <>
+      {items.length === 0 ? (
           <EmptyState text="No flagged inspection items right now." />
         ) : (
           <MediaLightboxProvider items={itemLightboxItems}>
@@ -183,7 +180,22 @@ export default async function FlaggedPage() {
             </div>
           </MediaLightboxProvider>
         )}
+    </>
+  );
+
+  return (
+    <div>
+      <div className="mb-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-extrabold tracking-tight text-balance">Flagged</h1>
+          <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{feedback.length + items.length}</span>
+        </div>
+        <p className="mt-1 text-[13.5px] text-ink-muted">Feedback and inspection items marked as needing attention.</p>
       </div>
+
+      {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
+
+      <FlaggedTabs feedbackCount={feedback.length} itemsCount={items.length} feedbackContent={feedbackContent} itemsContent={itemsContent} />
     </div>
   );
 }
