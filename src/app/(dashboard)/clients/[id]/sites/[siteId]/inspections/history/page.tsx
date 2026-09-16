@@ -85,13 +85,22 @@ export default async function InspectionHistoryPage({
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-5.5 py-3.5 font-bold">
-                    <Link
-                      prefetch={false}
-                      href={`/clients/${id}/sites/${siteId}/inspections/${inspection.id}`}
-                      className="text-ink-muted hover:text-ink hover:underline"
-                    >
-                      View
-                    </Link>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        prefetch={false}
+                        href={`/clients/${id}/sites/${siteId}/inspections/${inspection.id}`}
+                        className="text-ink-muted hover:text-ink hover:underline"
+                      >
+                        View
+                      </Link>
+                      <a
+                        href={`/api/inspection-report/${inspection.id}`}
+                        download={`inspection-report-${inspection.id}.pdf`}
+                        className="text-ink-muted hover:text-ink hover:underline"
+                      >
+                        Report
+                      </a>
+                    </div>
                   </td>
                 </tr>
               ))}

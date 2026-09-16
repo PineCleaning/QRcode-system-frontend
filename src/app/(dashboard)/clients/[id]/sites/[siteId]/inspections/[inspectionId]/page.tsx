@@ -81,6 +81,23 @@ export default async function InspectionDetailPage({
             {inspection.completedAt && ` · Completed ${formatDate(inspection.completedAt)}`}
           </p>
         </div>
+        {inspection.status === 'COMPLETED' && (
+          <a
+            href={`/api/inspection-report/${inspectionId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-line px-4.5 py-2.5 text-[13.5px] font-bold text-ink transition hover:-translate-y-px"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 3v13.5m0 0-4.5-4.5m4.5 4.5 4.5-4.5M3.75 19.5h16.5"
+              />
+            </svg>
+            Report PDF
+          </a>
+        )}
       </div>
 
       {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
