@@ -95,7 +95,7 @@ export async function openOrResumeInspectionAction(siteId: string): Promise<Site
   return apiFetch<SiteInspection>(`/sites/${siteId}/inspections`, { method: 'POST' });
 }
 
-/** The last 10 completed sessions for a site (Week 3 Wed "Past Inspections" list). */
+/** The last 10 completed sessions for a site (Week 3 Wed "Completed Inspections" list). */
 export async function findCompletedInspectionsAction(siteId: string): Promise<CompletedInspectionSummary[]> {
   return apiFetch<CompletedInspectionSummary[]>(`/sites/${siteId}/inspections/completed`);
 }
@@ -123,9 +123,16 @@ export interface FinishInspectionState {
  * once the admin dismisses it - see FinishInspectionButton's "Done"
  * handler.
  */
+/** The backend's actual response shape for this endpoint (see InspectionsService.finishInspection) - deliberately lighter than SiteInspection, since this is the only caller and it never reads anything beyond these fields. */
+interface FinishInspectionResult {
+  id: string;
+  averageScore: number | null;
+  meetsStandard: boolean | null;
+}
+
 export async function finishInspectionAction(inspectionId: string): Promise<FinishInspectionState> {
   try {
-    const result = await apiFetch<SiteInspection>(`/inspections/${inspectionId}/finish`, { method: 'POST' });
+    const result = await apiFetch<FinishInspectionResult>(`/inspections/${inspectionId}/finish`, { method: 'POST' });
     return { error: null, averageScore: result.averageScore ?? undefined, meetsStandard: result.meetsStandard ?? undefined };
   } catch (err) {
     return { error: err instanceof ApiError ? err.message : 'Failed to finish inspection' };

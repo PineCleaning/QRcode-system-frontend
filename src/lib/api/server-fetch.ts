@@ -14,8 +14,29 @@ export class ApiError extends Error {
   }
 }
 
+interface ApiFetchOptions extends RequestInit {
+  /**
+   * Opts this one call into Next's timed Data Cache instead of the
+   * default `no-store` - only safe for read-only lookups that rarely
+   * change (a client/site's name/address), never for anything that
+   * just got mutated or that must reflect real-time state. A
+   * `revalidatePath` call elsewhere does NOT clear this - a timed
+   * cache entry is only ever invalidated by its own expiry or an
+   * explicit `revalidateTag`, so this is a bounded, self-healing
+   * staleness window (at most `revalidateSeconds` old), not a bug.
+   *
+   * Added 2026-09-16: measured that adding an inspection item cost
+   * ~2.2s for its own write plus another ~1.5-3s re-fetching the
+   * current page's client+site info (via revalidatePath forcing
+   * page.tsx's Promise.all to re-run) even though neither actually
+   * changed - that data doesn't need to be network-fresh on every
+   * single item add within the same short session.
+   */
+  revalidateSeconds?: number;
+}
+
 /** Server-side only (Server Components/Actions) - attaches the current admin's Supabase access token. */
-export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+export async function apiFetch<T>(path: string, init?: ApiFetchOptions): Promise<T> {
   const supabase = await createClient();
   const {
     data: { session },
@@ -25,16 +46,18 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     throw new ApiError(401, 'Not authenticated');
   }
 
+  const { revalidateSeconds, ...restInit } = init ?? {};
+
   let res: Response;
   try {
     res = await fetch(`${API_BASE_URL}${path}`, {
-      ...init,
+      ...restInit,
       headers: {
         ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
         ...init?.headers,
         Authorization: `Bearer ${session.access_token}`,
       },
-      cache: 'no-store',
+      ...(revalidateSeconds !== undefined ? { next: { revalidate: revalidateSeconds } } : { cache: 'no-store' }),
       // Without this, a genuinely hung backend request (a stuck query, a
       // deadlock) leaves the caller's "Saving…" button disabled
       // indefinitely - there's no other timeout anywhere in this path.

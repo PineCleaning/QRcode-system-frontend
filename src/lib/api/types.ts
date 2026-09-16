@@ -274,7 +274,7 @@ export interface SiteInspection {
   items: InspectionItem[];
 }
 
-/** Shape returned by GET /sites/:siteId/inspections/completed - a lightweight summary (no items/media) for the "Past Inspections" list. */
+/** Shape returned by GET /sites/:siteId/inspections/completed - a lightweight summary (no items/media) for the "Completed Inspections" list. */
 export interface CompletedInspectionSummary {
   id: string;
   siteId: string;
@@ -284,4 +284,5 @@ export interface CompletedInspectionSummary {
   startedAt: string;
   completedAt: string | null;
   itemCount: number;
+  inspectedBy: string | null;
 }

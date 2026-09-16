@@ -16,15 +16,18 @@ const DELETE_MEDIA_WARNING = 'This permanently removes the file from Cloudinary 
 
 export default async function SiteInspectionsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; siteId: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { id, siteId } = await params;
+  const { error } = await searchParams;
   const path = `/clients/${id}/sites/${siteId}/inspections`;
 
   const [client, site, inspection] = await Promise.all([
-    apiFetch<Client>(`/clients/${id}`),
-    apiFetch<Site>(`/sites/${siteId}`),
+    apiFetch<Client>(`/clients/${id}`, { revalidateSeconds: 30 }),
+    apiFetch<Site>(`/sites/${siteId}`, { revalidateSeconds: 30 }),
     openOrResumeInspectionAction(siteId),
   ]);
   const isOpen = inspection.status === 'OPEN';
@@ -84,7 +87,7 @@ export default async function SiteInspectionsPage({
                 href={`/clients/${id}/sites/${siteId}/inspections/history`}
                 className="inline-flex items-center rounded-xl border border-line px-4.5 py-2.5 text-[13.5px] font-bold text-ink transition hover:-translate-y-px"
               >
-                Past Inspections
+                Completed Inspections
               </Link>
               {isOpen && (
                 <>
@@ -96,6 +99,8 @@ export default async function SiteInspectionsPage({
           </div>
         </div>
       </div>
+
+      {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
       {inspection.items.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-[26px] border border-line bg-surface p-12 text-center shadow-sm">

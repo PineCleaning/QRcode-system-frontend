@@ -32,7 +32,7 @@ export default async function InspectionHistoryPage({
         </Link>
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-extrabold tracking-tight">Past Inspections</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight">Completed Inspections</h1>
             <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{inspections.length}</span>
           </div>
           <p className="mt-1 text-[13.5px] text-ink-muted">
@@ -54,6 +54,7 @@ export default async function InspectionHistoryPage({
           <table className="w-full min-w-[640px] text-left text-[13.5px]">
             <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
               <tr>
+                <th className="whitespace-nowrap px-5.5 py-4">Inspected By</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Completed</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Spaces</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Average</th>
@@ -64,6 +65,9 @@ export default async function InspectionHistoryPage({
             <tbody>
               {inspections.map((inspection) => (
                 <tr key={inspection.id} className="border-b border-line align-top last:border-0 hover:bg-ink/[0.03]">
+                  <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold text-ink/80">
+                    {inspection.inspectedBy ?? <span className="text-ink-muted/40">—</span>}
+                  </td>
                   <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold text-ink/80">
                     {inspection.completedAt ? formatDate(inspection.completedAt) : <span className="text-ink-muted/40">—</span>}
                   </td>

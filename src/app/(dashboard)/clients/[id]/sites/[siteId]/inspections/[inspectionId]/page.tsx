@@ -13,7 +13,7 @@ const DELETE_MEDIA_WARNING = 'This permanently removes the file from Cloudinary 
 
 /**
  * Read-only view of one specific inspection session, whatever its
- * status - used by the "Past Inspections" list to open a completed
+ * status - used by the "Completed Inspections" list to open a completed
  * session (open ones are reachable here too, but the main inspections
  * page is the normal way to work on one). No Add item, Edit, or Finish
  * controls - flagging is the one exception, since a flag is a
@@ -22,10 +22,13 @@ const DELETE_MEDIA_WARNING = 'This permanently removes the file from Cloudinary 
  */
 export default async function InspectionDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; siteId: string; inspectionId: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { id, siteId, inspectionId } = await params;
+  const { error } = await searchParams;
   const path = `/clients/${id}/sites/${siteId}/inspections/${inspectionId}`;
 
   const [client, site, inspection] = await Promise.all([
@@ -52,7 +55,7 @@ export default async function InspectionDetailPage({
         <Link
           prefetch={false}
           href={`/clients/${id}/sites/${siteId}/inspections/history`}
-          aria-label="Back to Past Inspections"
+          aria-label="Back to Completed Inspections"
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink transition hover:-translate-y-px"
         >
           <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -79,6 +82,8 @@ export default async function InspectionDetailPage({
           </p>
         </div>
       </div>
+
+      {error && <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
       {inspection.items.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-[26px] border border-line bg-surface p-12 text-center shadow-sm">
