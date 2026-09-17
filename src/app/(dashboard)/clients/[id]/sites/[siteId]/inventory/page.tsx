@@ -113,7 +113,7 @@ export default async function SiteInventoryPage({
                   </td>
                   <td className="px-5.5 py-3.5 font-semibold tabular-nums text-ink/80">{item.quantity}</td>
                   <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold text-ink/80">
-                    {item.lastSupplyDate ? formatDateOnly(item.lastSupplyDate) : <span className="text-ink-muted/40">—</span>}
+                    {item.lastSupplied ? formatDateOnly(item.lastSupplied) : <span className="text-ink-muted/40">—</span>}
                   </td>
                   <td className="max-w-xs px-5.5 py-3.5 text-ink/80">
                     {item.notes ? (
