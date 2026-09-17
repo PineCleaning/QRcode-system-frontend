@@ -4,6 +4,7 @@ import { FlagButton } from '@/components/FlagButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { AdminFeedbackSubmission, FlaggedInspectionItem } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
 import { setFeedbackFlaggedAction } from '../feedback/actions';
@@ -30,10 +31,13 @@ export default async function FlaggedPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const [feedback, items] = await Promise.all([
+  const [feedback, items, currentAdmin] = await Promise.all([
     apiFetch<AdminFeedbackSubmission[]>('/admin/feedback?flagged=true'),
     apiFetch<FlaggedInspectionItem[]>('/inspections/items/flagged'),
+    getCurrentAdmin(),
   ]);
+  // Deleting an attachment (either feedback or inspection media) is Admin-only on the backend - mirrored here so non-Admin roles never see a control that would 403.
+  const isAdmin = currentAdmin?.role === 'ADMIN';
 
   const verifiedFeedbackMedia = feedback.flatMap((f) => f.media.filter((m) => m.url));
   const feedbackMediaIndexMap = new Map(verifiedFeedbackMedia.map((m, i) => [m.id, i]));
@@ -91,7 +95,7 @@ export default async function FlaggedPage({
                           <TruncatedText text={item.feedback} lines={2} />
                         </td>
                         <td className="px-5.5 py-3.5">
-                          <AttachmentsCell media={item.media} pathToRevalidate={PATH} mediaIndexMap={feedbackMediaIndexMap} />
+                          <AttachmentsCell media={item.media} pathToRevalidate={PATH} mediaIndexMap={feedbackMediaIndexMap} isAdmin={isAdmin} />
                         </td>
                         <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold tabular-nums text-ink/80">{formatDate(item.submittedAt)}</td>
                         <td className="px-5.5 py-3.5">
@@ -166,6 +170,7 @@ export default async function FlaggedPage({
                               mediaIndexMap={itemMediaIndexMap}
                               deleteAction={deleteInspectionMediaAction}
                               deleteWarning="This permanently removes the file from Cloudinary storage - it cannot be recovered."
+                              isAdmin={isAdmin}
                             />
                           </td>
                           <td className="px-5.5 py-3.5">

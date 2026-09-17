@@ -4,6 +4,7 @@ import { FlagButton } from '@/components/FlagButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, Site } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
 import { deleteInspectionMediaAction, openOrResumeInspectionAction, setInspectionItemFlaggedAction } from './actions';
@@ -25,12 +26,15 @@ export default async function SiteInspectionsPage({
   const { error } = await searchParams;
   const path = `/clients/${id}/sites/${siteId}/inspections`;
 
-  const [client, site, inspection] = await Promise.all([
+  const [client, site, inspection, currentAdmin] = await Promise.all([
     apiFetch<Client>(`/clients/${id}`, { revalidateSeconds: 30 }),
     apiFetch<Site>(`/sites/${siteId}`, { revalidateSeconds: 30 }),
     openOrResumeInspectionAction(siteId),
+    getCurrentAdmin(),
   ]);
   const isOpen = inspection.status === 'OPEN';
+  // Deleting inspection media is Admin-only on the backend - mirrored here so non-Admin roles never see a control that would 403.
+  const isAdmin = currentAdmin?.role === 'ADMIN';
 
   // Every verified attachment across every item in this session,
   // flattened into one shared list - same pattern as the Feedback
@@ -156,6 +160,7 @@ export default async function SiteInspectionsPage({
                       mediaIndexMap={mediaIndexMap}
                       deleteAction={deleteInspectionMediaAction}
                       deleteWarning={DELETE_MEDIA_WARNING}
+                      isAdmin={isAdmin}
                     />
                   </td>
                   <td className="whitespace-nowrap px-5.5 py-3.5 font-bold">

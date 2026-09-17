@@ -4,6 +4,7 @@ import { FlagButton } from '@/components/FlagButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, Site, SiteInspection } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
 import { deleteInspectionMediaAction, setInspectionItemFlaggedAction } from '../actions';
@@ -31,11 +32,14 @@ export default async function InspectionDetailPage({
   const { error } = await searchParams;
   const path = `/clients/${id}/sites/${siteId}/inspections/${inspectionId}`;
 
-  const [client, site, inspection] = await Promise.all([
+  const [client, site, inspection, currentAdmin] = await Promise.all([
     apiFetch<Client>(`/clients/${id}`),
     apiFetch<Site>(`/sites/${siteId}`),
     apiFetch<SiteInspection>(`/inspections/${inspectionId}`),
+    getCurrentAdmin(),
   ]);
+  // Deleting inspection media is Admin-only on the backend - mirrored here so non-Admin roles never see a control that would 403.
+  const isAdmin = currentAdmin?.role === 'ADMIN';
 
   const verifiedMedia = inspection.items.flatMap((item) => item.media.filter((m) => m.url));
   const mediaIndexMap = new Map(verifiedMedia.map((m, i) => [m.id, i]));
@@ -153,6 +157,7 @@ export default async function InspectionDetailPage({
                       mediaIndexMap={mediaIndexMap}
                       deleteAction={deleteInspectionMediaAction}
                       deleteWarning={DELETE_MEDIA_WARNING}
+                      isAdmin={isAdmin}
                     />
                   </td>
                   <td className="px-5.5 py-3.5">
