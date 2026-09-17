@@ -22,8 +22,8 @@ export function SiteQrModal({
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="text-ink-muted hover:text-ink">
-        View
+      <button type="button" onClick={() => setOpen(true)} className="whitespace-nowrap text-ink-muted hover:text-ink">
+        QR Code
       </button>
 
       {open && (

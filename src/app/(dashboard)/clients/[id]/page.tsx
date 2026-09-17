@@ -3,6 +3,7 @@ import { ConfirmDeactivateButton } from '@/components/ConfirmDeactivateButton';
 import { CopyLinkButton } from '@/components/CopyLinkButton';
 import { Pagination } from '@/components/Pagination';
 import { SiteQrModal } from '@/components/SiteQrModal';
+import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, PaginatedSites } from '@/lib/api/types';
@@ -98,11 +99,23 @@ export default async function ClientDetailPage({
             <tbody>
               {sites.map((site) => (
                 <tr key={site.id} className="border-b border-line last:border-0 hover:bg-ink/[0.03]">
-                  <td className="max-w-[180px] px-5.5 py-3.5 font-bold">{site.businessName}</td>
-                  <td className="max-w-[200px] px-5.5 py-3.5 font-semibold text-ink/80">{site.address || <span className="text-ink-muted/40">—</span>}</td>
-                  <td className="px-5.5 py-3.5">
+                  <td className="max-w-[180px] px-5.5 py-3.5 font-bold">
+                    <TruncatedText text={site.businessName} lines={1} className="break-all" />
+                  </td>
+                  <td className="max-w-[200px] px-5.5 py-3.5 font-semibold text-ink/80">
+                    {site.address ? (
+                      <TruncatedText text={site.address} lines={1} className="break-all" />
+                    ) : (
+                      <span className="text-ink-muted/40">—</span>
+                    )}
+                  </td>
+                  <td className="max-w-[220px] px-5.5 py-3.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-[14.5px] font-semibold tracking-wide text-ink/75">{site.slug}</span>
+                      <TruncatedText
+                        text={site.slug}
+                        lines={1}
+                        className="break-all font-mono text-[14.5px] font-semibold tracking-wide text-ink/75"
+                      />
                       <CopyLinkButton url={site.feedbackUrl} />
                     </div>
                   </td>
@@ -121,7 +134,7 @@ export default async function ClientDetailPage({
                     </span>
                   </td>
                   <td className="px-5.5 py-3.5 font-bold">
-                    <div className="flex gap-3 text-[13.5px]">
+                    <div className="flex flex-nowrap items-center gap-3 whitespace-nowrap text-[13.5px]">
                       <SiteQrModal
                         siteId={site.id}
                         businessName={site.businessName}

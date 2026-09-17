@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { deleteAttachmentAction } from '@/app/(dashboard)/feedback/actions';
 import { ConfirmDeleteButton } from './ConfirmDeleteButton';
 import { useOpenLightbox } from './MediaLightbox';
+import { TruncatedText } from './TruncatedText';
 
 type DeleteAction = (mediaId: string, pathToRevalidate: string) => Promise<void>;
 
@@ -84,7 +85,7 @@ function AttachmentLink({
         className={`flex min-w-0 items-center gap-1.5 text-sky ${underlineOnHover ? 'hover:underline' : ''}`}
       >
         {icon}
-        <span className="truncate">{label}</span>
+        <TruncatedText text={label} lines={1} className="min-w-0 break-all" />
       </button>
     );
   }
@@ -92,7 +93,7 @@ function AttachmentLink({
   return (
     <span className="flex min-w-0 items-center gap-1.5 text-ink-muted/70">
       {icon}
-      <span className="truncate">{label}</span>
+      <TruncatedText text={label} lines={1} className="min-w-0 break-all" />
       <span className="shrink-0 text-[10px] text-coral">({item.status === 'REJECTED' ? 'Rejected' : 'Unavailable'})</span>
     </span>
   );
@@ -148,6 +149,7 @@ export function AttachmentsCell({
   mediaIndexMap,
   deleteAction = deleteAttachmentAction,
   deleteWarning = 'This permanently removes the file from Cloudinary storage, and it will also disappear from the Media page - not just from this list.',
+  isAdmin = false,
 }: {
   media: MediaItem[];
   pathToRevalidate: string;
@@ -157,6 +159,8 @@ export function AttachmentsCell({
   deleteAction?: DeleteAction;
   /** Confirmation copy shown before deleting - defaults to the Feedback/Media page's wording. */
   deleteWarning?: string;
+  /** Deleting an attachment is Admin-only on the backend (both `/admin/media/:id` and `/inspections/media/:mediaId`) - the trash icon only renders for Admins so non-Admin roles never see a control that would 403. */
+  isAdmin?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
@@ -221,7 +225,9 @@ export function AttachmentsCell({
     return (
       <div className="flex max-w-[200px] items-center gap-1 text-xs">
         <AttachmentLink item={media[0]} lightboxIndex={mediaIndexMap.get(media[0].id)} />
-        <DeleteAttachmentButton item={media[0]} pathToRevalidate={pathToRevalidate} deleteAction={deleteAction} warning={deleteWarning} />
+        {isAdmin && (
+          <DeleteAttachmentButton item={media[0]} pathToRevalidate={pathToRevalidate} deleteAction={deleteAction} warning={deleteWarning} />
+        )}
       </div>
     );
   }
@@ -238,7 +244,7 @@ export function AttachmentsCell({
       >
         <span className="flex min-w-0 items-center gap-1.5">
           {media[0].resourceType === 'IMAGE' ? <ImageIcon /> : <VideoIcon />}
-          <span className="truncate">{mediaLabel(media[0])}</span>
+          <TruncatedText text={mediaLabel(media[0])} lines={1} className="min-w-0 break-all" />
         </span>
         <svg
           className={`h-3 w-3 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
@@ -269,7 +275,9 @@ export function AttachmentsCell({
                     underlineOnHover={false}
                     onSelect={() => setOpen(false)}
                   />
-                  <DeleteAttachmentButton item={item} pathToRevalidate={pathToRevalidate} deleteAction={deleteAction} warning={deleteWarning} />
+                  {isAdmin && (
+                    <DeleteAttachmentButton item={item} pathToRevalidate={pathToRevalidate} deleteAction={deleteAction} warning={deleteWarning} />
+                  )}
                 </div>
               ))}
             </div>

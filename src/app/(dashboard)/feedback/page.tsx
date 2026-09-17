@@ -143,7 +143,7 @@ export default async function FeedbackPage({
                         </TruncatedText>
                       </td>
                       <td className="px-4 py-3.5">
-                        <TruncatedText text={item.site.businessName} lines={1}>
+                        <TruncatedText text={item.site.businessName} lines={1} className="break-all">
                           <Link
                             prefetch={false}
                             href={`/clients/${item.site.client.id}/sites/${item.site.id}/feedback`}
@@ -155,7 +155,7 @@ export default async function FeedbackPage({
                       </td>
                       <td className="px-4 py-3.5 font-semibold text-ink/80">
                         {item.site.address ? (
-                          <TruncatedText text={item.site.address} lines={1} />
+                          <TruncatedText text={item.site.address} lines={1} className="break-all" />
                         ) : (
                           <span className="text-xs italic text-ink-muted/70">Not provided</span>
                         )}
@@ -163,11 +163,15 @@ export default async function FeedbackPage({
                       <td className="px-4 py-3.5 font-semibold text-ink/80">
                         <TruncatedText text={item.feedback} lines={2} />
                       </td>
-                      <td className="truncate px-4 py-3.5 font-semibold tabular-nums text-ink/80">
-                        {item.mobileNumber ?? <span className="text-xs italic text-ink-muted/70">Not provided</span>}
+                      <td className="px-4 py-3.5 font-semibold tabular-nums text-ink/80">
+                        {item.mobileNumber ? (
+                          <TruncatedText text={item.mobileNumber} lines={1} className="break-all" />
+                        ) : (
+                          <span className="text-xs italic text-ink-muted/70">Not provided</span>
+                        )}
                       </td>
                       <td className="px-4 py-3.5">
-                        <AttachmentsCell media={item.media} pathToRevalidate="/feedback" mediaIndexMap={mediaIndexMap} />
+                        <AttachmentsCell media={item.media} pathToRevalidate="/feedback" mediaIndexMap={mediaIndexMap} isAdmin={isAdmin} />
                       </td>
                       <td className="px-4 py-3.5 font-semibold tabular-nums text-ink/80">
                         <TruncatedText text={formatDate(item.submittedAt)} lines={1} />

@@ -6,6 +6,7 @@ import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { RetryButton } from '@/components/RetryButton';
 import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
+import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, FeedbackSubmission, Site } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
 import { deleteFeedbackAction, retryFeedbackAction, setFeedbackFlaggedAction } from '@/app/(dashboard)/feedback/actions';
@@ -27,11 +28,14 @@ export default async function SiteFeedbackPage({
 }) {
   const { id, siteId } = await params;
   const { error } = await searchParams;
-  const [client, site, feedback] = await Promise.all([
+  const [client, site, feedback, currentAdmin] = await Promise.all([
     apiFetch<Client>(`/clients/${id}`),
     apiFetch<Site>(`/sites/${siteId}`),
     apiFetch<FeedbackSubmission[]>(`/sites/${siteId}/feedback`),
+    getCurrentAdmin(),
   ]);
+  // Deleting feedback is Admin-only (backend RolesGuard) - mirrored here so non-Admin roles never see a button that would 403, same gating as the global Feedback page.
+  const isAdmin = currentAdmin?.role === 'ADMIN';
 
   // Same shared-lightbox setup as the main Feedback page, scoped to
   // this one site's rows only.
@@ -109,6 +113,7 @@ export default async function SiteFeedbackPage({
                       media={item.media}
                       pathToRevalidate={`/clients/${id}/sites/${siteId}/feedback`}
                       mediaIndexMap={mediaIndexMap}
+                      isAdmin={isAdmin}
                     />
                   </td>
                   <td className="px-5.5 py-3.5">
@@ -133,16 +138,18 @@ export default async function SiteFeedbackPage({
                         flagged={item.flagged}
                         action={setFeedbackFlaggedAction.bind(null, item.id, !item.flagged, `/clients/${id}/sites/${siteId}/feedback`)}
                       />
-                      <ConfirmDeleteButton
-                        action={deleteFeedbackAction.bind(null, item.id, `/clients/${id}/sites/${siteId}/feedback`)}
-                        itemLabel="this feedback submission"
-                        warning={
-                          item.clickupTaskId
-                            ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
-                            : 'This also deletes every attachment - none of it can be recovered.'
-                        }
-                        triggerClassName="font-bold text-red-500 hover:text-red-700"
-                      />
+                      {isAdmin && (
+                        <ConfirmDeleteButton
+                          action={deleteFeedbackAction.bind(null, item.id, `/clients/${id}/sites/${siteId}/feedback`)}
+                          itemLabel="this feedback submission"
+                          warning={
+                            item.clickupTaskId
+                              ? 'This also deletes its ClickUp ticket and every attachment - none of it can be recovered.'
+                              : 'This also deletes every attachment - none of it can be recovered.'
+                          }
+                          triggerClassName="font-bold text-red-500 hover:text-red-700"
+                        />
+                      )}
                     </div>
                   </td>
                 </tr>
