@@ -88,12 +88,12 @@ export default async function SiteInventoryPage({
             <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
               <tr>
                 <th className="whitespace-nowrap px-5.5 py-4">Item</th>
-                <th className="whitespace-nowrap px-5.5 py-4">Types</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Type</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Status</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Quantity</th>
-                <th className="whitespace-nowrap px-5.5 py-4">Last Supply Date</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Last Supplied</th>
                 <th className="px-5.5 py-4">Notes</th>
-                <th className="whitespace-nowrap px-5.5 py-4">Last Edited Date/Time</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Last Updated</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Actions</th>
               </tr>
             </thead>
@@ -113,7 +113,7 @@ export default async function SiteInventoryPage({
                   </td>
                   <td className="px-5.5 py-3.5 font-semibold tabular-nums text-ink/80">{item.quantity}</td>
                   <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold text-ink/80">
-                    {item.lastSupplyDate ? formatDateOnly(item.lastSupplyDate) : <span className="text-ink-muted/40">—</span>}
+                    {item.lastSupplied ? formatDateOnly(item.lastSupplied) : <span className="text-ink-muted/40">—</span>}
                   </td>
                   <td className="max-w-xs px-5.5 py-3.5 text-ink/80">
                     {item.notes ? (

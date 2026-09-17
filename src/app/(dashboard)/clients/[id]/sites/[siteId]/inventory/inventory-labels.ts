@@ -36,8 +36,8 @@ export const STATUS_BADGE_STYLES: Record<InventoryStatus, string> = {
   IN_STOCK: 'bg-green/15 text-green',
   GOOD: 'bg-green/15 text-green',
   LOW_STOCK: 'bg-amber/15 text-amber',
-  URGENT_LOW_STOCK: 'bg-coral/15 text-coral',
-  OUT_OF_STOCK: 'bg-coral/15 text-coral',
-  NEEDS_REPAIR: 'bg-coral/15 text-coral',
-  OUT_OF_SERVICE: 'bg-ink-muted/15 text-ink-muted',
+  URGENT_LOW_STOCK: 'bg-red/15 text-red',
+  OUT_OF_STOCK: 'bg-red/15 text-red',
+  NEEDS_REPAIR: 'bg-orange/15 text-orange',
+  OUT_OF_SERVICE: 'bg-red/15 text-red',
 };

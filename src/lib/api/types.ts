@@ -81,7 +81,7 @@ export interface PaginatedFeedback {
   pageSize: number;
 }
 
-/** Shape returned by GET /clients/:id/sites?page=&pageSize= - the unpaginated Site[] shape stays for the Feedback/Assets filter dropdowns. */
+/** Shape returned by GET /clients/:id/sites?page=&pageSize= - the unpaginated Site[] shape stays for the Feedback/Media filter dropdowns. */
 export interface PaginatedSites {
   data: Site[];
   total: number;
@@ -89,13 +89,13 @@ export interface PaginatedSites {
   pageSize: number;
 }
 
-/** Global media library (admin "Assets" page) - VERIFIED-only, so url is never null here. */
+/** Global media library (admin "Media" page) - VERIFIED-only, so url is never null here. */
 export interface AdminMediaItem extends Omit<FeedbackMedia, 'url'> {
   url: string;
   feedback: { id: string; site: Pick<Site, 'id' | 'businessName' | 'slug'> & { client: Pick<Client, 'id' | 'clientName' | 'clientId'> } };
 }
 
-/** GET /admin/media/storage-usage - Cloudinary account usage, for the Assets page's storage widget. */
+/** GET /admin/media/storage-usage - Cloudinary account usage, for the Media page's storage widget. */
 export interface CloudinaryUsage {
   plan: string;
   storageUsedBytes: number;
@@ -194,7 +194,7 @@ export interface InventoryItem {
   category: InventoryCategory;
   status: InventoryStatus;
   quantity: number;
-  lastSupplyDate: string | null;
+  lastSupplied: string | null;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
@@ -203,6 +203,27 @@ export interface InventoryItem {
 /** Shape returned by GET /sites/:siteId/inventory?page=&pageSize= - the unpaginated InventoryItem[] shape stays for callers that never send those params. */
 export interface PaginatedInventory {
   data: InventoryItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Shape returned by GET /admin/inventory - the cross-site list for the global "Inventory / Assets" nav tab, same InventoryItem fields plus which site/client each row belongs to. */
+export interface AdminInventoryItem extends InventoryItem {
+  site: {
+    id: string;
+    businessName: string;
+    client: {
+      id: string;
+      clientName: string;
+      clientId: string;
+    };
+  };
+}
+
+/** Shape returned by GET /admin/inventory?page=&pageSize= - the paginated form of AdminInventoryItem[]. */
+export interface PaginatedAdminInventory {
+  data: AdminInventoryItem[];
   total: number;
   page: number;
   pageSize: number;

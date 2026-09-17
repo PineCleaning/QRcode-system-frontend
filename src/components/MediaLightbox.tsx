@@ -40,7 +40,7 @@ function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
 }
 
 /**
- * Wraps an entire media grid (Assets page) so any card's Review button
+ * Wraps an entire media grid (Media page) so any card's Review button
  * can open a shared full-screen lightbox and navigate Prev/Next across
  * every item, not just the one it was opened from. A single instance
  * lives once per page, not per-card - context is what lets any card's

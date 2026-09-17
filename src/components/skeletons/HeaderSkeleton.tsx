@@ -1,4 +1,4 @@
-/** Matches the plain (no-card) page header pattern used across Clients/Feedback/Assets/Client Detail/Site Feedback. */
+/** Matches the plain (no-card) page header pattern used across Clients/Feedback/Media/Client Detail/Site Feedback. */
 export function HeaderSkeleton({
   titleWidth = 'w-40',
   withSubtitle = true,
