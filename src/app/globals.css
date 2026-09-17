@@ -22,6 +22,8 @@
   --sky: #0ea5e9;
   --amber: #f59e0b;
   --coral: #f4633a;
+  --red: #dc2626;
+  --orange: #f97316;
   --hero-grad-1: #86efac;
   --hero-grad-2: #16a34a;
   --hero-text: var(--ink);
@@ -52,6 +54,8 @@
   --sky: #38bdf8;
   --amber: #fbbf24;
   --coral: #fb7857;
+  --red: #f87171;
+  --orange: #fb923c;
   --hero-text: #ffffff;
   --hero-tag: #ffffff;
   /* Dark mode keeps the original ink-on-bg primary button (near-white
@@ -80,6 +84,8 @@
   --color-sky: var(--sky);
   --color-amber: var(--amber);
   --color-coral: var(--coral);
+  --color-red: var(--red);
+  --color-orange: var(--orange);
 }
 
 body {

@@ -88,12 +88,12 @@ export default async function SiteInventoryPage({
             <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
               <tr>
                 <th className="whitespace-nowrap px-5.5 py-4">Item</th>
-                <th className="whitespace-nowrap px-5.5 py-4">Types</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Type</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Status</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Quantity</th>
-                <th className="whitespace-nowrap px-5.5 py-4">Last Supply Date</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Last Supplied</th>
                 <th className="px-5.5 py-4">Notes</th>
-                <th className="whitespace-nowrap px-5.5 py-4">Last Edited Date/Time</th>
+                <th className="whitespace-nowrap px-5.5 py-4">Last Updated</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Actions</th>
               </tr>
             </thead>

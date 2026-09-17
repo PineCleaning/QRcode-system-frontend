@@ -69,7 +69,7 @@ export function InventoryItemForm({
 
       <div>
         <label htmlFor="category" className="mb-1 block text-sm font-bold text-ink">
-          Types <span className="text-coral">*</span>
+          Type <span className="text-coral">*</span>
         </label>
         <input type="hidden" name="category" value={category} />
         <Select id="category" value={category} onChange={setCategory} placeholder="Select a type" options={CATEGORY_OPTIONS} />
