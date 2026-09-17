@@ -44,7 +44,7 @@ test.describe.serial('Site CRUD, QR modal, deactivate', () => {
   test('QR modal shows the code and PNG/PDF download links', async ({ page }) => {
     await page.goto(`/clients/${clientCode}`);
     const row = page.locator('tr', { hasText: SITE_NAME });
-    await row.getByRole('button', { name: 'View' }).click();
+    await row.getByRole('button', { name: 'QR Code' }).click();
 
     await expect(page.getByRole('heading', { name: SITE_NAME })).toBeVisible();
     await expect(page.getByRole('img', { name: `QR code for ${SITE_NAME}` })).toBeVisible();

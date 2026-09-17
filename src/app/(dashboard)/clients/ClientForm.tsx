@@ -83,7 +83,7 @@ export function ClientForm({
           <input
             id="clientId"
             name="clientId"
-            value={clientId}
+            value={isEdit ? clientId.toUpperCase() : clientId}
             onChange={(e) => {
               setClientId(e.target.value);
               setCodeManuallyEdited(true);

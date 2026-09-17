@@ -19,7 +19,7 @@ test.describe('Auth & navigation', () => {
 });
 
 test.describe('Authenticated navigation', () => {
-  test('sidebar links move between Clients, Feedbacks, Media', async ({ page }) => {
+  test('sidebar links move between Clients and Feedbacks', async ({ page }) => {
     await page.goto('/clients');
     await expect(page.getByRole('heading', { name: 'Clients' })).toBeVisible();
 
@@ -27,12 +27,23 @@ test.describe('Authenticated navigation', () => {
     await expect(page).toHaveURL(/\/feedback/);
     await expect(page.getByRole('heading', { name: 'Feedback' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Media' }).click();
+    await page.getByRole('link', { name: 'Clients' }).click();
+    await expect(page).toHaveURL(/\/clients$/);
+  });
+
+  // Media and Integrations moved out of the sidebar into the Admin-only
+  // "More" (three-dot) menu next to the profile icon - see MoreMenu.tsx.
+  test('More menu (Admin-only) reaches Media and Integrations', async ({ page }) => {
+    await page.goto('/clients');
+    await page.getByRole('button', { name: 'More' }).click();
+
+    await page.getByRole('menuitem', { name: 'Media' }).click();
     await expect(page).toHaveURL(/\/media/);
     await expect(page.getByRole('heading', { name: 'Media' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Clients' }).click();
-    await expect(page).toHaveURL(/\/clients$/);
+    await page.getByRole('button', { name: 'More' }).click();
+    await page.getByRole('menuitem', { name: 'Integrations' }).click();
+    await expect(page).toHaveURL(/\/settings\/clickup/);
   });
 
   test('sign out returns to login and re-protects the dashboard', async ({ browser }) => {

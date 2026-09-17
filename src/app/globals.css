@@ -7,6 +7,23 @@
    never get the class - they stay on the light tokens below. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Tailwind's Preflight resets <button> to cursor:default, but every
+   custom-styled <button> action in this app (Edit, Delete, Deactivate,
+   QR Code, Add..., etc.) is meant to read as clickable exactly like the
+   <Link>-based actions next to it (Feedback, Inventory, Inspections),
+   which get pointer from the browser's own anchor default. Without
+   this, hovering a link-styled button in the same row as a real link
+   shows an inconsistent cursor - confirmed via a real screenshot
+   (2026-09-17) comparing the Sites table's QR Code/Edit/Deactivate
+   buttons against its Feedback/Inventory/Inspections links. One global
+   rule here fixes every such button at once instead of adding
+   `cursor-pointer` to each of the dozen+ individual trigger components. */
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
