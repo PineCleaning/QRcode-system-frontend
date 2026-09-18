@@ -25,7 +25,7 @@ export function TableRowsSkeleton({
   return (
     <div className="overflow-x-auto rounded-[26px] border border-line bg-surface shadow-sm">
       <table className="w-full text-left text-[13.5px]" style={{ minWidth }}>
-        <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
+        <thead className="border-b border-line text-[12.5px] font-extrabold uppercase tracking-wide text-ink-muted">
           <tr>
             {columns.map((col) => (
               <th key={col.label} className={`whitespace-nowrap px-5.5 py-4 ${col.align === 'center' ? 'text-center' : ''}`}>

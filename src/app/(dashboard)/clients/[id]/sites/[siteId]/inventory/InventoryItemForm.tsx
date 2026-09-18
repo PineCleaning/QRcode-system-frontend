@@ -100,19 +100,6 @@ export function InventoryItemForm({
       </div>
 
       <div>
-        <label htmlFor="lastSupplied" className="mb-1 block text-sm font-bold text-ink">
-          Last Supplied
-        </label>
-        <input
-          id="lastSupplied"
-          name="lastSupplied"
-          type="date"
-          defaultValue={item?.lastSupplied ? item.lastSupplied.slice(0, 10) : ''}
-          className="w-full rounded-xl border border-line bg-page px-3 py-2 text-sm text-ink focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
-        />
-      </div>
-
-      <div>
         <label htmlFor="notes" className="mb-1 block text-sm font-bold text-ink">
           Notes
         </label>

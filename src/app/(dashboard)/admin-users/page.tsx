@@ -59,7 +59,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
       <div className="overflow-hidden rounded-[26px] border border-line bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] text-left text-[13.5px]">
-            <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
+            <thead className="border-b border-line text-[12.5px] font-extrabold uppercase tracking-wide text-ink-muted">
               <tr>
                 <th className="whitespace-nowrap px-5.5 py-4">Name</th>
                 <th className="whitespace-nowrap px-5.5 py-4">Email</th>

@@ -8,7 +8,6 @@ export const INVENTORY_SKELETON_COLUMNS: SkeletonColumn[] = [
   { label: 'Type', width: 'w-28' },
   { label: 'Status', width: 'w-20' },
   { label: 'Quantity', width: 'w-10' },
-  { label: 'Last Supplied', width: 'w-20' },
   { label: 'Notes', width: 'w-full max-w-xs' },
   { label: 'Last Updated', width: 'w-24' },
   { label: 'Actions', width: 'w-16' },

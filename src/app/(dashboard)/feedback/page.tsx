@@ -115,7 +115,7 @@ export default async function FeedbackPage({
                   <col className="w-[11%]" />
                   <col className="w-[7%]" />
                 </colgroup>
-                <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
+                <thead className="border-b border-line text-[12.5px] font-extrabold uppercase tracking-wide text-ink-muted">
                   <tr>
                     <th className="whitespace-nowrap px-4 py-4">Client</th>
                     <th className="whitespace-nowrap px-4 py-4">Site</th>

@@ -196,7 +196,6 @@ export interface InventoryItem {
   category: InventoryCategory;
   status: InventoryStatus;
   quantity: number;
-  lastSupplied: string | null;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
@@ -210,7 +209,7 @@ export interface PaginatedInventory {
   pageSize: number;
 }
 
-/** Shape returned by GET /admin/inventory - the cross-site list for the global "Inventory / Assets" nav tab, same InventoryItem fields plus which site/client each row belongs to. */
+/** Shape returned by GET /admin/inventory - the cross-site list for the global "Assets" nav tab, same InventoryItem fields plus which site/client each row belongs to. */
 export interface AdminInventoryItem extends InventoryItem {
   site: {
     id: string;
@@ -306,4 +305,25 @@ export interface CompletedInspectionSummary {
   completedAt: string | null;
   itemCount: number;
   inspectedBy: string | null;
+}
+
+/** Shape returned by GET /admin/inspections/completed - the cross-site list for the global "Completed Inspections" nav tab, same CompletedInspectionSummary fields plus which site/client each row belongs to. */
+export interface AdminCompletedInspection extends CompletedInspectionSummary {
+  site: {
+    id: string;
+    businessName: string;
+    client: {
+      id: string;
+      clientName: string;
+      clientId: string;
+    };
+  };
+}
+
+/** Shape returned by GET /admin/inspections/completed?page=&pageSize= - the paginated form of AdminCompletedInspection[]. */
+export interface PaginatedAdminCompletedInspections {
+  data: AdminCompletedInspection[];
+  total: number;
+  page: number;
+  pageSize: number;
 }

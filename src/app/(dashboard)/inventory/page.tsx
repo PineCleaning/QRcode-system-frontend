@@ -13,7 +13,7 @@ import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, PaginatedAdminInventory, PaginatedSites } from '@/lib/api/types';
-import { formatDate, formatDateOnly } from '@/lib/format-date';
+import { formatDate } from '@/lib/format-date';
 import { AddGlobalInventoryItemModal } from './AddGlobalInventoryItemModal';
 
 const PATH = '/inventory';
@@ -55,7 +55,7 @@ export default async function GlobalInventoryPage({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-extrabold tracking-tight text-balance">Inventory / Assets</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight text-balance">Assets</h1>
               <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{total}</span>
             </div>
             <p className="mt-1 text-[13.5px] text-ink-muted">Every tracked item across every client and site.</p>
@@ -85,7 +85,7 @@ export default async function GlobalInventoryPage({
             <div className="overflow-hidden rounded-[26px] border border-line bg-surface shadow-sm">
               <div className="overflow-x-auto">
               <table className="w-full min-w-[1100px] text-left text-[13.5px]">
-                <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
+                <thead className="border-b border-line text-[12.5px] font-extrabold uppercase tracking-wide text-ink-muted">
                   <tr>
                     <th className="whitespace-nowrap px-5.5 py-4">Client</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Site</th>
@@ -93,7 +93,6 @@ export default async function GlobalInventoryPage({
                     <th className="whitespace-nowrap px-5.5 py-4">Type</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Status</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Quantity</th>
-                    <th className="whitespace-nowrap px-5.5 py-4">Last Supplied</th>
                     <th className="px-5.5 py-4">Notes</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Last Updated</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Actions</th>
@@ -103,7 +102,7 @@ export default async function GlobalInventoryPage({
                   {items.map((item) => (
                     <tr key={item.id} className="border-b border-line align-top last:border-0 hover:bg-ink/[0.03]">
                       <td className="max-w-[160px] px-5.5 py-3.5">
-                        <TruncatedText text={item.site.client.clientName} lines={1}>
+                        <TruncatedText text={item.site.client.clientName} lines={1} className="break-all">
                           <Link
                             prefetch={false}
                             href={`/clients/${item.site.client.id}/sites/${item.site.id}/inventory`}
@@ -124,7 +123,9 @@ export default async function GlobalInventoryPage({
                           </Link>
                         </TruncatedText>
                       </td>
-                      <td className="max-w-[180px] px-5.5 py-3.5 font-bold">{item.item}</td>
+                      <td className="max-w-[180px] px-5.5 py-3.5 font-bold">
+                        <TruncatedText text={item.item} lines={2} className="break-all" />
+                      </td>
                       <td className="max-w-[200px] px-5.5 py-3.5 font-semibold text-ink/80">
                         <TruncatedText text={CATEGORY_LABELS[item.category]} lines={1} />
                       </td>
@@ -136,9 +137,6 @@ export default async function GlobalInventoryPage({
                         </span>
                       </td>
                       <td className="px-5.5 py-3.5 font-semibold tabular-nums text-ink/80">{item.quantity}</td>
-                      <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold text-ink/80">
-                        {item.lastSupplied ? formatDateOnly(item.lastSupplied) : <span className="text-ink-muted/40">—</span>}
-                      </td>
                       <td className="max-w-xs px-5.5 py-3.5 text-ink/80">
                         {item.notes ? (
                           <TruncatedText text={item.notes} lines={2} className="break-all" />
