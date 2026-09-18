@@ -5,14 +5,12 @@ import { ApiError, apiFetch } from '@/lib/api/server-fetch';
 import type { InventoryItem } from '@/lib/api/types';
 
 function buildBody(formData: FormData) {
-  const lastSupplied = (formData.get('lastSupplied') as string)?.trim();
   const notes = (formData.get('notes') as string)?.trim();
   return {
     item: (formData.get('item') as string)?.trim(),
     category: formData.get('category') as string,
     status: formData.get('status') as string,
     quantity: Number(formData.get('quantity')),
-    lastSupplied: lastSupplied || undefined,
     notes: notes || undefined,
   };
 }

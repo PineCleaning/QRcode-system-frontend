@@ -13,7 +13,7 @@ import { TruncatedText } from '@/components/TruncatedText';
 import { apiFetch } from '@/lib/api/server-fetch';
 import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, PaginatedAdminInventory, PaginatedSites } from '@/lib/api/types';
-import { formatDate, formatDateOnly } from '@/lib/format-date';
+import { formatDate } from '@/lib/format-date';
 import { AddGlobalInventoryItemModal } from './AddGlobalInventoryItemModal';
 
 const PATH = '/inventory';
@@ -93,7 +93,6 @@ export default async function GlobalInventoryPage({
                     <th className="whitespace-nowrap px-5.5 py-4">Type</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Status</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Quantity</th>
-                    <th className="whitespace-nowrap px-5.5 py-4">Last Supplied</th>
                     <th className="px-5.5 py-4">Notes</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Last Updated</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Actions</th>
@@ -138,9 +137,6 @@ export default async function GlobalInventoryPage({
                         </span>
                       </td>
                       <td className="px-5.5 py-3.5 font-semibold tabular-nums text-ink/80">{item.quantity}</td>
-                      <td className="whitespace-nowrap px-5.5 py-3.5 font-semibold text-ink/80">
-                        {item.lastSupplied ? formatDateOnly(item.lastSupplied) : <span className="text-ink-muted/40">—</span>}
-                      </td>
                       <td className="max-w-xs px-5.5 py-3.5 text-ink/80">
                         {item.notes ? (
                           <TruncatedText text={item.notes} lines={2} className="break-all" />

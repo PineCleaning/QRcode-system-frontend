@@ -196,7 +196,6 @@ export interface InventoryItem {
   category: InventoryCategory;
   status: InventoryStatus;
   quantity: number;
-  lastSupplied: string | null;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
