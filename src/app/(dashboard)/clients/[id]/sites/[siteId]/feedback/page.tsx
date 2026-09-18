@@ -88,7 +88,7 @@ export default async function SiteFeedbackPage({
         <MediaLightboxProvider items={lightboxItems}>
         <div className="overflow-x-auto rounded-[26px] border border-line bg-surface shadow-sm">
           <table className="w-full min-w-[720px] text-left text-[13.5px]">
-            <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
+            <thead className="border-b border-line text-[12.5px] font-extrabold uppercase tracking-wide text-ink-muted">
               <tr>
                 <th className="whitespace-nowrap px-5.5 py-4">Date</th>
                 <th className="px-5.5 py-4">Feedback</th>

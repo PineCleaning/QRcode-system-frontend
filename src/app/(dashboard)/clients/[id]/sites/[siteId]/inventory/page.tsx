@@ -100,7 +100,9 @@ export default async function SiteInventoryPage({
             <tbody>
               {items.map((item) => (
                 <tr key={item.id} className="border-b border-line align-top last:border-0 hover:bg-ink/[0.03]">
-                  <td className="max-w-[200px] px-5.5 py-3.5 font-bold">{item.item}</td>
+                  <td className="max-w-[200px] px-5.5 py-3.5 font-bold">
+                    <TruncatedText text={item.item} lines={2} className="break-all" />
+                  </td>
                   <td className="max-w-[220px] px-5.5 py-3.5 font-semibold text-ink/80">
                     <TruncatedText text={CATEGORY_LABELS[item.category]} lines={1} />
                   </td>

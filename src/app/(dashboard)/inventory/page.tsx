@@ -85,7 +85,7 @@ export default async function GlobalInventoryPage({
             <div className="overflow-hidden rounded-[26px] border border-line bg-surface shadow-sm">
               <div className="overflow-x-auto">
               <table className="w-full min-w-[1100px] text-left text-[13.5px]">
-                <thead className="border-b border-line text-[10.5px] font-extrabold uppercase tracking-wide text-ink-muted">
+                <thead className="border-b border-line text-[12.5px] font-extrabold uppercase tracking-wide text-ink-muted">
                   <tr>
                     <th className="whitespace-nowrap px-5.5 py-4">Client</th>
                     <th className="whitespace-nowrap px-5.5 py-4">Site</th>
@@ -103,7 +103,7 @@ export default async function GlobalInventoryPage({
                   {items.map((item) => (
                     <tr key={item.id} className="border-b border-line align-top last:border-0 hover:bg-ink/[0.03]">
                       <td className="max-w-[160px] px-5.5 py-3.5">
-                        <TruncatedText text={item.site.client.clientName} lines={1}>
+                        <TruncatedText text={item.site.client.clientName} lines={1} className="break-all">
                           <Link
                             prefetch={false}
                             href={`/clients/${item.site.client.id}/sites/${item.site.id}/inventory`}
@@ -124,7 +124,9 @@ export default async function GlobalInventoryPage({
                           </Link>
                         </TruncatedText>
                       </td>
-                      <td className="max-w-[180px] px-5.5 py-3.5 font-bold">{item.item}</td>
+                      <td className="max-w-[180px] px-5.5 py-3.5 font-bold">
+                        <TruncatedText text={item.item} lines={2} className="break-all" />
+                      </td>
                       <td className="max-w-[200px] px-5.5 py-3.5 font-semibold text-ink/80">
                         <TruncatedText text={CATEGORY_LABELS[item.category]} lines={1} />
                       </td>
