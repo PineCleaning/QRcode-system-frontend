@@ -63,6 +63,8 @@ export interface FeedbackSubmission {
   mobileNumber: string | null;
   status: FeedbackStatus;
   clickupTaskId: string | null;
+  /** Manually toggled by an admin/supervisor to mark this as needing urgent follow-up. */
+  flagged: boolean;
   submittedAt: string;
   deliveredAt: string | null;
   media: FeedbackMedia[];
@@ -236,4 +238,72 @@ export interface InventoryHistoryEntry {
   previousStatus: InventoryStatus;
   previousNotes: string | null;
   changedAt: string;
+}
+
+export type InspectionRating = 'EXCELLENT' | 'ABOVE_AVERAGE' | 'AVERAGE' | 'BELOW_AVERAGE' | 'VERY_POOR';
+
+export type InspectionSessionStatus = 'OPEN' | 'COMPLETED';
+
+export interface InspectionItemMedia {
+  id: string;
+  inspectionItemId: string;
+  cloudinaryPublicId: string;
+  resourceType: 'IMAGE' | 'VIDEO';
+  originalFilename: string | null;
+  mimeType: string;
+  sizeBytes: number;
+  status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  uploadedAt: string;
+  /** Derived server-side at read time, never stored - null when status isn't VERIFIED. */
+  url: string | null;
+  /** Only populated in the response immediately after this file was submitted - not persisted. */
+  rejectionReason: string | null;
+}
+
+export interface InspectionItem {
+  id: string;
+  inspectionId: string;
+  spaceName: string;
+  isNotApplicable: boolean;
+  rating: InspectionRating | null;
+  percentage: number | null;
+  notes: string | null;
+  /** Manually toggled by an admin/supervisor to mark this space as needing follow-up - independent of its rating. */
+  flagged: boolean;
+  createdAt: string;
+  updatedAt: string;
+  media: InspectionItemMedia[];
+}
+
+/** Shape returned by GET /inspections/items/flagged - an item plus just enough site/client context to link back, for the Flagged tab. */
+export interface FlaggedInspectionItem extends InspectionItem {
+  inspection: {
+    id: string;
+    status: InspectionSessionStatus;
+    site: Pick<Site, 'id' | 'businessName' | 'address' | 'slug'> & { client: Pick<Client, 'id' | 'clientName' | 'clientId'> };
+  };
+}
+
+export interface SiteInspection {
+  id: string;
+  siteId: string;
+  status: InspectionSessionStatus;
+  averageScore: number | null;
+  meetsStandard: boolean | null;
+  startedAt: string;
+  completedAt: string | null;
+  items: InspectionItem[];
+}
+
+/** Shape returned by GET /sites/:siteId/inspections/completed - a lightweight summary (no items/media) for the "Completed Inspections" list. */
+export interface CompletedInspectionSummary {
+  id: string;
+  siteId: string;
+  status: InspectionSessionStatus;
+  averageScore: number | null;
+  meetsStandard: boolean | null;
+  startedAt: string;
+  completedAt: string | null;
+  itemCount: number;
+  inspectedBy: string | null;
 }

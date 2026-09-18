@@ -77,7 +77,15 @@ export function Select({
     // one must NOT close the panel, or scrolling the list itself was
     // impossible to do without it closing mid-scroll.
     function handleScrollOrResize(e: Event) {
-      if (panelRef.current?.contains(e.target as Node)) return;
+      // A window 'resize' event's target is the Window object itself, not
+      // a Node - Node.contains() throws a TypeError if passed anything
+      // else. Real bug, reproduced live (2026-09-02): opening a dropdown
+      // and resizing the window crashed with "Failed to execute 'contains'
+      // on 'Node': parameter 1 is not of type 'Node'". Only scroll events
+      // ever have a genuine Node target (the element being scrolled);
+      // resize always falls through to closing the panel, which matches
+      // the original intent below anyway.
+      if (e.target instanceof Node && panelRef.current?.contains(e.target)) return;
       setOpen(false);
     }
 
