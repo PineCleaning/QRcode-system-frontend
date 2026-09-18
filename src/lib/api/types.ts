@@ -307,3 +307,24 @@ export interface CompletedInspectionSummary {
   itemCount: number;
   inspectedBy: string | null;
 }
+
+/** Shape returned by GET /admin/inspections/completed - the cross-site list for the global "Completed Inspections" nav tab, same CompletedInspectionSummary fields plus which site/client each row belongs to. */
+export interface AdminCompletedInspection extends CompletedInspectionSummary {
+  site: {
+    id: string;
+    businessName: string;
+    client: {
+      id: string;
+      clientName: string;
+      clientId: string;
+    };
+  };
+}
+
+/** Shape returned by GET /admin/inspections/completed?page=&pageSize= - the paginated form of AdminCompletedInspection[]. */
+export interface PaginatedAdminCompletedInspections {
+  data: AdminCompletedInspection[];
+  total: number;
+  page: number;
+  pageSize: number;
+}

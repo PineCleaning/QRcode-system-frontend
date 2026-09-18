@@ -62,7 +62,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/inventory',
-    label: 'Inventory / Assets',
+    label: 'Assets',
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path
@@ -70,6 +70,15 @@ const NAV_ITEMS = [
           strokeLinejoin="round"
           d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375C2.754 3.75 2.25 4.254 2.25 4.875v1.5c0 .621.504 1.125 1.125 1.125Z"
         />
+      </svg>
+    ),
+  },
+  {
+    href: '/inspections',
+    label: 'Completed Inspections',
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
       </svg>
     ),
   },
@@ -123,7 +132,7 @@ function NavLinks({ role, onNavigate }: { role?: AdminRole; onNavigate?: () => v
               prefetch={false}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-semibold ${
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold ${
                 active ? 'bg-primary text-page' : 'text-ink-muted hover:bg-line/50'
               }`}
             >
