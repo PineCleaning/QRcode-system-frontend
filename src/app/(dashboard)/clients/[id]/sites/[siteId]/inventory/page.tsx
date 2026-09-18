@@ -52,7 +52,7 @@ export default async function SiteInventoryPage({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-extrabold tracking-tight">Inventory / Assets</h1>
+                <h1 className="text-2xl font-extrabold tracking-tight">Assets</h1>
                 <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{total}</span>
               </div>
               <p className="mt-1 text-[13.5px] text-ink-muted">{site.businessName}</p>

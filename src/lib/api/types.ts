@@ -209,7 +209,7 @@ export interface PaginatedInventory {
   pageSize: number;
 }
 
-/** Shape returned by GET /admin/inventory - the cross-site list for the global "Inventory / Assets" nav tab, same InventoryItem fields plus which site/client each row belongs to. */
+/** Shape returned by GET /admin/inventory - the cross-site list for the global "Assets" nav tab, same InventoryItem fields plus which site/client each row belongs to. */
 export interface AdminInventoryItem extends InventoryItem {
   site: {
     id: string;

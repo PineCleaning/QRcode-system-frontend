@@ -55,7 +55,7 @@ export default async function GlobalInventoryPage({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-extrabold tracking-tight text-balance">Inventory / Assets</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight text-balance">Assets</h1>
               <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-page">{total}</span>
             </div>
             <p className="mt-1 text-[13.5px] text-ink-muted">Every tracked item across every client and site.</p>

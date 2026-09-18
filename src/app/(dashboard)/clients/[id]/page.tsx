@@ -154,14 +154,14 @@ export default async function ClientDetailPage({
                         href={`/clients/${id}/sites/${site.id}/inventory`}
                         className="text-ink-muted hover:text-ink"
                       >
-                        Inventory
+                        Asset
                       </Link>
                       <Link
                         prefetch={false}
                         href={`/clients/${id}/sites/${site.id}/inspections`}
                         className="text-ink-muted hover:text-ink"
                       >
-                        Inspections
+                        Inspection
                       </Link>
                       {isAdmin && !clientInactive && (
                         <>
