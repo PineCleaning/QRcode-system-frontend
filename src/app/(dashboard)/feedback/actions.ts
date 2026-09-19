@@ -41,24 +41,6 @@ export async function deleteAttachmentAction(mediaId: string, pathToRevalidate: 
 }
 
 /**
- * Toggles a feedback submission's flagged marker - open to both roles,
- * same as retry. Also revalidates /flagged so a newly-flagged item
- * appears there (and a newly-unflagged one disappears) without a
- * manual refresh.
- */
-export async function setFeedbackFlaggedAction(feedbackId: string, flagged: boolean, pathToRevalidate: string) {
-  try {
-    await apiFetch(`/admin/feedback/${feedbackId}/flag`, { method: 'PATCH', body: JSON.stringify({ flagged }) });
-  } catch (err) {
-    const message = err instanceof ApiError ? err.message : 'Failed to update flag';
-    revalidatePath(pathToRevalidate);
-    redirect(`${pathToRevalidate}?error=${encodeURIComponent(message)}`);
-  }
-  revalidatePath(pathToRevalidate);
-  revalidatePath('/flagged');
-}
-
-/**
  * Deletes a feedback submission entirely - its ClickUp ticket (if any),
  * its attachments (Cloudinary + DB), and the submission row itself, via
  * DELETE /admin/feedback/:id. This is the Dashboard -> ClickUp direction

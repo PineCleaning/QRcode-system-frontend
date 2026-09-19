@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { AttachmentsCell } from '@/components/AttachmentsCell';
 import { ConfirmDeleteButton } from '@/components/ConfirmDeleteButton';
 import { FilterPendingProvider } from '@/components/FilterPending';
-import { FlagButton } from '@/components/FlagButton';
 import { MediaLightboxProvider } from '@/components/MediaLightbox';
 import { Pagination } from '@/components/Pagination';
 import { RetryButton } from '@/components/RetryButton';
@@ -13,7 +12,7 @@ import { apiFetch } from '@/lib/api/server-fetch';
 import { getCurrentAdmin } from '@/lib/api/current-admin';
 import type { Client, PaginatedFeedback, PaginatedSites } from '@/lib/api/types';
 import { formatDate } from '@/lib/format-date';
-import { deleteFeedbackAction, retryFeedbackAction, setFeedbackFlaggedAction } from './actions';
+import { deleteFeedbackAction, retryFeedbackAction } from './actions';
 import { FeedbackFilters } from './FeedbackFilters';
 
 const STATUS_STYLES: Record<string, string> = {
@@ -192,10 +191,6 @@ export default async function FeedbackPage({
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center justify-center gap-2">
-                          <FlagButton
-                            flagged={item.flagged}
-                            action={setFeedbackFlaggedAction.bind(null, item.id, !item.flagged, '/feedback')}
-                          />
                           {isAdmin ? (
                             <ConfirmDeleteButton
                               action={deleteFeedbackAction.bind(null, item.id, '/feedback')}
